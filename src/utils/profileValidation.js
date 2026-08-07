@@ -10,6 +10,44 @@ function normalizeEmail(value) {
         : "";
 }
 
+function validateRegistration(data) {
+    const fullName = normalizeName(
+        data.fullName
+    );
+    const email = normalizeEmail(data.email);
+    const password =
+        typeof data.password === "string"
+            ? data.password
+            : "";
+
+    if (!fullName || !email || !password) {
+        return {
+            error: "Name, email and password are required."
+        };
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return {
+            error: "Please enter a valid email address."
+        };
+    }
+
+    if (password.length < 8) {
+        return {
+            error:
+                "Password must contain at least 8 characters."
+        };
+    }
+
+    return {
+        value: {
+            fullName,
+            email,
+            password
+        }
+    };
+}
+
 function validateProfileUpdate(data) {
     const fullName = normalizeName(
         data.fullName
@@ -176,6 +214,7 @@ function validatePasswordReset(data) {
 module.exports = {
     normalizeEmail,
     normalizeName,
+    validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
     validateForgotPasswordRequest,

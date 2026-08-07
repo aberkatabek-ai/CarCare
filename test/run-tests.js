@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 
 const {
+    validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
     validateForgotPasswordRequest,
@@ -28,6 +29,40 @@ function runTest(name, testFn) {
         process.exitCode = 1;
     }
 }
+
+runTest(
+    "registration rejects short passwords before account checks",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "123456"
+        });
+
+        assert.equal(
+            result.error,
+            "Password must contain at least 8 characters."
+        );
+    }
+);
+
+runTest(
+    "registration normalizes valid data",
+    () => {
+        const result = validateRegistration({
+            fullName: "  Berk Acar  ",
+            email: " TEST@Example.com ",
+            password: "password123"
+        });
+
+        assert.equal(result.error, undefined);
+        assert.deepEqual(result.value, {
+            fullName: "Berk Acar",
+            email: "test@example.com",
+            password: "password123"
+        });
+    }
+);
 
 runTest(
     "profile update normalizes valid data",

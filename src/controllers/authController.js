@@ -3,6 +3,7 @@ const db = require("../config/db");
 const {
     normalizeEmail,
     normalizeName,
+    validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
     validateForgotPasswordRequest,
@@ -137,41 +138,22 @@ function createUserSession(req, userId) {
 
 async function register(req, res, next) {
     try {
-        const { fullName, email, password } = req.body;
+        const validation =
+            validateRegistration(req.body);
 
-        const normalizedName =
-            normalizeName(fullName);
-
-        const normalizedEmail =
-            normalizeEmail(email);
-
-        if (!normalizedName || !normalizedEmail || !password) {
+        if (validation.error) {
             return res.status(400).json({
                 success: false,
-                message: "Name, email and password are required."
+                message: validation.error
             });
         }
 
-        const validEmail =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
-
-        if (!validEmail) {
-            return res.status(400).json({
-                success: false,
-                message: "Please enter a valid email address."
-            });
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must contain at least 8 characters."
-            });
-        }
+        const registrationData =
+            validation.value;
 
         const existingUser = await db.query(
             "SELECT id FROM users WHERE email = $1",
-            [normalizedEmail]
+            [registrationData.email]
         );
 
         if (existingUser.rows.length > 0) {
@@ -191,7 +173,11 @@ async function register(req, res, next) {
             )
             VALUES ($1, $2, $3)
             RETURNING id, full_name, email, created_at`,
-            [normalizedName, normalizedEmail, passwordHash]
+            [
+                registrationData.fullName,
+                registrationData.email,
+                passwordHash
+            ]
         );
 
         const user = result.rows[0];
