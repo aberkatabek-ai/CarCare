@@ -73,6 +73,13 @@ if (registerForm) {
             return;
         }
 
+        if (password.length < 8) {
+            showMessage(
+                "Password must contain at least 8 characters."
+            );
+            return;
+        }
+
         setSubmitting(registerForm, true);
 
         try {
