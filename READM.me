@@ -35,6 +35,13 @@ CarCare is an Express + PostgreSQL vehicle management app for tracking garage in
 - Run the schema migration before deploying the new build.
 - Prefer HTTPS behind a reverse proxy.
 
+## Render Notes
+
+- `render.yaml` is included for a quick public deploy on Render.
+- Free Render web services spin down after 15 minutes of inactivity and can take around a minute to wake up again.
+- Render's default filesystem is ephemeral, so uploaded documents and issue photos are not durable on the free setup.
+- For durable uploads later, attach a paid persistent disk and mount it under `/opt/render/project/src/uploads`, keeping `UPLOADS_DIRECTORY=/opt/render/project/src/uploads/documents`.
+
 ## Tests
 
 Run:

@@ -2,13 +2,20 @@ const path = require("path");
 const crypto = require("crypto");
 const fs = require("fs/promises");
 
-const uploadDirectory = path.join(
+const defaultUploadDirectory = path.join(
     __dirname,
     "..",
     "..",
     "uploads",
     "documents"
 );
+
+const uploadDirectory =
+    process.env.UPLOADS_DIRECTORY
+        ? path.resolve(
+            process.env.UPLOADS_DIRECTORY
+        )
+        : defaultUploadDirectory;
 
 const allowedMimeTypes = new Map([
     ["application/pdf", ".pdf"],
@@ -137,6 +144,15 @@ async function ensureUploadDirectory() {
     });
 }
 
+function resolveStoredDocumentAbsolutePath(
+    storedName
+) {
+    return path.join(
+        uploadDirectory,
+        storedName
+    );
+}
+
 async function saveUploadedDocument(file) {
     if (!file) {
         return null;
@@ -156,10 +172,10 @@ async function saveUploadedDocument(file) {
         )
     )}${extension}`;
 
-    const absolutePath = path.join(
-        uploadDirectory,
-        generatedName
-    );
+    const absolutePath =
+        resolveStoredDocumentAbsolutePath(
+            generatedName
+        );
 
     await fs.writeFile(absolutePath, file.buffer);
 
@@ -177,10 +193,10 @@ async function removeStoredDocument(storedName) {
         return;
     }
 
-    const absolutePath = path.join(
-        uploadDirectory,
-        storedName
-    );
+    const absolutePath =
+        resolveStoredDocumentAbsolutePath(
+            storedName
+        );
 
     await fs.unlink(absolutePath).catch(() => {});
 }
@@ -192,5 +208,6 @@ module.exports = {
     sanitizeFileName,
     saveUploadedDocument,
     removeStoredDocument,
+    resolveStoredDocumentAbsolutePath,
     uploadDirectory
 };

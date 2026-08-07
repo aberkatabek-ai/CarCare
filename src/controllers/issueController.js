@@ -1,9 +1,9 @@
 const db = require("../config/db");
-const path = require("path");
 const {
     normalizeOptionalFilePayload,
     saveUploadedDocument,
-    removeStoredDocument
+    removeStoredDocument,
+    resolveStoredDocumentAbsolutePath
 } = require("../utils/documentUpload");
 const {
     normalizeComparableText
@@ -184,12 +184,7 @@ function calculateRiskLevel({
 function getIssueMediaAbsolutePath(
     storedFileName
 ) {
-    return path.join(
-        __dirname,
-        "..",
-        "..",
-        "uploads",
-        "documents",
+    return resolveStoredDocumentAbsolutePath(
         storedFileName
     );
 }

@@ -1,4 +1,3 @@
-const path = require("path");
 const db = require("../config/db");
 const {
     normalizeLicensePlate
@@ -6,7 +5,8 @@ const {
 const {
     normalizeOptionalFilePayload,
     saveUploadedDocument,
-    removeStoredDocument
+    removeStoredDocument,
+    resolveStoredDocumentAbsolutePath
 } = require("../utils/documentUpload");
 const {
     recognizeDocumentText
@@ -86,12 +86,7 @@ function buildVerifiedPlateConflictResponse(res) {
 }
 
 function getDocumentAbsolutePath(storedFileName) {
-    return path.join(
-        __dirname,
-        "..",
-        "..",
-        "uploads",
-        "documents",
+    return resolveStoredDocumentAbsolutePath(
         storedFileName
     );
 }
