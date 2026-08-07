@@ -2,6 +2,47 @@ const loginForm = document.querySelector("#login-form");
 const registerForm = document.querySelector("#register-form");
 const messageElement = document.querySelector("#form-message");
 
+function attachPasswordToggles(root = document) {
+    root.querySelectorAll("[data-password-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const wrapper = button.closest(
+                ".password-input-wrapper"
+            );
+            const input =
+                wrapper?.querySelector(
+                    'input[type="password"], input[type="text"]'
+                );
+
+            if (!input) {
+                return;
+            }
+
+            const shouldShow =
+                input.type === "password";
+
+            input.type = shouldShow
+                ? "text"
+                : "password";
+
+            button.textContent = shouldShow
+                ? "Hide"
+                : "Show";
+
+            button.setAttribute(
+                "aria-label",
+                shouldShow
+                    ? "Hide password"
+                    : "Show password"
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                shouldShow ? "true" : "false"
+            );
+        });
+    });
+}
+
 function showMessage(message, type = "error") {
     if (!messageElement) {
         return;
@@ -19,6 +60,8 @@ function setSubmitting(form, submitting) {
         ? "Please wait..."
         : button.dataset.defaultText;
 }
+
+attachPasswordToggles();
 
 if (loginForm) {
     const button = loginForm.querySelector('button[type="submit"]');

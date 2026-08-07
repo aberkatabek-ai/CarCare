@@ -254,6 +254,44 @@ a {
         background 150ms ease;
 }
 
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-input-wrapper input {
+    padding-right: 82px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+
+    min-width: 58px;
+    min-height: 34px;
+    padding: 0 10px;
+
+    color: var(--primary);
+    background: rgba(31, 74, 58, 0.08);
+    border: 1px solid rgba(31, 74, 58, 0.15);
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.password-toggle:hover {
+    background: rgba(31, 74, 58, 0.14);
+    transform: translateY(-50%);
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid rgba(31, 74, 58, 0.28);
+    outline-offset: 2px;
+}
+
 .form-group input:focus {
     background: white;
     border-color: var(--primary);

@@ -43,7 +43,10 @@
                 <p>Start tracking your vehicles and maintenance history.</p>
             </div>
 
-            <form id="register-form">
+            <form
+                id="register-form"
+                method="post"
+            >
                 <div class="form-group">
                     <label for="full-name">Full name</label>
 
@@ -71,14 +74,26 @@
                 <div class="form-group">
                     <label for="password">Password</label>
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        minlength="8"
-                        autocomplete="new-password"
-                        required
-                    >
+                    <div class="password-input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-password-toggle
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -86,14 +101,26 @@
                         Confirm password
                     </label>
 
-                    <input
-                        type="password"
-                        id="password-confirmation"
-                        name="passwordConfirmation"
-                        minlength="8"
-                        autocomplete="new-password"
-                        required
-                    >
+                    <div class="password-input-wrapper">
+                        <input
+                            type="password"
+                            id="password-confirmation"
+                            name="passwordConfirmation"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-password-toggle
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
                 </div>
 
                 <p
