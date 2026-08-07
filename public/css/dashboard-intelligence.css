@@ -1,0 +1,411 @@
+.dashboard-overview {
+    margin-top: 24px;
+}
+
+.overview-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+
+    margin-bottom: 20px;
+}
+
+.overview-heading h2 {
+    margin: 0 0 8px;
+    font-size: 25px;
+}
+
+.overview-heading p:not(.eyebrow) {
+    max-width: 650px;
+    margin: 0;
+
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.last-updated {
+    color: var(--muted);
+
+    font-size: 13px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.statistic-card {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 174px;
+    padding: 21px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(247, 243, 237, 0.98),
+            rgba(233, 226, 216, 0.92)
+        );
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+
+    box-shadow:
+        0 10px 30px rgba(32, 38, 42, 0.05);
+
+    transition:
+        transform 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.statistic-card:hover {
+    transform: translateY(-3px);
+    border-color: #b7ab98;
+
+    box-shadow:
+        0 16px 35px rgba(28, 33, 37, 0.12);
+}
+
+.statistic-card::after {
+    position: absolute;
+    right: -28px;
+    bottom: -38px;
+
+    width: 100px;
+    height: 100px;
+
+    background: rgba(176, 151, 108, 0.12);
+    border-radius: 50%;
+
+    content: "";
+}
+
+.attention-card::after {
+    background: rgba(176, 151, 108, 0.16);
+}
+
+.statistic-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.statistic-icon {
+    display: grid;
+    place-items: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.vehicle-icon {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.plan-icon {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.attention-icon {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.cost-icon {
+    color: var(--success);
+    background: var(--success-background);
+}
+
+.statistic-label {
+    color: var(--muted);
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.statistic-value {
+    position: relative;
+    z-index: 1;
+
+    display: block;
+
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.cost-value {
+    font-size: 27px;
+}
+
+.statistic-card p {
+    position: relative;
+    z-index: 1;
+
+    margin: 12px 0 0;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.dashboard-insight-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 18px;
+
+    margin-top: 18px;
+}
+
+.dashboard-insight-card {
+    padding: 24px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+}
+
+.insight-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+
+    margin-bottom: 20px;
+}
+
+.insight-heading h3 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.insight-link {
+    padding: 8px 11px;
+
+    color: var(--primary);
+    background: var(--primary-soft);
+
+    border-radius: 9px;
+
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        background 150ms ease,
+        transform 150ms ease;
+}
+
+.insight-link:hover {
+    background: #cac1af;
+    transform: translateY(-1px);
+}
+
+.overview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.overview-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    min-height: 84px;
+    padding: 14px;
+
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+}
+
+.overview-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    min-width: 0;
+}
+
+.overview-item-content strong,
+.overview-item-content span,
+.overview-item-content small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.overview-item-content strong {
+    font-size: 14px;
+}
+
+.overview-item-content span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.overview-item-content small {
+    color: #8e968f;
+    font-size: 12px;
+}
+
+.overview-status,
+.service-cost-badge {
+    flex-shrink: 0;
+
+    padding: 7px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.overview-status.overdue {
+    color: #8f2d28;
+    background: var(--error-background);
+}
+
+.overview-status.due_soon {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.service-cost-badge {
+    color: var(--success);
+    background: var(--success-background);
+}
+
+.overview-empty-state {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    min-height: 190px;
+    padding: 32px 20px;
+
+    background: var(--surface-soft);
+    border: 1px dashed #b29f88;
+    border-radius: var(--radius-medium);
+
+    text-align: center;
+}
+
+.overview-empty-icon {
+    display: grid;
+    place-items: center;
+
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+
+    color: var(--success);
+    background: var(--success-background);
+
+    border-radius: 50%;
+
+    font-size: 18px;
+    font-weight: 850;
+}
+
+.overview-empty-state strong {
+    font-size: 14px;
+}
+
+.overview-empty-state p {
+    max-width: 320px;
+    margin: 6px 0 0;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.overview-loading {
+    min-height: 190px;
+    padding: 70px 20px;
+
+    color: var(--muted);
+    background: var(--surface-soft);
+
+    border-radius: var(--radius-medium);
+
+    text-align: center;
+}
+
+/*
+    This also corrects the old --primaryprimary
+    typo without changing style.css.
+*/
+.count-badge {
+    color: var(--primary);
+}
+
+@media (max-width: 1000px) {
+    .statistics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 850px) {
+    .dashboard-insight-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .overview-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .last-updated {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 520px) {
+    .statistics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .statistic-card {
+        min-height: 155px;
+    }
+
+    .insight-heading,
+    .overview-list-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .overview-status,
+    .service-cost-badge {
+        align-self: flex-start;
+    }
+}

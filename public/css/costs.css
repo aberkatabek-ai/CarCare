@@ -1,0 +1,573 @@
+.costs-body {
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(198, 145, 63, 0.14),
+            transparent 32%
+        ),
+        linear-gradient(180deg, #e9e3d7 0%, #ddd8cd 42%);
+}
+
+.cost-container {
+    width: min(1400px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 50px 0 80px;
+}
+
+.cost-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 40px;
+    color: white;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(176, 151, 108, 0.3),
+            transparent 36%
+        ),
+        linear-gradient(
+            120deg,
+            #143126,
+            #1f4a3a 65%,
+            #6d6247
+        );
+    border-radius: 30px;
+    box-shadow:
+        0 24px 55px
+        rgba(32, 38, 42, 0.2);
+}
+
+.cost-hero h2 {
+    margin: 8px 0 10px;
+    color: white;
+    font-size: clamp(30px, 4vw, 44px);
+}
+
+.cost-hero p:last-child {
+    max-width: 680px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.cost-eyebrow {
+    margin: 0;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+}
+
+.cost-hero .cost-eyebrow {
+    color: #d8c79d;
+}
+
+.cost-account-badge {
+    flex-shrink: 0;
+    padding: 13px 20px;
+    color: white;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.cost-summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 26px;
+}
+
+.cost-summary-card {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+    background: rgba(247, 243, 237, 0.98);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow:
+        0 12px 30px
+        rgba(15, 23, 42, 0.05);
+}
+
+.cost-summary-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    background: var(--primary);
+    content: "";
+}
+
+.cost-summary-card.fuel::before {
+    background: var(--success);
+}
+
+.cost-summary-card.service::before {
+    background: #7d6a44;
+}
+
+.cost-summary-card.expense::before {
+    background: #8f7a52;
+}
+
+.cost-summary-card span {
+    display: block;
+    margin-bottom: 10px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cost-summary-card strong {
+    display: block;
+    color: #0f172a;
+    font-size: clamp(25px, 3vw, 34px);
+}
+
+.cost-summary-card p {
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.cost-warning {
+    margin-top: 24px;
+    padding: 15px 17px;
+    color: #7d6a44;
+    background: #efe2c4;
+    border: 1px solid #cfbe94;
+    border-radius: 14px;
+}
+
+.cost-form-layout {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 24px;
+    margin-top: 26px;
+}
+
+.cost-panel {
+    padding: 30px;
+    background: rgba(247, 243, 237, 0.98);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    box-shadow:
+        0 14px 40px
+        rgba(32, 38, 42, 0.05);
+}
+
+.cost-section-heading {
+    margin-bottom: 25px;
+}
+
+.cost-section-heading h2,
+.cost-history-heading h2 {
+    margin: 7px 0 8px;
+    color: #0f172a;
+    font-size: 27px;
+}
+
+.cost-section-heading p:last-child,
+.cost-history-heading p:last-child {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.cost-form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+}
+
+.cost-full-width {
+    grid-column: 1 / -1;
+}
+
+.cost-panel label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.cost-panel input,
+.cost-panel select,
+.cost-panel textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 14px;
+    color: var(--text);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    font: inherit;
+}
+
+.cost-panel input,
+.cost-panel select {
+    min-height: 49px;
+}
+
+.cost-panel textarea {
+    min-height: 95px;
+    resize: vertical;
+}
+
+.cost-panel input:focus,
+.cost-panel select:focus,
+.cost-panel textarea:focus {
+    background: white;
+    border-color: var(--primary);
+    box-shadow:
+        0 0 0 4px
+        rgba(40, 69, 84, 0.11);
+}
+
+.cost-checkbox {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0 0 18px;
+    padding: 14px;
+    background: #ece3d6;
+    border: 1px solid #d3c3ae;
+    border-radius: 13px;
+    cursor: pointer;
+}
+
+.cost-checkbox input {
+    width: 19px;
+    min-height: auto;
+    margin-top: 2px;
+}
+
+.cost-checkbox span {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cost-checkbox small {
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.fuel-price-preview {
+    margin-bottom: 18px;
+    padding: 13px;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.fuel-price-preview.calculated {
+    color: var(--success);
+    background: #edf6f0;
+    border-color: #b7d8c7;
+    font-weight: 700;
+}
+
+.cost-history-panel {
+    margin-top: 26px;
+}
+
+.cost-history-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.cost-history-heading .form-group {
+    width: min(270px, 100%);
+    margin: 0;
+}
+
+.cost-history-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.cost-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.cost-list-heading h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 19px;
+}
+
+.cost-list-heading span {
+    padding: 7px 10px;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.cost-entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cost-entry-card {
+    padding: 19px;
+    background: #f2ece3;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--success);
+    border-radius: 17px;
+}
+
+.expense-entry-card {
+    border-left-color: #8f7a52;
+}
+
+.cost-entry-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cost-entry-category {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.cost-entry-heading h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.cost-entry-vehicle {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.cost-entry-price {
+    flex-shrink: 0;
+    padding: 8px 10px;
+    color: var(--success);
+    background: var(--success-background);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.cost-details-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 17px;
+}
+
+.cost-detail {
+    padding: 11px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+}
+
+.cost-detail-label {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.cost-detail strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+.consumption-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 12px;
+    padding: 13px;
+    color: #64748b;
+    background: white;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+}
+
+.consumption-box.calculated {
+    color: var(--success);
+    background: #edf6f0;
+    border-color: #b7d8c7;
+}
+
+.consumption-box span,
+.consumption-box small {
+    font-size: 11px;
+}
+
+.consumption-box strong {
+    color: currentColor;
+    font-size: 15px;
+}
+
+.cost-entry-notes {
+    margin: 12px 0 0;
+    padding: 12px;
+    color: #475569;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.cost-entry-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.cost-loading-state,
+.cost-empty-state {
+    padding: 38px 20px;
+    color: #64748b;
+    background: #f0e9df;
+    border: 1px dashed #b29f88;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.cost-empty-icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    place-items: center;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border-radius: 14px;
+    font-weight: 900;
+}
+
+.cost-empty-state h3 {
+    margin: 0 0 7px;
+    color: #0f172a;
+}
+
+.cost-empty-state p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 1150px) {
+    .cost-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .cost-form-layout,
+    .cost-history-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .cost-container {
+        width: min(100% - 24px, 1400px);
+        padding-top: 25px;
+    }
+
+    .cost-hero {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 28px;
+        border-radius: 22px;
+    }
+
+    .cost-panel {
+        padding: 22px;
+        border-radius: 20px;
+    }
+
+    .cost-account-badge {
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .cost-history-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .cost-list-heading,
+    .cost-entry-heading,
+    .cost-entry-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .cost-entry-price {
+        align-self: flex-start;
+    }
+
+    .cost-entry-actions button,
+    .cost-entry-actions a {
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .cost-summary-grid,
+    .cost-form-grid,
+    .cost-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cost-full-width {
+        grid-column: auto;
+    }
+
+    .cost-entry-heading {
+        flex-direction: column;
+    }
+
+    .cost-panel {
+        padding: 20px;
+    }
+}

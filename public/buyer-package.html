@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Buyer Handoff Report | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/buyer-package.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/buyer-package.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body buyer-package-body">
+    <main class="buyer-package-container">
+        <div
+            id="buyer-package-loading"
+            class="buyer-package-state"
+        >
+            Preparing buyer handoff report...
+        </div>
+
+        <div
+            id="buyer-package-error"
+            class="buyer-package-state buyer-package-error"
+            hidden
+        >
+            <div class="buyer-package-error-icon">!</div>
+
+            <h1>Report could not be prepared</h1>
+
+            <p id="buyer-package-error-message">
+                The buyer handoff report is unavailable.
+            </p>
+
+            <a
+                class="page-action-link"
+                href="/index.html"
+            >
+                Return to dashboard
+            </a>
+        </div>
+
+        <div
+            id="buyer-package-content"
+            hidden
+        >
+            <header class="buyer-package-hero">
+                <div>
+                    <p class="buyer-package-eyebrow">
+                        CarCare buyer handoff report
+                    </p>
+
+                    <h1 id="buyer-package-title">
+                        Vehicle handoff
+                    </h1>
+
+                    <p id="buyer-package-subtitle">
+                        Vehicle summary report
+                    </p>
+                </div>
+
+                <div class="buyer-package-actions screen-only">
+                    <a
+                        id="buyer-package-back-link"
+                        class="secondary-button"
+                        href="/index.html"
+                    >
+                        Back to vehicle
+                    </a>
+
+                    <button
+                        id="buyer-package-print-button"
+                        class="primary-button buyer-package-print-button"
+                        type="button"
+                    >
+                        Print / Save PDF
+                    </button>
+                </div>
+            </header>
+
+            <section class="buyer-package-meta">
+                <div>
+                    <span>Vehicle</span>
+                    <strong id="buyer-package-vehicle-name">
+                        -
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Plate</span>
+                    <strong id="buyer-package-plate">
+                        -
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Report generated</span>
+                    <strong id="buyer-package-generated-at">
+                        -
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Vehicle status</span>
+                    <strong id="buyer-package-status">
+                        -
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Report ID</span>
+                    <strong id="buyer-package-report-id">
+                        -
+                    </strong>
+                </div>
+            </section>
+
+            <section class="buyer-package-stat-grid">
+                <article class="buyer-package-stat-card">
+                    <span>Recorded mileage</span>
+                    <strong id="buyer-package-mileage">
+                        0 km
+                    </strong>
+                </article>
+
+                <article class="buyer-package-stat-card">
+                    <span>Completed services</span>
+                    <strong id="buyer-package-service-count">
+                        0
+                    </strong>
+                </article>
+
+                <article class="buyer-package-stat-card">
+                    <span>Documents</span>
+                    <strong id="buyer-package-document-count">
+                        0
+                    </strong>
+                </article>
+
+                <article class="buyer-package-stat-card">
+                    <span>Recorded costs</span>
+                    <strong id="buyer-package-cost-total">
+                        0
+                    </strong>
+                </article>
+            </section>
+
+            <section class="buyer-package-grid">
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Vehicle snapshot
+                            </p>
+
+                            <h2>Summary</h2>
+                        </div>
+                    </div>
+
+                    <div
+                        id="buyer-package-summary-grid"
+                        class="buyer-package-summary-grid"
+                    ></div>
+                </section>
+
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Ownership
+                            </p>
+
+                            <h2>Verification status</h2>
+                        </div>
+                    </div>
+
+                    <div
+                        id="buyer-package-ownership-card"
+                        class="buyer-package-note-card"
+                    ></div>
+                </section>
+            </section>
+
+            <section class="buyer-package-panel">
+                <div class="buyer-package-panel-heading">
+                    <div>
+                        <p class="buyer-package-eyebrow">
+                            Workshop records
+                        </p>
+
+                        <h2>Service history</h2>
+                    </div>
+                </div>
+
+                <div id="buyer-package-service-list"></div>
+            </section>
+
+            <section class="buyer-package-grid">
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Legal records
+                            </p>
+
+                            <h2>Documents</h2>
+                        </div>
+                    </div>
+
+                    <div id="buyer-package-document-list"></div>
+                </section>
+
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Issue history
+                            </p>
+
+                            <h2>Reported issues</h2>
+                        </div>
+                    </div>
+
+                    <div id="buyer-package-issue-list"></div>
+                </section>
+            </section>
+
+            <section class="buyer-package-grid">
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Operating cost
+                            </p>
+
+                            <h2>Fuel records</h2>
+                        </div>
+                    </div>
+
+                    <div id="buyer-package-fuel-list"></div>
+                </section>
+
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Ownership cost
+                            </p>
+
+                            <h2>Other expenses</h2>
+                        </div>
+                    </div>
+
+                    <div id="buyer-package-expense-list"></div>
+                </section>
+            </section>
+
+            <section class="buyer-package-panel">
+                <div class="buyer-package-panel-heading">
+                    <div>
+                        <p class="buyer-package-eyebrow">
+                            Odometer audit
+                        </p>
+
+                        <h2>Mileage history</h2>
+                    </div>
+                </div>
+
+                <div id="buyer-package-mileage-list"></div>
+            </section>
+
+            <section class="buyer-package-grid">
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Ready for sharing
+                            </p>
+
+                            <h2>Buyer checklist</h2>
+                        </div>
+                    </div>
+
+                    <p class="buyer-package-section-text">
+                        This quick summary helps a buyer review the most important points before the sale is finalized.
+                    </p>
+
+                    <div
+                        id="buyer-package-handover-grid"
+                        class="buyer-package-summary-grid"
+                    ></div>
+                </section>
+
+                <section class="buyer-package-panel">
+                    <div class="buyer-package-panel-heading">
+                        <div>
+                            <p class="buyer-package-eyebrow">
+                                Final handoff
+                            </p>
+
+                            <h2>Print and sign</h2>
+                        </div>
+                    </div>
+
+                    <p class="buyer-package-section-text">
+                        After printing, the seller and buyer can use this area as a simple handoff confirmation.
+                    </p>
+
+                    <div class="buyer-package-signature-grid">
+                        <div class="buyer-package-signature-card">
+                            <span>Seller name / signature</span>
+                            <div class="buyer-package-signature-line"></div>
+                        </div>
+
+                        <div class="buyer-package-signature-card">
+                            <span>Buyer name / signature</span>
+                            <div class="buyer-package-signature-line"></div>
+                        </div>
+
+                        <div class="buyer-package-signature-card">
+                            <span>Handover date</span>
+                            <div class="buyer-package-signature-line"></div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <footer class="buyer-package-footer">
+                <strong>
+                    CarCare Buyer Handoff Report
+                </strong>
+
+                <p>
+                    This document is generated from the records entered into CarCare. It is intended to help a buyer review the vehicle's tracked history together with official invoices and legal paperwork.
+                </p>
+
+                <p class="buyer-package-footer-note">
+                    For a shareable version, use the Print / Save PDF button.
+                </p>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

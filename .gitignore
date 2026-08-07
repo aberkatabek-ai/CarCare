@@ -1,0 +1,10 @@
+node_modules/
+.env
+uploads/
+npm-debug.log*
+
+eng.traineddata
+tur.traineddata
+
+eng.traineddata
+tur.traineddata

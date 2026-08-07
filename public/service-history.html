@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Service History | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/service-history.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/service-history.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="/service-history.html"
+                >
+                    Service history
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="page-heading-card history-heading">
+            <div>
+                <p class="eyebrow">
+                    Vehicle records
+                </p>
+
+                <h2>Service history</h2>
+
+                <p>
+                    Review completed maintenance work,
+                    expenses and service information.
+                </p>
+            </div>
+
+            <div class="status-badge">
+                <span id="account-name">
+                    Loading...
+                </span>
+            </div>
+        </section>
+
+        <section class="history-summary-grid">
+            <article class="history-summary-card">
+                <span class="summary-label">
+                    Completed services
+                </span>
+
+                <strong id="total-services">
+                    0
+                </strong>
+            </article>
+
+            <article class="history-summary-card">
+                <span class="summary-label">
+                    Total actual cost
+                </span>
+
+                <strong id="total-cost">
+                    ₺0
+                </strong>
+            </article>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="history-toolbar">
+                <div>
+                    <p class="eyebrow">
+                        Maintenance records
+                    </p>
+
+                    <h2>Completed work</h2>
+                </div>
+
+                <div class="filter-control">
+                    <label for="history-vehicle-filter">
+                        Filter by vehicle
+                    </label>
+
+                    <select id="history-vehicle-filter">
+                        <option value="all">
+                            All vehicles
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="service-history-list">
+                <div class="loading-state">
+                    Loading service history...
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

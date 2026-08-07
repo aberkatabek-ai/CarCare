@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Maintenance | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/maintenance.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="page-heading-card">
+            <div>
+                <p class="eyebrow">
+                    Maintenance center
+                </p>
+
+                <h2>Maintenance plans</h2>
+
+                <p>
+                    Plan upcoming service work and identify
+                    urgent maintenance.
+                </p>
+            </div>
+
+            <div class="status-badge">
+                <span id="account-name">
+                    Loading...
+                </span>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="section-heading">
+                <p class="eyebrow">
+                    New maintenance plan
+                </p>
+
+                <h2>Create a plan</h2>
+
+                <p>
+                    Enter either a mileage interval,
+                    a month interval, or both.
+                </p>
+            </div>
+
+            <div
+                id="no-vehicle-warning"
+                class="warning-box hidden"
+            >
+                <strong>No vehicle found.</strong>
+
+                <span>
+                    Add a vehicle from the dashboard before
+                    creating a maintenance plan.
+                </span>
+
+                <a href="/index.html">
+                    Go to dashboard
+                </a>
+            </div>
+
+            <form
+                id="maintenance-form"
+                class="maintenance-form"
+            >
+                <div class="maintenance-form-grid">
+                    <div class="form-group">
+                        <label for="vehicle-id">
+                            Vehicle
+                        </label>
+
+                        <select
+                            id="vehicle-id"
+                            name="vehicleId"
+                            required
+                        >
+                            <option value="">
+                                Select a vehicle
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maintenance-name">
+                            Maintenance name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="maintenance-name"
+                            name="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">
+                            Category
+                        </label>
+
+                        <select
+                            id="category"
+                            name="category"
+                            required
+                        >
+                            <option value="">
+                                Select a category
+                            </option>
+
+                            <option value="Engine">
+                                Engine
+                            </option>
+
+                            <option value="Brakes">
+                                Brakes
+                            </option>
+
+                            <option value="Transmission">
+                                Transmission
+                            </option>
+
+                            <option value="Electrical">
+                                Electrical
+                            </option>
+
+                            <option value="Suspension">
+                                Suspension
+                            </option>
+
+                            <option value="Tires">
+                                Tires
+                            </option>
+
+                            <option value="Fluids">
+                                Fluids
+                            </option>
+
+                            <option value="Filters">
+                                Filters
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interval-km">
+                            Interval in kilometres
+                        </label>
+
+                        <input
+                            type="number"
+                            id="interval-km"
+                            name="intervalKm"
+                            min="1"
+                            step="1"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interval-months">
+                            Interval in months
+                        </label>
+
+                        <input
+                            type="number"
+                            id="interval-months"
+                            name="intervalMonths"
+                            min="1"
+                            step="1"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimated-cost">
+                            Estimated cost
+                        </label>
+
+                        <input
+                            type="number"
+                            id="estimated-cost"
+                            name="estimatedCost"
+                            min="0"
+                            step="0.01"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last-service-km">
+                            Last service mileage
+                        </label>
+
+                        <input
+                            type="number"
+                            id="last-service-km"
+                            name="lastServiceKm"
+                            min="0"
+                            step="1"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last-service-date">
+                            Last service date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="last-service-date"
+                            name="lastServiceDate"
+                        >
+                    </div>
+
+                    <div class="critical-control">
+                        <label for="is-critical">
+                            <input
+                                type="checkbox"
+                                id="is-critical"
+                                name="isCritical"
+                            >
+
+                            <span>
+                                <strong>
+                                    Critical maintenance
+                                </strong>
+
+                                <small>
+                                    Mark safety-sensitive or
+                                    engine-critical work.
+                                </small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <p
+                    id="maintenance-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="vehicle-form-actions">
+                    <button
+                        type="submit"
+                        class="primary-button vehicle-submit"
+                    >
+                        Create maintenance plan
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="plans-toolbar">
+                <div>
+                    <p class="eyebrow">
+                        Plan overview
+                    </p>
+
+                    <h2>Your maintenance plans</h2>
+                </div>
+
+                <div class="filter-control">
+                    <label for="vehicle-filter">
+                        Filter by vehicle
+                    </label>
+
+                    <select id="vehicle-filter">
+                        <option value="all">
+                            All vehicles
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="maintenance-list">
+                <div class="loading-state">
+                    Loading maintenance plans...
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Health Center | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/health.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/health.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="/health.html"
+                >
+                    Health center
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="health-container">
+        <section class="health-hero">
+            <div>
+                <p class="health-eyebrow">
+                    Vehicle Health Center
+                </p>
+
+                <h1>
+                    Understand a problem before
+                    visiting the workshop.
+                </h1>
+
+                <p>
+                    Record symptoms, assess urgency and keep
+                    the complete repair journey connected to
+                    your vehicle.
+                </p>
+            </div>
+
+            <div class="health-owner">
+                <span>Signed in as</span>
+
+                <strong id="account-name">
+                    Loading...
+                </strong>
+            </div>
+        </section>
+
+        <section class="health-statistics">
+            <article class="health-stat-card">
+                <span>Open issues</span>
+                <strong id="open-issue-count">0</strong>
+                <p>Waiting for diagnosis or repair</p>
+            </article>
+
+            <article class="health-stat-card red-stat">
+                <span>High risk</span>
+                <strong id="red-issue-count">0</strong>
+                <p>Issues requiring urgent attention</p>
+            </article>
+
+            <article class="health-stat-card orange-stat">
+                <span>Needs inspection</span>
+                <strong id="orange-issue-count">0</strong>
+                <p>Issues that should be checked soon</p>
+            </article>
+
+            <article class="health-stat-card green-stat">
+                <span>Repaired</span>
+                <strong id="repaired-issue-count">0</strong>
+                <p>Problems marked as resolved</p>
+            </article>
+        </section>
+
+        <section class="health-section">
+            <div class="health-section-heading">
+                <div>
+                    <p class="eyebrow">Report a symptom</p>
+                    <h2>What did you notice?</h2>
+
+                    <p>
+                        Describe what the vehicle is doing.
+                        CarCare will calculate an initial
+                        urgency level.
+                    </p>
+                </div>
+            </div>
+
+            <div
+                id="no-vehicle-warning"
+                class="health-warning"
+                hidden
+            >
+                Add a vehicle from the Dashboard before
+                reporting an issue.
+            </div>
+
+            <form
+                id="issue-form"
+                class="issue-form"
+            >
+                <div class="issue-form-grid">
+                    <div class="form-group">
+                        <label for="issue-vehicle">
+                            Vehicle
+                        </label>
+
+                        <select
+                            id="issue-vehicle"
+                            name="vehicleId"
+                            required
+                        >
+                            <option value="">
+                                Select a vehicle
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issue-title">
+                            Short issue title
+                        </label>
+
+                        <input
+                            id="issue-title"
+                            name="issueTitle"
+                            type="text"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issue-category">
+                            Category
+                        </label>
+
+                        <select
+                            id="issue-category"
+                            name="category"
+                            required
+                        >
+                            <option value="">
+                                Select a category
+                            </option>
+
+                            <option value="engine">
+                                Engine
+                            </option>
+
+                            <option value="brakes">
+                                Brakes
+                            </option>
+
+                            <option value="steering">
+                                Steering
+                            </option>
+
+                            <option value="suspension">
+                                Suspension
+                            </option>
+
+                            <option value="transmission">
+                                Transmission
+                            </option>
+
+                            <option value="electrical">
+                                Electrical
+                            </option>
+
+                            <option value="cooling">
+                                Cooling system
+                            </option>
+
+                            <option value="tires">
+                                Tires
+                            </option>
+
+                            <option value="exhaust">
+                                Exhaust
+                            </option>
+
+                            <option value="body">
+                                Body
+                            </option>
+
+                            <option value="other">
+                                Other
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issue-severity">
+                            Symptom severity
+                        </label>
+
+                        <select
+                            id="issue-severity"
+                            name="severity"
+                            required
+                        >
+                            <option value="mild">
+                                Mild
+                            </option>
+
+                            <option value="moderate">
+                                Moderate
+                            </option>
+
+                            <option value="severe">
+                                Severe
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="warning-light">
+                            Dashboard warning light
+                        </label>
+
+                        <select
+                            id="warning-light"
+                            name="warningLight"
+                        >
+                            <option value="none">
+                                No warning light
+                            </option>
+
+                            <option value="yellow">
+                                Yellow warning light
+                            </option>
+
+                            <option value="red">
+                                Red warning light
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="occurs-when">
+                            When does it happen?
+                        </label>
+
+                        <input
+                            id="occurs-when"
+                            name="occursWhen"
+                            type="text"
+                        >
+                    </div>
+
+                    <div class="form-group issue-full-width">
+                        <label for="issue-description">
+                            Detailed description
+                        </label>
+
+                        <textarea
+                            id="issue-description"
+                            name="description"
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="issue-checkbox-grid">
+                    <label class="issue-checkbox">
+                        <input
+                            id="can-drive-normally"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <span>
+                            <strong>
+                                Vehicle drives normally
+                            </strong>
+
+                            <small>
+                                Uncheck this if controlling or
+                                driving the vehicle feels unsafe.
+                            </small>
+                        </span>
+                    </label>
+
+                    <label class="issue-checkbox">
+                        <input
+                            id="is-worsening"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            <strong>
+                                The symptom is getting worse
+                            </strong>
+
+                            <small>
+                                Select this if it has become more
+                                frequent or severe.
+                            </small>
+                        </span>
+                    </label>
+                </div>
+
+                <div
+                    id="risk-preview"
+                    class="risk-preview green"
+                    aria-live="polite"
+                >
+                    <div class="risk-preview-heading">
+                        <span
+                            id="risk-preview-dot"
+                            class="risk-dot"
+                        ></span>
+
+                        <strong id="risk-preview-title">
+                            Initial assessment: Monitor
+                        </strong>
+                    </div>
+
+                    <p id="risk-preview-message">
+                        No urgent warning signs are currently
+                        selected.
+                    </p>
+
+                    <small>
+                        This is an initial safety guide, not a
+                        mechanical diagnosis.
+                    </small>
+                </div>
+
+                <p
+                    id="issue-form-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="issue-form-actions">
+                    <button
+                        type="submit"
+                        class="primary-button issue-submit"
+                    >
+                        Report issue
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="health-section">
+            <div class="health-list-heading">
+                <div>
+                    <p class="eyebrow">Issue tracking</p>
+                    <h2>Vehicle issues</h2>
+                </div>
+
+                <div class="health-filters">
+                    <select
+                        id="issue-vehicle-filter"
+                        aria-label="Filter by vehicle"
+                    >
+                        <option value="all">
+                            All vehicles
+                        </option>
+                    </select>
+
+                    <select
+                        id="issue-status-filter"
+                        aria-label="Filter by status"
+                    >
+                        <option value="all">
+                            All statuses
+                        </option>
+
+                        <option value="open">
+                            Open
+                        </option>
+
+                        <option value="diagnosed">
+                            Diagnosed
+                        </option>
+
+                        <option value="repaired">
+                            Repaired
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="issue-list">
+                <div class="loading-state">
+                    Loading vehicle issues...
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

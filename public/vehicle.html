@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vehicle Details | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/vehicle.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/vehicle.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body vehicle-passport-body">
+    <header class="dashboard-header screen-only">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/service-history.html"
+                >
+                    Service history
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="vehicle-page-container">
+        <div
+            id="vehicle-page-loading"
+            class="vehicle-page-state"
+        >
+            Loading vehicle passport...
+        </div>
+
+        <div
+            id="vehicle-page-error"
+            class="vehicle-page-state error-state"
+            hidden
+        >
+            <div class="state-icon">!</div>
+
+            <h1>Vehicle could not be loaded</h1>
+
+            <p id="vehicle-error-message">
+                The requested vehicle was not found.
+            </p>
+
+            <a
+                class="page-action-link"
+                href="/index.html"
+            >
+                Return to dashboard
+            </a>
+        </div>
+
+        <div
+            id="vehicle-page-content"
+            hidden
+        >
+            <div class="passport-toolbar screen-only">
+                <a
+                    class="back-link toolbar-back-link"
+                    href="/index.html"
+                >
+                    ← Back to garage
+                </a>
+
+                <div class="passport-toolbar-actions">
+                    <span class="passport-ready-badge">
+                        Vehicle Passport ready
+                    </span>
+
+                    <button
+                        id="export-buyer-package-button"
+                        class="secondary-button passport-export-button"
+                        type="button"
+                    >
+                        Buyer handoff report
+                    </button>
+
+                    <button
+                        id="print-passport-button"
+                        class="primary-button passport-print-button"
+                        type="button"
+                    >
+                        Print / Save PDF
+                    </button>
+                </div>
+            </div>
+
+            <section class="vehicle-hero">
+                <div class="vehicle-hero-content">
+                    <p class="vehicle-hero-eyebrow">
+                        CarCare Vehicle Passport
+                    </p>
+
+                    <h1 id="vehicle-title">
+                        Vehicle
+                    </h1>
+
+                    <p id="vehicle-subtitle">
+                        Loading vehicle...
+                    </p>
+
+                    <div class="vehicle-identity">
+                        <span id="vehicle-model-year">
+                            Model year not specified
+                        </span>
+
+                        <span id="vehicle-license-plate">
+                            License plate not specified
+                        </span>
+
+                        <span id="vehicle-passport-number">
+                            Passport #—
+                        </span>
+                    </div>
+                </div>
+
+                <div class="hero-mileage">
+                    <span id="vehicle-mileage-label">
+                        Current mileage
+                    </span>
+
+                    <strong id="vehicle-current-mileage">
+                        0 km
+                    </strong>
+
+                    <small id="vehicle-mileage-note">
+                        Odometer reductions are not permitted
+                    </small>
+                </div>
+            </section>
+
+            <section class="passport-meta-bar">
+                <div>
+                    <span>Owner</span>
+                    <strong id="passport-owner-name">
+                        Loading account...
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Report generated</span>
+                    <strong id="passport-generated-at">
+                        —
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Record status</span>
+                    <strong id="passport-record-status">
+                        Live database record
+                    </strong>
+                </div>
+            </section>
+
+            <section class="vehicle-detail-section">
+                <div class="vehicle-section-heading">
+                    <div>
+                        <p class="eyebrow">
+                            Ownership verification
+                        </p>
+
+                        <h2>Verify ownership</h2>
+                    </div>
+                </div>
+
+                <p class="muted-text">
+                    Upload a clear registration image to verify that this plate belongs to your account.
+                </p>
+
+                <form id="ownership-verification-form">
+                    <div class="form-group">
+                        <label for="ownership-document-file">
+                            Registration image
+                        </label>
+
+                        <input
+                            id="ownership-document-file"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        >
+
+                        <p
+                            id="ownership-document-help"
+                            class="document-file-help"
+                        >
+                            No file selected.
+                        </p>
+                    </div>
+
+                    <p
+                        id="ownership-verification-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <div class="modal-actions">
+                        <button
+                            id="ownership-verify-button"
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Verify ownership
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="vehicle-summary-grid">
+                <article class="vehicle-summary-card">
+                    <span class="summary-label">
+                        Maintenance plans
+                    </span>
+
+                    <strong id="vehicle-plan-count">
+                        0
+                    </strong>
+
+                    <p>
+                        Plans registered for this vehicle
+                    </p>
+                </article>
+
+                <article class="vehicle-summary-card attention-summary">
+                    <span class="summary-label">
+                        Needs attention
+                    </span>
+
+                    <strong id="vehicle-attention-count">
+                        0
+                    </strong>
+
+                    <p>
+                        Maintenance, health or document alerts
+                    </p>
+                </article>
+
+                <article class="vehicle-summary-card">
+                    <span class="summary-label">
+                        Completed services
+                    </span>
+
+                    <strong id="vehicle-service-count">
+                        0
+                    </strong>
+
+                    <p>
+                        Permanent workshop records
+                    </p>
+                </article>
+
+                <article class="vehicle-summary-card">
+                    <span class="summary-label">
+                        Open health issues
+                    </span>
+
+                    <strong id="vehicle-open-issue-count">
+                        0
+                    </strong>
+
+                    <p>
+                        Reported or diagnosed issues
+                    </p>
+                </article>
+
+                <article class="vehicle-summary-card">
+                    <span class="summary-label">
+                        Fuel recorded
+                    </span>
+
+                    <strong id="vehicle-total-liters">
+                        0 L
+                    </strong>
+
+                    <p>
+                        Total fuel added to this vehicle
+                    </p>
+                </article>
+
+                <article class="vehicle-summary-card cost-summary">
+                    <span class="summary-label">
+                        Ownership cost
+                    </span>
+
+                    <strong id="vehicle-total-cost">
+                        ₺0
+                    </strong>
+
+                    <p>
+                        Service, fuel and other expenses
+                    </p>
+                </article>
+            </section>
+
+            <section class="vehicle-detail-grid">
+                <article class="vehicle-detail-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Odometer records
+                            </p>
+
+                            <h2>Mileage history</h2>
+                        </div>
+
+                        <span
+                            id="mileage-record-count"
+                            class="vehicle-count-pill"
+                        >
+                            0 updates
+                        </span>
+                    </div>
+
+                    <div id="mileage-history-list"></div>
+                </article>
+
+                <article class="vehicle-detail-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Maintenance watch
+                            </p>
+
+                            <h2>Maintenance plans</h2>
+                        </div>
+
+                        <a
+                            class="section-action-link screen-only"
+                            href="/maintenance.html"
+                        >
+                            Manage plans
+                        </a>
+                    </div>
+
+                    <div id="vehicle-maintenance-list"></div>
+                </article>
+            </section>
+
+            <section class="vehicle-detail-section service-section">
+                <div class="vehicle-section-heading">
+                    <div>
+                        <p class="eyebrow">
+                            Workshop records
+                        </p>
+
+                        <h2>Service history</h2>
+                    </div>
+
+                    <a
+                        class="section-action-link screen-only"
+                        href="/service-history.html"
+                    >
+                        Full history
+                    </a>
+                </div>
+
+                <div id="vehicle-service-list"></div>
+            </section>
+
+            <section class="vehicle-detail-section service-section">
+                <div class="vehicle-section-heading">
+                    <div>
+                        <p class="eyebrow">
+                            Unified history
+                        </p>
+
+                        <h2>Vehicle timeline</h2>
+                    </div>
+                </div>
+
+                <div id="vehicle-timeline-list"></div>
+            </section>
+
+            <section class="passport-section-grid">
+                <article class="vehicle-detail-section passport-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Vehicle health
+                            </p>
+
+                            <h2>Issues and repairs</h2>
+                        </div>
+
+                        <a
+                            class="section-action-link screen-only"
+                            href="/health.html"
+                        >
+                            Health center
+                        </a>
+                    </div>
+
+                    <div id="vehicle-issue-list"></div>
+                </article>
+
+                <article class="vehicle-detail-section passport-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Legal and renewal records
+                            </p>
+
+                            <h2>Documents</h2>
+                        </div>
+
+                        <a
+                            class="section-action-link screen-only"
+                            href="/documents.html"
+                        >
+                            Manage documents
+                        </a>
+                    </div>
+
+                    <div id="vehicle-document-list"></div>
+                </article>
+            </section>
+
+            <section class="passport-section-grid cost-detail-grid">
+                <article class="vehicle-detail-section passport-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Running costs
+                            </p>
+
+                            <h2>Fuel history</h2>
+                        </div>
+
+                        <strong
+                            id="vehicle-fuel-cost"
+                            class="section-total"
+                        >
+                            ₺0
+                        </strong>
+                    </div>
+
+                    <div id="vehicle-fuel-list"></div>
+                </article>
+
+                <article class="vehicle-detail-section passport-section">
+                    <div class="vehicle-section-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Ownership spending
+                            </p>
+
+                            <h2>Other expenses</h2>
+                        </div>
+
+                        <strong
+                            id="vehicle-expense-cost"
+                            class="section-total"
+                        >
+                            ₺0
+                        </strong>
+                    </div>
+
+                    <div id="vehicle-expense-list"></div>
+                </article>
+            </section>
+
+            <footer class="passport-footer">
+                <div class="passport-footer-brand">
+                    <span>C</span>
+
+                    <div>
+                        <strong>CarCare Vehicle Passport</strong>
+                        <small>
+                            A consolidated record generated from CarCare.
+                        </small>
+                    </div>
+                </div>
+
+                <p>
+                    This report reflects the records available at the
+                    generation time. Keep invoices and official documents
+                    for legal verification.
+                </p>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

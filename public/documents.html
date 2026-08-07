@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Documents | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/documents.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/documents.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body documents-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/service-history.html"
+                >
+                    Service history
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/health.html"
+                >
+                    Health
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="/documents.html"
+                >
+                    Documents
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="document-container">
+        <section class="document-hero">
+            <div>
+                <p class="document-eyebrow">
+                    DOCUMENT & RENEWAL CENTER
+                </p>
+
+                <h2>Never miss a renewal</h2>
+
+                <p>
+                    Track inspections, insurance,
+                    emission tests and other important
+                    vehicle deadlines.
+                </p>
+            </div>
+
+            <div
+                id="account-name"
+                class="document-account-badge"
+            >
+                Loading...
+            </div>
+        </section>
+
+        <section class="document-statistics">
+            <article class="document-stat-card">
+                <span>Total records</span>
+
+                <strong id="total-document-count">
+                    0
+                </strong>
+            </article>
+
+            <article class="document-stat-card valid">
+                <span>Currently valid</span>
+
+                <strong id="valid-document-count">
+                    0
+                </strong>
+            </article>
+
+            <article class="document-stat-card due-soon">
+                <span>Due soon</span>
+
+                <strong id="due-soon-count">
+                    0
+                </strong>
+            </article>
+
+            <article class="document-stat-card expired">
+                <span>Expired</span>
+
+                <strong id="expired-document-count">
+                    0
+                </strong>
+            </article>
+        </section>
+
+        <section class="document-panel">
+            <div class="document-section-heading">
+                <div>
+                    <p class="document-eyebrow">
+                        DOCUMENT ENTRY
+                    </p>
+
+                    <h2 id="document-form-heading">
+                        Add a document record
+                    </h2>
+
+                    <p id="document-form-description">
+                        Save the document itself here, then configure when CarCare should warn you about renewal.
+                    </p>
+                </div>
+            </div>
+
+            <div
+                id="no-vehicle-warning"
+                class="document-warning"
+                hidden
+            >
+                Add a vehicle from the dashboard before
+                creating a document reminder.
+            </div>
+
+            <form
+                id="document-form"
+                class="document-form"
+            >
+                <div class="document-form-grid">
+                    <div class="document-form-section">
+                        <div class="document-form-section-heading">
+                            <h3>Document details</h3>
+
+                            <p>
+                                Information about the actual file or official record.
+                            </p>
+                        </div>
+
+                    <div class="form-group">
+                        <label for="document-vehicle">
+                            Vehicle
+                        </label>
+
+                        <select
+                            id="document-vehicle"
+                            name="vehicleId"
+                            required
+                        >
+                            <option value="">
+                                Select a vehicle
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-type">
+                            Document type
+                        </label>
+
+                        <select
+                            id="document-type"
+                            name="documentType"
+                            required
+                        >
+                            <option value="">
+                                Select a type
+                            </option>
+
+                            <option value="inspection">
+                                Vehicle inspection
+                            </option>
+
+                            <option value="insurance">
+                                Traffic insurance
+                            </option>
+
+                            <option value="casco">
+                                Comprehensive insurance
+                            </option>
+
+                            <option value="emission">
+                                Emission inspection
+                            </option>
+
+                            <option value="tax">
+                                Vehicle tax
+                            </option>
+
+                            <option value="warranty">
+                                Warranty
+                            </option>
+
+                            <option value="other">
+                                Other
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-title">
+                            Reminder title
+                        </label>
+
+                        <input
+                            id="document-title"
+                            name="title"
+                            type="text"
+                            maxlength="120"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-provider">
+                            Provider
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            id="document-provider"
+                            name="provider"
+                            type="text"
+                            maxlength="120"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-number">
+                            Document number
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            id="document-number"
+                            name="documentNumber"
+                            type="text"
+                            maxlength="100"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-file">
+                            Upload file
+
+                            <span class="optional-text">
+                                PDF, JPG, PNG or WEBP
+                            </span>
+                        </label>
+
+                        <input
+                            id="document-file"
+                            name="documentFile"
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                        >
+
+                        <p
+                            id="document-file-help"
+                            class="document-file-help"
+                        >
+                            No file selected.
+                        </p>
+                    </div>
+                    </div>
+
+                    <div class="document-form-section document-form-section-accent">
+                        <div class="document-form-section-heading">
+                            <h3>Renewal alert settings</h3>
+
+                            <p>
+                                Decide when CarCare should remind you before this document expires.
+                            </p>
+                        </div>
+
+                    <div class="form-group">
+                        <label for="reminder-days">
+                            Reminder lead time
+                        </label>
+
+                        <div class="input-suffix">
+                            <input
+                                id="reminder-days"
+                                name="reminderDays"
+                                type="number"
+                                min="0"
+                                max="365"
+                                step="1"
+                                value="30"
+                                required
+                            >
+
+                            <span>days</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-start-date">
+                            Start date
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            id="document-start-date"
+                            name="startDate"
+                            type="date"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-expiry-date">
+                            Expiry date
+                        </label>
+
+                        <input
+                            id="document-expiry-date"
+                            name="expiryDate"
+                            type="date"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group document-notes-group">
+                        <label for="document-notes">
+                            Notes
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <textarea
+                            id="document-notes"
+                            name="notes"
+                            maxlength="2000"
+                        ></textarea>
+                    </div>
+                    </div>
+                </div>
+
+                <p
+                    id="document-form-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="document-form-actions">
+                    <button
+                        id="cancel-document-edit"
+                        class="secondary-button"
+                        type="button"
+                        hidden
+                    >
+                        Cancel edit
+                    </button>
+
+                    <button
+                        id="document-submit-button"
+                        class="primary-button"
+                        type="submit"
+                    >
+                        Save document
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="document-panel">
+            <div class="document-list-heading passport-list-heading">
+                <div>
+                    <p class="document-eyebrow">
+                        VEHICLE REPORTS
+                    </p>
+
+                    <h2>Vehicle passports</h2>
+
+                    <p>
+                        Open each vehicle's consolidated passport
+                        report from the document center.
+                    </p>
+                </div>
+            </div>
+
+            <div id="passport-list">
+                <div class="document-loading-state">
+                    Loading vehicle passports...
+                </div>
+            </div>
+        </section>
+
+        <section class="document-panel">
+            <div class="document-list-heading">
+                <div>
+                    <p class="document-eyebrow">
+                        RENEWAL TIMELINE
+                    </p>
+
+                    <h2>Your documents</h2>
+
+                    <p>
+                        Stored document records and their reminder status are shown here.
+                    </p>
+                </div>
+
+                <div class="document-filters">
+                    <div class="form-group">
+                        <label for="document-vehicle-filter">
+                            Vehicle
+                        </label>
+
+                        <select id="document-vehicle-filter">
+                            <option value="all">
+                                All vehicles
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document-status-filter">
+                            Status
+                        </label>
+
+                        <select id="document-status-filter">
+                            <option value="all">
+                                All statuses
+                            </option>
+
+                            <option value="expired">
+                                Expired
+                            </option>
+
+                            <option value="due_soon">
+                                Due soon
+                            </option>
+
+                            <option value="valid">
+                                Valid
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="document-list">
+                <div class="document-loading-state">
+                    Loading document reminders...
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

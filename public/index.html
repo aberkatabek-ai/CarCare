@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/dashboard-intelligence.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/dashboard-alerts.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/app.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/dashboard-alerts.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link active"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/maintenance.html"
+                >
+                    Maintenance
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="/settings.html"
+                >
+                    Settings
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="welcome-card">
+            <div>
+                <p class="eyebrow">Your dashboard</p>
+
+                <h2>
+                    Welcome,
+                    <span id="user-name">Driver</span>
+                </h2>
+
+                <p
+                    id="user-email"
+                    class="muted-text"
+                >
+                    Loading account...
+                </p>
+            </div>
+
+            <div class="welcome-actions">
+                <a
+                    class="secondary-button welcome-link-button"
+                    href="/documents.html"
+                >
+                    Upload documents
+                </a>
+
+                <div class="status-badge">
+                    Database connected
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-overview">
+            <div class="overview-heading">
+                <div>
+                    <p class="eyebrow">Garage intelligence</p>
+                    <h2>Vehicle overview</h2>
+
+                    <p>
+                        A live summary of your vehicles,
+                        maintenance plans and service expenses.
+                    </p>
+                </div>
+
+                <span
+                    id="dashboard-last-updated"
+                    class="last-updated"
+                >
+                    Loading information...
+                </span>
+            </div>
+
+            <div class="statistics-grid">
+                <article class="statistic-card">
+                    <div class="statistic-card-top">
+                        <span class="statistic-icon vehicle-icon">
+                            V
+                        </span>
+
+                        <span class="statistic-label">
+                            Vehicles
+                        </span>
+                    </div>
+
+                    <strong
+                        id="stat-vehicle-count"
+                        class="statistic-value"
+                    >
+                        —
+                    </strong>
+
+                    <p id="stat-vehicle-detail">
+                        Loading garage...
+                    </p>
+                </article>
+
+                <article class="statistic-card">
+                    <div class="statistic-card-top">
+                        <span class="statistic-icon plan-icon">
+                            P
+                        </span>
+
+                        <span class="statistic-label">
+                            Maintenance plans
+                        </span>
+                    </div>
+
+                    <strong
+                        id="stat-plan-count"
+                        class="statistic-value"
+                    >
+                        —
+                    </strong>
+
+                    <p id="stat-plan-detail">
+                        Loading plans...
+                    </p>
+                </article>
+
+                <article class="statistic-card attention-card">
+                    <div class="statistic-card-top">
+                        <span class="statistic-icon attention-icon">
+                            !
+                        </span>
+
+                        <span class="statistic-label">
+                            Needs attention
+                        </span>
+                    </div>
+
+                    <strong
+                        id="stat-attention-count"
+                        class="statistic-value"
+                    >
+                        —
+                    </strong>
+
+                    <p id="stat-attention-detail">
+                        Checking maintenance...
+                    </p>
+                </article>
+
+                <article class="statistic-card">
+                    <div class="statistic-card-top">
+                        <span class="statistic-icon cost-icon">
+                            ₺
+                        </span>
+
+                        <span class="statistic-label">
+                            Service spending
+                        </span>
+                    </div>
+
+                    <strong
+                        id="stat-service-cost"
+                        class="statistic-value cost-value"
+                    >
+                        —
+                    </strong>
+
+                    <p id="stat-service-detail">
+                        Loading service records...
+                    </p>
+                </article>
+            </div>
+
+            <div class="dashboard-insight-grid">
+                <article class="dashboard-insight-card">
+                    <div class="insight-heading">
+                        <div>
+                            <p class="eyebrow">Maintenance watch</p>
+                            <h3>Needs your attention</h3>
+                        </div>
+
+                        <a
+                            class="insight-link"
+                            href="/maintenance.html"
+                        >
+                            View plans
+                        </a>
+                    </div>
+
+                    <div
+                        id="maintenance-overview-list"
+                        class="overview-list"
+                    >
+                        <div class="overview-loading">
+                            Loading maintenance plans...
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dashboard-insight-card">
+                    <div class="insight-heading">
+                        <div>
+                            <p class="eyebrow">Recent activity</p>
+                            <h3>Latest service records</h3>
+                        </div>
+
+                        <a
+                            class="insight-link"
+                            href="/service-history.html"
+                        >
+                            View history
+                        </a>
+                    </div>
+
+                    <div
+                        id="recent-service-list"
+                        class="overview-list"
+                    >
+                        <div class="overview-loading">
+                            Loading service history...
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="smart-alerts-section">
+            <div class="smart-alerts-heading">
+                <div>
+                    <p class="eyebrow">
+                        Smart alerts
+                    </p>
+
+                    <h2>Your priority center</h2>
+
+                    <p>
+                        Maintenance, health and document
+                        warnings are prioritised in one place.
+                    </p>
+                </div>
+
+                <div class="smart-alerts-heading-actions">
+                    <span
+                        id="smart-alert-count"
+                        class="smart-alert-count"
+                    >
+                        0 alerts
+                    </span>
+
+                    <button
+                        id="refresh-smart-alerts"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="smart-alert-statistics">
+                <article class="smart-alert-stat critical">
+                    <span>Critical</span>
+
+                    <strong id="critical-smart-alert-count">
+                        0
+                    </strong>
+                </article>
+
+                <article class="smart-alert-stat warning">
+                    <span>Upcoming</span>
+
+                    <strong id="warning-smart-alert-count">
+                        0
+                    </strong>
+                </article>
+
+                <article class="smart-alert-stat information">
+                    <span>Monitor</span>
+
+                    <strong id="information-smart-alert-count">
+                        0
+                    </strong>
+                </article>
+            </div>
+
+            <div
+                id="smart-alert-list"
+                class="smart-alert-list"
+            >
+                <div class="smart-alert-loading">
+                    Analysing your garage...
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-workspace">
+        <section class="dashboard-section garage-composer">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Vehicle garage</p>
+                    <h2>Add a vehicle</h2>
+
+                    <p>
+                        Register a vehicle to begin tracking
+                        mileage, paperwork and maintenance.
+                        Ownership can later be verified with
+                        an uploaded registration image.
+                    </p>
+                </div>
+            </div>
+
+            <form
+                id="vehicle-form"
+                class="vehicle-form"
+            >
+                <div class="vehicle-form-grid">
+                    <div class="form-group">
+                        <label for="brand">Brand</label>
+
+                        <input
+                            type="text"
+                            id="brand"
+                            name="brand"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model">Model</label>
+
+                        <input
+                            type="text"
+                            id="model"
+                            name="model"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model-year">
+                            Model year
+                        </label>
+
+                        <input
+                            type="number"
+                            id="model-year"
+                            name="modelYear"
+                            min="1886"
+                            max="2100"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nickname">
+                            Nickname
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nickname"
+                            name="nickname"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="license-plate">
+                            License plate
+
+                            <span class="optional-text">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="license-plate"
+                            name="licensePlate"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="current-mileage">
+                            Current mileage
+                        </label>
+
+                        <input
+                            type="number"
+                            id="current-mileage"
+                            name="currentMileage"
+                            min="0"
+                            step="1"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <p
+                    id="vehicle-form-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="vehicle-form-actions">
+                    <button
+                        type="submit"
+                        class="primary-button vehicle-submit"
+                    >
+                        Add vehicle
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="dashboard-section garage-panel">
+            <div class="section-heading vehicle-list-heading">
+                <div>
+                    <p class="eyebrow">Your vehicles</p>
+                    <h2>Garage</h2>
+                </div>
+
+                <div
+                    id="vehicle-count"
+                    class="count-badge"
+                >
+                    0 vehicles
+                </div>
+            </div>
+
+            <div id="vehicle-list">
+                <div class="loading-state">
+                    Loading vehicles...
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-section sold-vehicles-panel">
+            <div class="section-heading vehicle-list-heading">
+                <div>
+                    <p class="eyebrow">Archive</p>
+                    <h2>Sold vehicles</h2>
+
+                    <p>
+                        Vehicles you marked as sold stay here so their history remains visible.
+                    </p>
+                </div>
+
+                <div
+                    id="sold-vehicle-count"
+                    class="count-badge"
+                >
+                    0 vehicles
+                </div>
+            </div>
+
+            <div id="sold-vehicle-list">
+                <div class="loading-state">
+                    Loading sold vehicles...
+                </div>
+            </div>
+        </section>
+        </section>
+    </main>
+
+    <dialog
+        id="mileage-dialog"
+        class="modal"
+    >
+        <div class="modal-content">
+            <div class="modal-heading">
+                <div>
+                    <p class="eyebrow">
+                        Odometer update
+                    </p>
+
+                    <h2>Update mileage</h2>
+                </div>
+
+                <button
+                    id="close-mileage-dialog"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+            </div>
+
+            <p
+                id="mileage-vehicle-name"
+                class="muted-text"
+            ></p>
+
+            <p class="current-mileage-text">
+                Current mileage:
+
+                <strong id="current-mileage-value">
+                    0 km
+                </strong>
+            </p>
+
+            <div class="warning-box">
+                <strong>
+                    This change is permanent.
+                </strong>
+
+                <span>
+                    Mileage can only be increased and
+                    cannot be reduced later.
+                </span>
+            </div>
+
+            <form id="mileage-form">
+                <div class="form-group">
+                    <label for="new-mileage">
+                        New mileage
+                    </label>
+
+                    <input
+                        type="number"
+                        id="new-mileage"
+                        name="newMileage"
+                        min="1"
+                        step="1"
+                        required
+                    >
+                </div>
+
+                <p
+                    id="mileage-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="modal-actions">
+                    <button
+                        id="cancel-mileage-button"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-button modal-submit"
+                    >
+                        Confirm mileage
+                    </button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <dialog
+        id="vehicle-edit-dialog"
+        class="modal"
+    >
+        <div class="modal-content">
+            <div class="modal-heading">
+                <div>
+                    <p class="eyebrow">
+                        Garage edit
+                    </p>
+
+                    <h2>Edit vehicle details</h2>
+                </div>
+
+                <button
+                    id="close-vehicle-edit-dialog"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+            </div>
+
+            <form id="vehicle-edit-form">
+                <div class="vehicle-form-grid modal-form-grid">
+                    <div class="form-group">
+                        <label for="edit-brand">Brand</label>
+                        <input
+                            id="edit-brand"
+                            name="brand"
+                            type="text"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-model">Model</label>
+                        <input
+                            id="edit-model"
+                            name="model"
+                            type="text"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-model-year">Model year</label>
+                        <input
+                            id="edit-model-year"
+                            name="modelYear"
+                            type="number"
+                            min="1886"
+                            max="2100"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-nickname">Nickname</label>
+                        <input
+                            id="edit-nickname"
+                            name="nickname"
+                            type="text"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-license-plate">License plate</label>
+                        <input
+                            id="edit-license-plate"
+                            name="licensePlate"
+                            type="text"
+                        >
+                    </div>
+                </div>
+
+                <p
+                    id="vehicle-edit-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="modal-actions">
+                    <button
+                        id="cancel-vehicle-edit-button"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-button modal-submit"
+                    >
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+</body>
+</html>

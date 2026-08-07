@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cost Center | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/costs.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/costs.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body costs-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a
+                    class="nav-link"
+                    href="/index.html"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="/costs.html"
+                >
+                    Costs
+                </a>
+
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="cost-container">
+        <section class="cost-hero">
+            <div>
+                <p class="cost-eyebrow">
+                    COST INTELLIGENCE CENTER
+                </p>
+
+                <h2>Know what your car really costs</h2>
+
+                <p>
+                    Track fuel consumption, service spending
+                    and daily ownership expenses in one place.
+                </p>
+            </div>
+
+            <div
+                id="account-name"
+                class="cost-account-badge"
+            >
+                Loading...
+            </div>
+        </section>
+
+        <section class="cost-summary-grid">
+            <article class="cost-summary-card total">
+                <span>Total ownership cost</span>
+
+                <strong id="total-ownership-cost">
+                    ₺0
+                </strong>
+
+                <p>
+                    Fuel, services and additional expenses
+                </p>
+            </article>
+
+            <article class="cost-summary-card fuel">
+                <span>Fuel spending</span>
+
+                <strong id="total-fuel-cost">
+                    ₺0
+                </strong>
+
+                <p id="fill-up-summary">
+                    0 fill-ups
+                </p>
+            </article>
+
+            <article class="cost-summary-card service">
+                <span>Service spending</span>
+
+                <strong id="total-service-cost">
+                    ₺0
+                </strong>
+
+                <p id="service-summary">
+                    0 completed services
+                </p>
+            </article>
+
+            <article class="cost-summary-card expense">
+                <span>Other expenses</span>
+
+                <strong id="total-expense-cost">
+                    ₺0
+                </strong>
+
+                <p id="expense-summary">
+                    0 additional expenses
+                </p>
+            </article>
+        </section>
+
+        <div
+            id="no-vehicle-warning"
+            class="cost-warning"
+            hidden
+        >
+            Add a vehicle from the dashboard before
+            recording fuel or expenses.
+        </div>
+
+        <section class="cost-form-layout">
+            <article class="cost-panel">
+                <div class="cost-section-heading">
+                    <p class="cost-eyebrow">
+                        FUEL LOG
+                    </p>
+
+                    <h2>Add a fill-up</h2>
+
+                    <p>
+                        Full-tank entries allow CarCare to
+                        calculate average fuel consumption.
+                    </p>
+                </div>
+
+                <form id="fuel-form">
+                    <div class="cost-form-grid">
+                        <div class="form-group cost-full-width">
+                            <label for="fuel-vehicle">
+                                Vehicle
+                            </label>
+
+                            <select
+                                id="fuel-vehicle"
+                                name="vehicleId"
+                                required
+                            >
+                                <option value="">
+                                    Select a vehicle
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fuel-date">
+                                Fill-up date
+                            </label>
+
+                            <input
+                                id="fuel-date"
+                                name="filledAt"
+                                type="date"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fuel-odometer">
+                                Odometer
+                            </label>
+
+                            <input
+                                id="fuel-odometer"
+                                name="odometerKm"
+                                type="number"
+                                min="0"
+                                step="1"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fuel-liters">
+                                Litres
+                            </label>
+
+                            <input
+                                id="fuel-liters"
+                                name="liters"
+                                type="number"
+                                min="0.001"
+                                step="0.001"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fuel-total-cost">
+                                Total cost
+                            </label>
+
+                            <input
+                                id="fuel-total-cost"
+                                name="totalCost"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group cost-full-width">
+                            <label for="fuel-station">
+                                Fuel station
+
+                                <span class="optional-text">
+                                    Optional
+                                </span>
+                            </label>
+
+                            <input
+                                id="fuel-station"
+                                name="station"
+                                type="text"
+                                maxlength="120"
+                            >
+                        </div>
+
+                        <div class="form-group cost-full-width">
+                            <label for="fuel-notes">
+                                Notes
+
+                                <span class="optional-text">
+                                    Optional
+                                </span>
+                            </label>
+
+                            <textarea
+                                id="fuel-notes"
+                                name="notes"
+                                maxlength="2000"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <label class="cost-checkbox">
+                        <input
+                            id="is-full-tank"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <span>
+                            <strong>Full tank</strong>
+
+                            <small>
+                                Use this entry when the tank
+                                was completely filled.
+                            </small>
+                        </span>
+                    </label>
+
+                    <div
+                        id="fuel-price-preview"
+                        class="fuel-price-preview"
+                    >
+                        Enter litres and total cost to
+                        calculate the unit price.
+                    </div>
+
+                    <p
+                        id="fuel-form-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <button
+                        class="primary-button"
+                        type="submit"
+                    >
+                        Add fuel entry
+                    </button>
+                </form>
+            </article>
+
+            <article class="cost-panel">
+                <div class="cost-section-heading">
+                    <p class="cost-eyebrow">
+                        OWNERSHIP EXPENSE
+                    </p>
+
+                    <h2>Add an expense</h2>
+
+                    <p>
+                        Record insurance, taxes, parking,
+                        tolls and other vehicle costs.
+                    </p>
+                </div>
+
+                <form id="expense-form">
+                    <div class="cost-form-grid">
+                        <div class="form-group cost-full-width">
+                            <label for="expense-vehicle">
+                                Vehicle
+                            </label>
+
+                            <select
+                                id="expense-vehicle"
+                                name="vehicleId"
+                                required
+                            >
+                                <option value="">
+                                    Select a vehicle
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense-type">
+                                Expense type
+                            </label>
+
+                            <select
+                                id="expense-type"
+                                name="expenseType"
+                                required
+                            >
+                                <option value="">
+                                    Select a type
+                                </option>
+
+                                <option value="insurance">
+                                    Traffic insurance
+                                </option>
+
+                                <option value="casco">
+                                    Comprehensive insurance
+                                </option>
+
+                                <option value="tax">
+                                    Vehicle tax
+                                </option>
+
+                                <option value="inspection">
+                                    Vehicle inspection
+                                </option>
+
+                                <option value="emission">
+                                    Emission inspection
+                                </option>
+
+                                <option value="parking">
+                                    Parking
+                                </option>
+
+                                <option value="toll">
+                                    Road toll
+                                </option>
+
+                                <option value="wash">
+                                    Car wash
+                                </option>
+
+                                <option value="accessory">
+                                    Vehicle accessory
+                                </option>
+
+                                <option value="fine">
+                                    Traffic fine
+                                </option>
+
+                                <option value="other">
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense-amount">
+                                Amount
+                            </label>
+
+                            <input
+                                id="expense-amount"
+                                name="amount"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group cost-full-width">
+                            <label for="expense-title">
+                                Expense title
+                            </label>
+
+                            <input
+                                id="expense-title"
+                                name="title"
+                                type="text"
+                                maxlength="120"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense-date">
+                                Expense date
+                            </label>
+
+                            <input
+                                id="expense-date"
+                                name="expenseDate"
+                                type="date"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense-odometer">
+                                Odometer
+
+                                <span class="optional-text">
+                                    Optional
+                                </span>
+                            </label>
+
+                            <input
+                                id="expense-odometer"
+                                name="odometerKm"
+                                type="number"
+                                min="0"
+                                step="1"
+                            >
+                        </div>
+
+                        <div class="form-group cost-full-width">
+                            <label for="expense-provider">
+                                Provider
+
+                                <span class="optional-text">
+                                    Optional
+                                </span>
+                            </label>
+
+                            <input
+                                id="expense-provider"
+                                name="provider"
+                                type="text"
+                                maxlength="120"
+                            >
+                        </div>
+
+                        <div class="form-group cost-full-width">
+                            <label for="expense-notes">
+                                Notes
+
+                                <span class="optional-text">
+                                    Optional
+                                </span>
+                            </label>
+
+                            <textarea
+                                id="expense-notes"
+                                name="notes"
+                                maxlength="2000"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <p
+                        id="expense-form-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <button
+                        class="primary-button"
+                        type="submit"
+                    >
+                        Add expense
+                    </button>
+                </form>
+            </article>
+        </section>
+
+        <section class="cost-panel cost-history-panel">
+            <div class="cost-history-heading">
+                <div>
+                    <p class="cost-eyebrow">
+                        COST HISTORY
+                    </p>
+
+                    <h2>Fuel and expenses</h2>
+
+                    <p>
+                        Review all ownership costs recorded
+                        for your vehicles.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="cost-vehicle-filter">
+                        Vehicle
+                    </label>
+
+                    <select id="cost-vehicle-filter">
+                        <option value="all">
+                            All vehicles
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="cost-history-grid">
+                <div>
+                    <div class="cost-list-heading">
+                        <h3>Fuel entries</h3>
+
+                        <span id="fuel-entry-count">
+                            0 entries
+                        </span>
+                    </div>
+
+                    <div
+                        id="fuel-entry-list"
+                        class="cost-entry-list"
+                    >
+                        <div class="cost-loading-state">
+                            Loading fuel entries...
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="cost-list-heading">
+                        <h3>Other expenses</h3>
+
+                        <span id="expense-entry-count">
+                            0 entries
+                        </span>
+                    </div>
+
+                    <div
+                        id="expense-entry-list"
+                        class="cost-entry-list"
+                    >
+                        <div class="cost-loading-state">
+                            Loading expenses...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

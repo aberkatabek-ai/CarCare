@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Settings | CarCare</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/maintenance.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/css/settings.css"
+    >
+
+    <script
+        src="/js/api.js"
+        defer
+    ></script>
+
+    <script
+        src="/js/settings.js"
+        defer
+    ></script>
+</head>
+
+<body class="dashboard-body settings-body">
+    <header class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="brand compact">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CarCare</h1>
+                    <p>Vehicle Intelligence</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a class="nav-link" href="/index.html">Dashboard</a>
+                <button
+                    id="logout-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Log out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="settings-container">
+        <section class="settings-hero">
+            <div>
+                <p class="eyebrow">Account center</p>
+                <h2>Profile and security settings</h2>
+                <p>
+                    Update your visible account details,
+                    preferred display name and password.
+                </p>
+            </div>
+
+            <div
+                id="settings-account-badge"
+                class="settings-account-badge"
+            >
+                Loading account...
+            </div>
+        </section>
+
+        <section class="settings-grid">
+            <section class="settings-panel">
+                <div class="settings-panel-heading">
+                    <div>
+                        <p class="eyebrow">Profile</p>
+                        <h2>Public account details</h2>
+                    </div>
+                </div>
+
+                <form id="profile-form">
+                    <div class="settings-form-grid">
+                        <div class="form-group">
+                            <label for="profile-full-name">Full name</label>
+                            <input
+                                id="profile-full-name"
+                                name="fullName"
+                                type="text"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profile-preferred-name">
+                                Preferred name
+                                <span class="optional-text">Optional</span>
+                            </label>
+                            <input
+                                id="profile-preferred-name"
+                                name="preferredName"
+                                type="text"
+                                maxlength="60"
+                            >
+                        </div>
+
+                        <div class="form-group settings-form-span">
+                            <label for="profile-email">Email</label>
+                            <input
+                                id="profile-email"
+                                name="email"
+                                type="email"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <p
+                        id="profile-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <div class="settings-form-actions">
+                        <button
+                            type="submit"
+                            class="primary-button settings-submit"
+                        >
+                            Save profile
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="settings-panel">
+                <div class="settings-panel-heading">
+                    <div>
+                        <p class="eyebrow">Security</p>
+                        <h2>Change password</h2>
+                    </div>
+                </div>
+
+                <form id="password-form">
+                    <div class="settings-form-grid">
+                        <div class="form-group settings-form-span">
+                            <label for="current-password">Current password</label>
+                            <input
+                                id="current-password"
+                                name="currentPassword"
+                                type="password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-password">New password</label>
+                            <input
+                                id="new-password"
+                                name="newPassword"
+                                type="password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm password</label>
+                            <input
+                                id="confirm-password"
+                                name="confirmPassword"
+                                type="password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <p
+                        id="password-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <div class="settings-form-actions">
+                        <button
+                            type="submit"
+                            class="primary-button settings-submit"
+                        >
+                            Update password
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="settings-panel">
+                <div class="settings-panel-heading">
+                    <div>
+                        <p class="eyebrow">Reminders</p>
+                        <h2>Email notifications</h2>
+                    </div>
+                </div>
+
+                <form id="reminder-settings-form">
+                    <div class="settings-toggle-card">
+                        <div>
+                            <strong>Email reminder digest</strong>
+
+                            <p>
+                                CarCare can send you document expiry and maintenance alerts by email.
+                            </p>
+                        </div>
+
+                        <label class="settings-switch">
+                            <input
+                                id="reminders-enabled"
+                                name="remindersEnabled"
+                                type="checkbox"
+                            >
+
+                            <span class="settings-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <p
+                        id="reminder-settings-message"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                    <div class="settings-form-actions">
+                        <button
+                            type="submit"
+                            class="primary-button settings-submit"
+                        >
+                            Save reminder settings
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </section>
+    </main>
+</body>
+</html>
