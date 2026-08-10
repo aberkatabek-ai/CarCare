@@ -289,12 +289,18 @@
         return documentRecords
             .filter(
                 (documentRecord) =>
+                    documentRecord.vehicle_status !==
+                        "sold" &&
+                    documentRecord.vehicle_status !==
+                        "archived" &&
+                    (
                     documentRecord
                         .renewal_status ===
                         "expired" ||
                     documentRecord
                         .renewal_status ===
                         "due_soon"
+                    )
             )
             .map((documentRecord) => {
                 const isExpired =
@@ -540,6 +546,10 @@
             const results =
                 await Promise.allSettled([
                     window.apiRequest(
+                        "/api/vehicles"
+                    ),
+
+                    window.apiRequest(
                         "/api/maintenance-plans"
                     ),
 
@@ -565,24 +575,37 @@
                 );
             }
 
-            const maintenancePlans =
+            const activeVehicles =
                 results[0].status ===
                 "fulfilled"
                     ? results[0].value
+                        .vehicles || []
+                    : [];
+
+            const activeVehicleIds = new Set(
+                activeVehicles.map((vehicle) =>
+                    String(vehicle.id)
+                )
+            );
+
+            const maintenancePlans =
+                results[1].status ===
+                "fulfilled"
+                    ? results[1].value
                         .maintenancePlans || []
                     : [];
 
             const issues =
-                results[1].status ===
+                results[2].status ===
                 "fulfilled"
-                    ? results[1].value
+                    ? results[2].value
                         .issues || []
                     : [];
 
             const documentRecords =
-                results[2].status ===
+                results[3].status ===
                 "fulfilled"
-                    ? results[2].value
+                    ? results[3].value
                         .documents || []
                     : [];
 
@@ -601,10 +624,23 @@
                     maintenancePlans
                 ),
 
-                ...buildIssueAlerts(issues),
+                ...buildIssueAlerts(
+                    issues.filter((issue) =>
+                        activeVehicleIds.has(
+                            String(issue.vehicle_id)
+                        )
+                    )
+                ),
 
                 ...buildDocumentAlerts(
-                    documentRecords
+                    documentRecords.filter(
+                        (documentRecord) =>
+                            activeVehicleIds.has(
+                                String(
+                                    documentRecord.vehicle_id
+                                )
+                            )
+                    )
                 )
             ]);
 
