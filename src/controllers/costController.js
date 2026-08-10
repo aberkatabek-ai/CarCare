@@ -3,6 +3,10 @@ const {
     normalizeComparableText,
     isMileageJumpSuspicious
 } = require("../utils/suspiciousData");
+const {
+    calculateVehicleCurrentMileage,
+    shouldRejectBackdatedMileageEntry
+} = require("../utils/mileageState");
 
 const allowedExpenseTypes = new Set([
     "insurance",
@@ -466,6 +470,32 @@ async function increaseVehicleMileage(
             vehicle.id
         ]
     );
+}
+
+async function ensureMileageBaseline(
+    client,
+    vehicle
+) {
+    const currentMileage = Number(
+        vehicle.current_mileage
+    );
+
+    if (currentMileage <= 0) {
+        return;
+    }
+
+    const existingHistoryResult =
+        await client.query(
+            `SELECT id
+             FROM mileage_history
+             WHERE vehicle_id = $1
+             LIMIT 1`,
+            [vehicle.id]
+        );
+
+    if (existingHistoryResult.rows.length > 0) {
+        return;
+    }
 
     await client.query(
         `INSERT INTO mileage_history (
@@ -477,9 +507,139 @@ async function increaseVehicleMileage(
         [
             vehicle.id,
             currentMileage,
-            newMileage
+            currentMileage
         ]
     );
+}
+
+async function getLatestMileageEventDate(
+    client,
+    vehicleId
+) {
+    const result = await client.query(
+        `SELECT MAX(event_date)::TEXT AS latest_event_date
+         FROM (
+            SELECT filled_at AS event_date
+            FROM fuel_entries
+            WHERE vehicle_id = $1
+
+            UNION ALL
+
+            SELECT expense_date AS event_date
+            FROM vehicle_expenses
+            WHERE vehicle_id = $1
+
+            UNION ALL
+
+            SELECT completed_at AS event_date
+            FROM service_history
+            WHERE vehicle_id = $1
+
+            UNION ALL
+
+            SELECT COALESCE(
+                (to_jsonb(mh)->>'recorded_at')::DATE,
+                created_at::DATE
+            ) AS event_date
+            FROM mileage_history mh
+            WHERE vehicle_id = $1
+         ) AS mileage_events`,
+        [vehicleId]
+    );
+
+    return (
+        result.rows[0]?.latest_event_date ||
+        null
+    );
+}
+
+async function syncVehicleMileageFromRecords(
+    client,
+    vehicleId,
+    userId
+) {
+    const result = await client.query(
+        `SELECT
+            COALESCE(
+                (
+                    SELECT ARRAY_AGG(mh.new_mileage)
+                    FROM mileage_history mh
+                    WHERE mh.vehicle_id = v.id
+                ),
+                ARRAY[]::INTEGER[]
+            ) AS mileage_history_readings,
+            COALESCE(
+                (
+                    SELECT ARRAY_AGG(f.odometer_km)
+                    FROM fuel_entries f
+                    WHERE f.vehicle_id = v.id
+                ),
+                ARRAY[]::INTEGER[]
+            ) AS fuel_readings,
+            COALESCE(
+                (
+                    SELECT ARRAY_AGG(e.odometer_km)
+                    FROM vehicle_expenses e
+                    WHERE e.vehicle_id = v.id
+                      AND e.odometer_km IS NOT NULL
+                ),
+                ARRAY[]::INTEGER[]
+            ) AS expense_readings,
+            COALESCE(
+                (
+                    SELECT ARRAY_AGG(sh.completed_at_mileage)
+                    FROM service_history sh
+                    WHERE sh.vehicle_id = v.id
+                ),
+                ARRAY[]::INTEGER[]
+            ) AS service_readings,
+            COALESCE(
+                (
+                    SELECT ARRAY_AGG(mp.last_service_km)
+                    FROM maintenance_plans mp
+                    WHERE mp.vehicle_id = v.id
+                      AND mp.last_service_km IS NOT NULL
+                ),
+                ARRAY[]::INTEGER[]
+            ) AS maintenance_readings
+         FROM vehicles v
+         WHERE v.id = $1
+           AND v.user_id = $2
+         FOR UPDATE`,
+        [
+            vehicleId,
+            userId
+        ]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+    const nextMileage =
+        calculateVehicleCurrentMileage({
+            mileageHistoryReadings:
+                row.mileage_history_readings,
+            fuelReadings: row.fuel_readings,
+            expenseReadings: row.expense_readings,
+            serviceReadings: row.service_readings,
+            maintenanceReadings:
+                row.maintenance_readings
+        });
+
+    await client.query(
+        `UPDATE vehicles
+         SET current_mileage = $1,
+             updated_at = NOW()
+         WHERE id = $2`,
+        [
+            nextMileage,
+            vehicleId
+        ]
+    );
+
+    return nextMileage;
 }
 
 async function getFuelRows(
@@ -755,6 +915,17 @@ async function createFuelEntry(
                 });
         }
 
+        await ensureMileageBaseline(
+            client,
+            vehicle
+        );
+
+        const latestMileageEventDate =
+            await getLatestMileageEventDate(
+                client,
+                fuelData.vehicleId
+            );
+
         if (
             isMileageJumpSuspicious({
                 previousMileage:
@@ -776,6 +947,33 @@ async function createFuelEntry(
                     success: false,
                     message:
                         "This fuel entry increases mileage too sharply. Please verify the odometer value."
+                });
+        }
+
+        if (
+            shouldRejectBackdatedMileageEntry({
+                entryDate: fuelData.filledAt,
+                latestEventDate:
+                    latestMileageEventDate,
+                currentMileage:
+                    vehicle.current_mileage,
+                nextMileage:
+                    fuelData.odometerKm
+            })
+        ) {
+            await client.query(
+                "ROLLBACK"
+            );
+
+            transactionActive =
+                false;
+
+            return res
+                .status(400)
+                .json({
+                    success: false,
+                    message:
+                        "Backdated fuel entries cannot exceed the vehicle's current mileage."
                 });
         }
 
@@ -978,15 +1176,14 @@ async function deleteFuelEntry(
         }
 
         const result = await db.query(
-            `DELETE FROM fuel_entries f
-
-             USING vehicles v
-
+            `SELECT
+                f.id,
+                f.vehicle_id
+             FROM fuel_entries f
+             INNER JOIN vehicles v
+                ON v.id = f.vehicle_id
              WHERE f.id = $1
-               AND v.id = f.vehicle_id
-               AND v.user_id = $2
-
-             RETURNING f.id`,
+               AND v.user_id = $2`,
             [
                 fuelEntryId,
                 req.session.userId
@@ -1004,6 +1201,31 @@ async function deleteFuelEntry(
                     message:
                         "Fuel entry was not found."
                 });
+        }
+
+        const client = await db.connect();
+
+        try {
+            await client.query("BEGIN");
+
+            await client.query(
+                `DELETE FROM fuel_entries
+                 WHERE id = $1`,
+                [fuelEntryId]
+            );
+
+            await syncVehicleMileageFromRecords(
+                client,
+                result.rows[0].vehicle_id,
+                req.session.userId
+            );
+
+            await client.query("COMMIT");
+        } catch (error) {
+            await client.query("ROLLBACK");
+            throw error;
+        } finally {
+            client.release();
         }
 
         res.json({
@@ -1170,6 +1392,17 @@ async function createExpense(
                 });
         }
 
+        await ensureMileageBaseline(
+            client,
+            vehicle
+        );
+
+        const latestMileageEventDate =
+            await getLatestMileageEventDate(
+                client,
+                expenseData.vehicleId
+            );
+
         if (
             expenseData.odometerKm !== null &&
             isMileageJumpSuspicious({
@@ -1192,6 +1425,35 @@ async function createExpense(
                     success: false,
                     message:
                         "This expense record increases mileage too sharply. Please verify the odometer value."
+                });
+        }
+
+        if (
+            expenseData.odometerKm !== null &&
+            shouldRejectBackdatedMileageEntry({
+                entryDate:
+                    expenseData.expenseDate,
+                latestEventDate:
+                    latestMileageEventDate,
+                currentMileage:
+                    vehicle.current_mileage,
+                nextMileage:
+                    expenseData.odometerKm
+            })
+        ) {
+            await client.query(
+                "ROLLBACK"
+            );
+
+            transactionActive =
+                false;
+
+            return res
+                .status(400)
+                .json({
+                    success: false,
+                    message:
+                        "Backdated expense entries cannot exceed the vehicle's current mileage."
                 });
         }
 
@@ -1370,15 +1632,14 @@ async function deleteExpense(
         }
 
         const result = await db.query(
-            `DELETE FROM vehicle_expenses e
-
-             USING vehicles v
-
+            `SELECT
+                e.id,
+                e.vehicle_id
+             FROM vehicle_expenses e
+             INNER JOIN vehicles v
+                ON v.id = e.vehicle_id
              WHERE e.id = $1
-               AND v.id = e.vehicle_id
-               AND v.user_id = $2
-
-             RETURNING e.id`,
+               AND v.user_id = $2`,
             [
                 expenseId,
                 req.session.userId
@@ -1396,6 +1657,31 @@ async function deleteExpense(
                     message:
                         "Expense was not found."
                 });
+        }
+
+        const client = await db.connect();
+
+        try {
+            await client.query("BEGIN");
+
+            await client.query(
+                `DELETE FROM vehicle_expenses
+                 WHERE id = $1`,
+                [expenseId]
+            );
+
+            await syncVehicleMileageFromRecords(
+                client,
+                result.rows[0].vehicle_id,
+                req.session.userId
+            );
+
+            await client.query("COMMIT");
+        } catch (error) {
+            await client.query("ROLLBACK");
+            throw error;
+        } finally {
+            client.release();
         }
 
         res.json({

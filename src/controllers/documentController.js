@@ -1,9 +1,9 @@
-const path = require("path");
 const db = require("../config/db");
 const {
     normalizeOptionalFilePayload,
     saveUploadedDocument,
-    removeStoredDocument
+    removeStoredDocument,
+    resolveStoredDocumentAbsolutePath
 } = require("../utils/documentUpload");
 
 const allowedDocumentTypes = new Set([
@@ -1139,14 +1139,10 @@ async function downloadDocumentFile(
                 });
         }
 
-        const absolutePath = path.join(
-            __dirname,
-            "..",
-            "..",
-            "uploads",
-            "documents",
-            document.stored_file_name
-        );
+        const absolutePath =
+            resolveStoredDocumentAbsolutePath(
+                document.stored_file_name
+            );
 
         res.setHeader(
             "Content-Type",

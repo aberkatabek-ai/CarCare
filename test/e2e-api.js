@@ -329,7 +329,7 @@ async function main() {
                 method: "POST",
                 body: JSON.stringify({
                     vehicleId,
-                    filledAt: "2026-08-03",
+                    filledAt: "2026-08-10",
                     odometerKm: 6600,
                     liters: 42.5,
                     totalCost: 2450,
@@ -355,7 +355,7 @@ async function main() {
                     expenseType: "parking",
                     title: "Mall parking",
                     amount: 120,
-                    expenseDate: "2026-08-04",
+                    expenseDate: "2026-08-10",
                     odometerKm: 6600,
                     provider: "Zorlu",
                     notes: "E2E expense"

@@ -463,6 +463,7 @@ async function createIssue(
     next
 ) {
     const savedPhotos = [];
+    const client = await db.connect();
 
     try {
         const {
@@ -586,7 +587,7 @@ async function createIssue(
             );
 
         const vehicleResult =
-            await db.query(
+            await client.query(
                 `SELECT id, vehicle_status
                  FROM vehicles
                  WHERE id = $1
@@ -620,7 +621,7 @@ async function createIssue(
         }
 
         const duplicateIssueResult =
-            await db.query(
+            await client.query(
                 `SELECT id
                  FROM vehicle_issues
                  WHERE user_id = $1
@@ -666,8 +667,17 @@ async function createIssue(
                     parsedIsWorsening
             });
 
+        for (const photo of photoValidation.value) {
+            const savedPhoto =
+                await saveUploadedDocument(photo);
+
+            savedPhotos.push(savedPhoto);
+        }
+
+        await client.query("BEGIN");
+
         const insertResult =
-            await db.query(
+            await client.query(
                 `INSERT INTO vehicle_issues (
                     user_id,
                     vehicle_id,
@@ -710,13 +720,8 @@ async function createIssue(
                 ]
             );
 
-        for (const photo of photoValidation.value) {
-            const savedPhoto =
-                await saveUploadedDocument(photo);
-
-            savedPhotos.push(savedPhoto);
-
-            await db.query(
+        for (const savedPhoto of savedPhotos) {
+            await client.query(
                 `INSERT INTO vehicle_issue_media (
                     issue_id,
                     stored_file_name,
@@ -735,6 +740,8 @@ async function createIssue(
             );
         }
 
+        await client.query("COMMIT");
+
         const issue = await findOwnedIssue(
             insertResult.rows[0].id,
             req.session.userId
@@ -749,12 +756,16 @@ async function createIssue(
             issue
         });
     } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+
         for (const savedPhoto of savedPhotos) {
             await removeStoredDocument(
                 savedPhoto.storedName
             );
         }
         next(error);
+    } finally {
+        client.release();
     }
 }
 
@@ -1150,6 +1161,19 @@ async function deleteIssue(
             });
         }
 
+        const mediaResult = await db.query(
+            `SELECT media.stored_file_name
+             FROM vehicle_issue_media media
+             INNER JOIN vehicle_issues issue
+                ON issue.id = media.issue_id
+             WHERE issue.id = $1
+               AND issue.user_id = $2`,
+            [
+                issueId,
+                req.session.userId
+            ]
+        );
+
         const result = await db.query(
             `DELETE FROM vehicle_issues
              WHERE id = $1
@@ -1169,6 +1193,12 @@ async function deleteIssue(
                 message:
                     "Vehicle issue was not found."
             });
+        }
+
+        for (const media of mediaResult.rows) {
+            await removeStoredDocument(
+                media.stored_file_name
+            );
         }
 
         res.json({

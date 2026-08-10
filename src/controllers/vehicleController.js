@@ -976,6 +976,15 @@ async function updateVehicle(req, res, next) {
             ]
         );
 
+        if (
+            plateChanged &&
+            currentVehicle.ownership_stored_file_name
+        ) {
+            await removeStoredDocument(
+                currentVehicle.ownership_stored_file_name
+            );
+        }
+
         res.json({
             success: true,
             message:
@@ -1351,6 +1360,33 @@ async function deleteVehicle(req, res, next) {
             });
         }
 
+        const fileResult = await db.query(
+            `SELECT stored_file_name
+             FROM vehicle_documents
+             WHERE vehicle_id = $1
+               AND stored_file_name IS NOT NULL
+
+             UNION ALL
+
+             SELECT media.stored_file_name
+             FROM vehicle_issue_media media
+             INNER JOIN vehicle_issues issue
+                ON issue.id = media.issue_id
+             WHERE issue.vehicle_id = $1
+
+             UNION ALL
+
+             SELECT ownership_stored_file_name
+             FROM vehicles
+             WHERE id = $1
+               AND user_id = $2
+               AND ownership_stored_file_name IS NOT NULL`,
+            [
+                vehicleId,
+                req.session.userId
+            ]
+        );
+
         const result = await db.query(
             `DELETE FROM vehicles
              WHERE id = $1
@@ -1368,6 +1404,12 @@ async function deleteVehicle(req, res, next) {
                 message:
                     "Vehicle was not found."
             });
+        }
+
+        for (const row of fileResult.rows) {
+            await removeStoredDocument(
+                row.stored_file_name
+            );
         }
 
         res.json({

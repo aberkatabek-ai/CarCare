@@ -20,6 +20,13 @@ const {
 const {
     evaluateOwnershipVerification
 } = require("../src/utils/ownershipVerification");
+const {
+    normalizeIsoDate
+} = require("../src/utils/dateValidation");
+const {
+    calculateVehicleCurrentMileage,
+    shouldRejectBackdatedMileageEntry
+} = require("../src/utils/mileageState");
 
 function runTest(name, testFn) {
     try {
@@ -31,6 +38,26 @@ function runTest(name, testFn) {
         process.exitCode = 1;
     }
 }
+
+runTest(
+    "date validation rejects impossible calendar dates",
+    () => {
+        assert.equal(
+            normalizeIsoDate("2026-02-31"),
+            null
+        );
+    }
+);
+
+runTest(
+    "date validation accepts real calendar dates",
+    () => {
+        assert.equal(
+            normalizeIsoDate("2026-02-28"),
+            "2026-02-28"
+        );
+    }
+);
 
 runTest(
     "registration rejects inappropriate full names",
@@ -329,6 +356,37 @@ runTest(
                 "Full name"
             ),
             "Full name contains inappropriate words."
+        );
+    }
+);
+
+runTest(
+    "mileage state recalculates current mileage from remaining records",
+    () => {
+        assert.equal(
+            calculateVehicleCurrentMileage({
+                mileageHistoryReadings: [6000, 6500],
+                fuelReadings: [],
+                expenseReadings: [],
+                serviceReadings: [6400],
+                maintenanceReadings: [6400]
+            }),
+            6500
+        );
+    }
+);
+
+runTest(
+    "mileage state rejects backdated entries above current mileage",
+    () => {
+        assert.equal(
+            shouldRejectBackdatedMileageEntry({
+                entryDate: "2026-08-03",
+                latestEventDate: "2026-08-10",
+                currentMileage: 6500,
+                nextMileage: 6600
+            }),
+            true
         );
     }
 );
