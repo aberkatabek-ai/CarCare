@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 
 const {
+    getPasswordValidationError,
     validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
@@ -31,12 +32,12 @@ function runTest(name, testFn) {
 }
 
 runTest(
-    "registration rejects short passwords before account checks",
+    "registration rejects passwords shorter than 8 characters",
     () => {
         const result = validateRegistration({
             fullName: "Berk Acar",
             email: " TEST@Example.com ",
-            password: "123456"
+            password: "Ab1!"
         });
 
         assert.equal(
@@ -47,19 +48,99 @@ runTest(
 );
 
 runTest(
-    "registration normalizes valid data",
+    "registration rejects passwords with spaces",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "Abcd 123!"
+        });
+
+        assert.equal(
+            result.error,
+            "Password cannot contain spaces."
+        );
+    }
+);
+
+runTest(
+    "registration rejects passwords without uppercase letters",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "berkacar1!"
+        });
+
+        assert.equal(
+            result.error,
+            "Password must contain at least one uppercase letter."
+        );
+    }
+);
+
+runTest(
+    "registration rejects passwords without lowercase letters",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "BERKACAR1!"
+        });
+
+        assert.equal(
+            result.error,
+            "Password must contain at least one lowercase letter."
+        );
+    }
+);
+
+runTest(
+    "registration rejects passwords without numbers",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "BerkAcar!"
+        });
+
+        assert.equal(
+            result.error,
+            "Password must contain at least one number."
+        );
+    }
+);
+
+runTest(
+    "registration rejects passwords without special characters",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: " TEST@Example.com ",
+            password: "BerkAcar1"
+        });
+
+        assert.equal(
+            result.error,
+            "Password must contain at least one special character."
+        );
+    }
+);
+
+runTest(
+    "registration normalizes valid data with a strong password",
     () => {
         const result = validateRegistration({
             fullName: "  Berk Acar  ",
             email: " TEST@Example.com ",
-            password: "password123"
+            password: "StrongPass1!"
         });
 
         assert.equal(result.error, undefined);
         assert.deepEqual(result.value, {
             fullName: "Berk Acar",
             email: "test@example.com",
-            password: "password123"
+            password: "StrongPass1!"
         });
     }
 );
@@ -101,13 +182,28 @@ runTest(
     "password update rejects reused password",
     () => {
         const result = validatePasswordUpdate({
-            currentPassword: "password123",
-            newPassword: "password123"
+            currentPassword: "CurrentPass1!",
+            newPassword: "CurrentPass1!"
         });
 
         assert.equal(
             result.error,
             "New password must be different from the current password."
+        );
+    }
+);
+
+runTest(
+    "password update rejects weak new passwords",
+    () => {
+        const result = validatePasswordUpdate({
+            currentPassword: "CurrentPass1!",
+            newPassword: "alllowercase1!"
+        });
+
+        assert.equal(
+            result.error,
+            "New password must contain at least one uppercase letter."
         );
     }
 );
@@ -135,12 +231,39 @@ runTest(
             validatePasswordReset({
                 email: "test@example.com",
                 code: "12ab",
-                newPassword: "password123"
+                newPassword: "StrongPass1!"
             });
 
         assert.equal(
             result.error,
             "Verification code must contain 6 digits."
+        );
+    }
+);
+
+runTest(
+    "password reset rejects weak new passwords",
+    () => {
+        const result =
+            validatePasswordReset({
+                email: "test@example.com",
+                code: "123456",
+                newPassword: "NoSpecial12"
+            });
+
+        assert.equal(
+            result.error,
+            "New password must contain at least one special character."
+        );
+    }
+);
+
+runTest(
+    "password validation helper accepts strong passwords",
+    () => {
+        assert.equal(
+            getPasswordValidationError("StrongPass1!"),
+            null
         );
     }
 );

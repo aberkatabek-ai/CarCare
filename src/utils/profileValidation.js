@@ -10,6 +10,40 @@ function normalizeEmail(value) {
         : "";
 }
 
+const passwordRequirementsText =
+    "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
+
+function getPasswordValidationError(
+    password,
+    label = "Password"
+) {
+    if (password.length < 8) {
+        return `${label} must contain at least 8 characters.`;
+    }
+
+    if (/\s/.test(password)) {
+        return `${label} cannot contain spaces.`;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+        return `${label} must contain at least one uppercase letter.`;
+    }
+
+    if (!/[a-z]/.test(password)) {
+        return `${label} must contain at least one lowercase letter.`;
+    }
+
+    if (!/\d/.test(password)) {
+        return `${label} must contain at least one number.`;
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+        return `${label} must contain at least one special character.`;
+    }
+
+    return null;
+}
+
 function validateRegistration(data) {
     const fullName = normalizeName(
         data.fullName
@@ -32,10 +66,12 @@ function validateRegistration(data) {
         };
     }
 
-    if (password.length < 8) {
+    const passwordError =
+        getPasswordValidationError(password);
+
+    if (passwordError) {
         return {
-            error:
-                "Password must contain at least 8 characters."
+            error: passwordError
         };
     }
 
@@ -120,10 +156,15 @@ function validatePasswordUpdate(data) {
         };
     }
 
-    if (newPassword.length < 8) {
+    const passwordError =
+        getPasswordValidationError(
+            newPassword,
+            "New password"
+        );
+
+    if (passwordError) {
         return {
-            error:
-                "New password must contain at least 8 characters."
+            error: passwordError
         };
     }
 
@@ -195,10 +236,15 @@ function validatePasswordReset(data) {
         };
     }
 
-    if (newPassword.length < 8) {
+    const passwordError =
+        getPasswordValidationError(
+            newPassword,
+            "New password"
+        );
+
+    if (passwordError) {
         return {
-            error:
-                "New password must contain at least 8 characters."
+            error: passwordError
         };
     }
 
@@ -212,6 +258,8 @@ function validatePasswordReset(data) {
 }
 
 module.exports = {
+    passwordRequirementsText,
+    getPasswordValidationError,
     normalizeEmail,
     normalizeName,
     validateRegistration,

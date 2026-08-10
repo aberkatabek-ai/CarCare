@@ -163,7 +163,10 @@ async function register(req, res, next) {
             });
         }
 
-        const passwordHash = await bcrypt.hash(password, 12);
+        const passwordHash = await bcrypt.hash(
+            registrationData.password,
+            12
+        );
 
         const result = await db.query(
             `INSERT INTO users (

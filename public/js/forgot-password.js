@@ -13,6 +13,39 @@ const forgotMessage = document.querySelector(
 const resetMessage = document.querySelector(
     "#reset-message"
 );
+const passwordRequirementsMessage =
+    "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
+
+function getPasswordValidationError(
+    password,
+    label = "Password"
+) {
+    if (password.length < 8) {
+        return `${label} must contain at least 8 characters.`;
+    }
+
+    if (/\s/.test(password)) {
+        return `${label} cannot contain spaces.`;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+        return `${label} must contain at least one uppercase letter.`;
+    }
+
+    if (!/[a-z]/.test(password)) {
+        return `${label} must contain at least one lowercase letter.`;
+    }
+
+    if (!/\d/.test(password)) {
+        return `${label} must contain at least one number.`;
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+        return `${label} must contain at least one special character.`;
+    }
+
+    return null;
+}
 
 function attachPasswordToggles(root = document) {
     root.querySelectorAll("[data-password-toggle]").forEach((button) => {
@@ -200,10 +233,16 @@ if (resetPasswordForm) {
                 return;
             }
 
-            if (newPassword.length < 8) {
+            const passwordError =
+                getPasswordValidationError(
+                    newPassword,
+                    "New password"
+                );
+
+            if (passwordError) {
                 showFormMessage(
                     resetMessage,
-                    "New password must contain at least 8 characters."
+                    `${passwordError} ${passwordRequirementsMessage}`
                 );
                 return;
             }

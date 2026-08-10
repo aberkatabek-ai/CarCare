@@ -70,6 +70,8 @@ async function main() {
     const client = new SessionClient();
     const email =
         `codex-e2e-${Date.now()}@example.com`;
+    const initialPassword = "StrongPass1!";
+    const resetPasswordValue = "ResetPass2@";
 
     const register = await client.request(
         "/api/auth/register",
@@ -78,7 +80,7 @@ async function main() {
             body: JSON.stringify({
                 fullName: "Codex E2E",
                 email,
-                password: "password123"
+                password: initialPassword
             })
         }
     );
@@ -479,7 +481,7 @@ async function main() {
                 body: JSON.stringify({
                     email,
                     code: forgotPassword.data.debugCode,
-                    newPassword: "password456"
+                    newPassword: resetPasswordValue
                 })
             }
         );
@@ -496,7 +498,7 @@ async function main() {
                 method: "POST",
                 body: JSON.stringify({
                     email,
-                    password: "password456"
+                    password: resetPasswordValue
                 })
             }
         );
