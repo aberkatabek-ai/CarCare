@@ -567,6 +567,127 @@
     line-height: 1.55;
 }
 
+.ai-panel {
+    margin-top: 18px;
+    padding: 20px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(244, 239, 229, 0.94),
+            rgba(232, 224, 212, 0.92)
+        );
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+}
+
+.ai-panel-copy {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.ai-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ai-quick-action {
+    padding: 10px 14px;
+    color: var(--primary);
+    background: rgba(226, 217, 203, 0.95);
+    border: 1px solid rgba(150, 129, 91, 0.22);
+    border-radius: 999px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    transition:
+        transform 150ms ease,
+        border-color 150ms ease,
+        background 150ms ease;
+}
+
+.ai-quick-action:hover {
+    transform: translateY(-1px);
+    border-color: #b39a6a;
+    background: rgba(236, 227, 213, 0.98);
+}
+
+.ai-chat-thread {
+    display: grid;
+    gap: 12px;
+    max-height: 360px;
+    margin-bottom: 16px;
+    padding-right: 4px;
+    overflow-y: auto;
+}
+
+.ai-message {
+    padding: 14px 15px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+}
+
+.ai-message strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.ai-message p {
+    margin: 0;
+    white-space: pre-wrap;
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.ai-message.assistant {
+    background: rgba(252, 248, 242, 0.95);
+}
+
+.ai-message.user {
+    background: rgba(226, 217, 203, 0.76);
+}
+
+.ai-chat-form textarea {
+    width: 100%;
+    min-height: 88px;
+    padding: 14px 15px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    resize: vertical;
+    font: inherit;
+    line-height: 1.5;
+}
+
+.ai-chat-form textarea:focus {
+    outline: none;
+    border-color: #a98d59;
+    box-shadow: 0 0 0 4px rgba(169, 141, 89, 0.12);
+}
+
+.ai-chat-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.ai-chat-status {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 /*
     This also corrects the old --primaryprimary
     typo without changing style.css.
@@ -625,6 +746,11 @@
     .insight-heading,
     .overview-list-item,
     .priority-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ai-chat-actions {
         align-items: flex-start;
         flex-direction: column;
     }

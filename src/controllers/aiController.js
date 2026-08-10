@@ -1,0 +1,348 @@
+const db = require("../config/db");
+const {
+    createRateLimiter
+} = require("../middleware/rateLimitMiddleware");
+const {
+    buildGarageAiContext,
+    hasAiConfiguration,
+    requestGarageAiReply
+} = require("../services/garageAiService");
+
+const aiChatLimiter = createRateLimiter({
+    keyPrefix: "ai-chat",
+    windowMs: 60 * 1000,
+    maxRequests: 12,
+    message:
+        "Too many AI requests. Please wait a moment before asking again."
+});
+
+function normalizeQuestion(value) {
+    if (typeof value !== "string") {
+        return "";
+    }
+
+    return value.trim();
+}
+
+async function loadGarageData(userId) {
+    const [
+        vehiclesResult,
+        maintenanceResult,
+        serviceResult,
+        issueResult,
+        documentResult,
+        expenseResult,
+        fuelResult,
+        costSummaryResult
+    ] = await Promise.all([
+        db.query(
+            `SELECT
+                id,
+                brand,
+                model,
+                model_year,
+                nickname,
+                license_plate,
+                current_mileage,
+                ownership_status
+             FROM vehicles
+             WHERE user_id = $1
+               AND vehicle_status = 'active'
+             ORDER BY created_at DESC`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                mp.id,
+                mp.vehicle_id,
+                mp.name,
+                mp.category,
+                mp.interval_km,
+                mp.interval_months,
+                mp.last_service_km,
+                mp.last_service_date,
+                mp.estimated_cost,
+                mp.is_critical,
+                v.current_mileage,
+                CASE
+                    WHEN mp.interval_km IS NOT NULL
+                        AND mp.last_service_km IS NOT NULL
+                        AND v.current_mileage >=
+                            mp.last_service_km + mp.interval_km
+                        THEN 'overdue'
+                    WHEN mp.interval_months IS NOT NULL
+                        AND mp.last_service_date IS NOT NULL
+                        AND CURRENT_DATE >= (
+                            mp.last_service_date +
+                            (
+                                mp.interval_months *
+                                INTERVAL '1 month'
+                            )
+                        )::DATE
+                        THEN 'overdue'
+                    WHEN mp.interval_km IS NOT NULL
+                        AND mp.last_service_km IS NOT NULL
+                        AND v.current_mileage >=
+                            (mp.last_service_km + mp.interval_km - 1000)
+                        THEN 'due_soon'
+                    WHEN mp.interval_months IS NOT NULL
+                        AND mp.last_service_date IS NOT NULL
+                        AND CURRENT_DATE >= (
+                            (
+                                mp.last_service_date +
+                                (
+                                    mp.interval_months *
+                                    INTERVAL '1 month'
+                                )
+                            )::DATE - INTERVAL '30 days'
+                        )::DATE
+                        THEN 'due_soon'
+                    ELSE 'ok'
+                END AS status
+             FROM maintenance_plans mp
+             INNER JOIN vehicles v
+                ON v.id = mp.vehicle_id
+             WHERE v.user_id = $1
+               AND v.vehicle_status = 'active'`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                sh.id,
+                sh.vehicle_id,
+                sh.maintenance_plan_id,
+                sh.service_name,
+                TO_CHAR(sh.completed_at, 'YYYY-MM-DD') AS completed_at,
+                sh.actual_cost
+             FROM service_history sh
+             INNER JOIN vehicles v
+                ON v.id = sh.vehicle_id
+             WHERE v.user_id = $1
+               AND v.vehicle_status = 'active'
+             ORDER BY sh.completed_at DESC, sh.id DESC
+             LIMIT 120`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                vi.id,
+                vi.vehicle_id,
+                vi.issue_title,
+                vi.risk_level,
+                vi.status
+             FROM vehicle_issues vi
+             INNER JOIN vehicles v
+                ON v.id = vi.vehicle_id
+             WHERE vi.user_id = $1
+               AND v.vehicle_status = 'active'
+             ORDER BY vi.created_at DESC`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                d.id,
+                d.vehicle_id,
+                d.title,
+                d.document_type,
+                TO_CHAR(d.expiry_date, 'YYYY-MM-DD') AS expiry_date,
+                (
+                    d.expiry_date -
+                    CURRENT_DATE
+                )::INTEGER AS days_remaining,
+                CASE
+                    WHEN d.expiry_date < CURRENT_DATE
+                        THEN 'expired'
+                    WHEN d.expiry_date <=
+                        CURRENT_DATE + d.reminder_days
+                        THEN 'due_soon'
+                    ELSE 'valid'
+                END AS renewal_status
+             FROM vehicle_documents d
+             INNER JOIN vehicles v
+                ON v.id = d.vehicle_id
+             WHERE v.user_id = $1
+               AND v.vehicle_status = 'active'
+             ORDER BY d.expiry_date ASC`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                e.id,
+                e.vehicle_id,
+                e.amount,
+                TO_CHAR(e.expense_date, 'YYYY-MM-DD') AS expense_date
+             FROM vehicle_expenses e
+             INNER JOIN vehicles v
+                ON v.id = e.vehicle_id
+             WHERE v.user_id = $1
+               AND v.vehicle_status = 'active'
+             ORDER BY e.expense_date DESC, e.id DESC
+             LIMIT 120`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                f.id,
+                f.vehicle_id,
+                f.total_cost,
+                TO_CHAR(f.filled_at, 'YYYY-MM-DD') AS filled_at
+             FROM fuel_entries f
+             INNER JOIN vehicles v
+                ON v.id = f.vehicle_id
+             WHERE v.user_id = $1
+               AND v.vehicle_status = 'active'
+             ORDER BY f.filled_at DESC, f.id DESC
+             LIMIT 120`,
+            [userId]
+        ),
+        db.query(
+            `SELECT
+                COALESCE(
+                    (
+                        SELECT SUM(f.total_cost)
+                        FROM fuel_entries f
+                        INNER JOIN vehicles v
+                            ON v.id = f.vehicle_id
+                        WHERE v.user_id = $1
+                          AND v.vehicle_status = 'active'
+                    ),
+                    0
+                ) AS total_fuel_cost,
+                COALESCE(
+                    (
+                        SELECT SUM(e.amount)
+                        FROM vehicle_expenses e
+                        INNER JOIN vehicles v
+                            ON v.id = e.vehicle_id
+                        WHERE v.user_id = $1
+                          AND v.vehicle_status = 'active'
+                    ),
+                    0
+                ) AS total_expense_cost,
+                COALESCE(
+                    (
+                        SELECT SUM(sh.actual_cost)
+                        FROM service_history sh
+                        INNER JOIN vehicles v
+                            ON v.id = sh.vehicle_id
+                        WHERE v.user_id = $1
+                          AND v.vehicle_status = 'active'
+                    ),
+                    0
+                ) AS total_service_cost`,
+            [userId]
+        )
+    ]);
+
+    const summaryRow =
+        costSummaryResult.rows[0] || {};
+
+    return {
+        vehicles: vehiclesResult.rows,
+        maintenancePlans:
+            maintenanceResult.rows,
+        serviceHistory: serviceResult.rows,
+        issues: issueResult.rows,
+        documents: documentResult.rows,
+        expenses: expenseResult.rows,
+        fuelEntries: fuelResult.rows,
+        costSummary: {
+            totalFuelCost:
+                Number(summaryRow.total_fuel_cost) ||
+                0,
+            totalExpenseCost:
+                Number(
+                    summaryRow.total_expense_cost
+                ) || 0,
+            totalServiceCost:
+                Number(
+                    summaryRow.total_service_cost
+                ) || 0,
+            totalOwnershipCost:
+                (Number(
+                    summaryRow.total_fuel_cost
+                ) || 0) +
+                (Number(
+                    summaryRow.total_expense_cost
+                ) || 0) +
+                (Number(
+                    summaryRow.total_service_cost
+                ) || 0)
+        }
+    };
+}
+
+async function chatWithGarageAi(
+    req,
+    res,
+    next
+) {
+    try {
+        const question = normalizeQuestion(
+            req.body.message
+        );
+
+        if (!question) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Ask a question before sending it to CarCare AI."
+            });
+        }
+
+        if (question.length > 1000) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Keep the AI question under 1000 characters."
+            });
+        }
+
+        const garageData = await loadGarageData(
+            req.session.userId
+        );
+        const garageContext =
+            buildGarageAiContext(garageData);
+
+        if (garageContext.overview.activeVehicleCount === 0) {
+            return res.json({
+                success: true,
+                configured:
+                    hasAiConfiguration(),
+                garageContext,
+                reply:
+                    "Add an active vehicle first. Then I can comment on maintenance risk, upcoming spend and document readiness."
+            });
+        }
+
+        const result =
+            await requestGarageAiReply({
+                message: question,
+                garageContext
+            });
+
+        res.json({
+            success: true,
+            configured: true,
+            model: result.model,
+            garageContext,
+            reply: result.reply
+        });
+    } catch (error) {
+        if (error.code === "AI_NOT_CONFIGURED") {
+            return res.status(503).json({
+                success: false,
+                configured: false,
+                message:
+                    "CarCare AI is not configured yet. Add OPENAI_API_KEY on the server to enable it."
+            });
+        }
+
+        next(error);
+    }
+}
+
+module.exports = {
+    aiChatLimiter,
+    chatWithGarageAi
+};

@@ -386,6 +386,92 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="ai-panel">
+                    <div class="priority-panel-heading">
+                        <div>
+                            <p class="eyebrow">CarCare AI</p>
+                            <h3>Ask your garage copilot</h3>
+                            <p class="ai-panel-copy">
+                                Ask what matters now, what may cost you next, or which vehicle needs attention first.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="ai-quick-actions">
+                        <button
+                            class="ai-quick-action"
+                            type="button"
+                            data-ai-question="What should I prioritize in my garage right now?"
+                        >
+                            What matters now?
+                        </button>
+
+                        <button
+                            class="ai-quick-action"
+                            type="button"
+                            data-ai-question="Which vehicle looks the riskiest and why?"
+                        >
+                            Which vehicle is riskiest?
+                        </button>
+
+                        <button
+                            class="ai-quick-action"
+                            type="button"
+                            data-ai-question="What ownership costs are most likely to hit me soon?"
+                        >
+                            What costs are coming?
+                        </button>
+                    </div>
+
+                    <div
+                        id="ai-chat-thread"
+                        class="ai-chat-thread"
+                    >
+                        <article class="ai-message assistant">
+                            <strong>CarCare AI</strong>
+                            <p>
+                                Ask about maintenance, cost pressure, issues or document readiness.
+                            </p>
+                        </article>
+                    </div>
+
+                    <form
+                        id="ai-chat-form"
+                        class="ai-chat-form"
+                    >
+                        <label
+                            class="sr-only"
+                            for="ai-chat-input"
+                        >
+                            Ask CarCare AI
+                        </label>
+
+                        <textarea
+                            id="ai-chat-input"
+                            rows="3"
+                            maxlength="1000"
+                            placeholder="Ask about your garage, maintenance, costs or risks..."
+                        ></textarea>
+
+                        <div class="ai-chat-actions">
+                            <p
+                                id="ai-chat-status"
+                                class="ai-chat-status"
+                            >
+                                AI replies are grounded in your recorded garage data.
+                            </p>
+
+                            <button
+                                id="ai-chat-submit"
+                                class="secondary-button"
+                                type="submit"
+                            >
+                                Ask AI
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </section>
 
             <div class="dashboard-insight-grid">

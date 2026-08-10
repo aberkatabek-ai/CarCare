@@ -36,6 +36,9 @@ const documentRoutes = require(
 const costRoutes = require(
     "./routes/costRoutes"
 );
+const aiRoutes = require(
+    "./routes/aiRoutes"
+);
 const {
     getSharedVehicleProfile
 } = require(
@@ -205,6 +208,11 @@ app.use(
 app.use(
     "/api/costs",
     costRoutes
+);
+
+app.use(
+    "/api/ai",
+    aiRoutes
 );
 
 app.use(notFound);

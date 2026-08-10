@@ -220,6 +220,27 @@ const garageStatusBadge =
     document.querySelector(
         "#garage-status-badge"
     );
+const aiChatThread = document.querySelector(
+    "#ai-chat-thread"
+);
+const aiChatForm = document.querySelector(
+    "#ai-chat-form"
+);
+const aiChatInput = document.querySelector(
+    "#ai-chat-input"
+);
+const aiChatStatus =
+    document.querySelector(
+        "#ai-chat-status"
+    );
+const aiChatSubmitButton =
+    document.querySelector(
+        "#ai-chat-submit"
+    );
+const aiQuickActionButtons =
+    document.querySelectorAll(
+        ".ai-quick-action"
+    );
 
 let vehicles = [];
 let soldVehicles = [];
@@ -227,6 +248,7 @@ let maintenancePlans = [];
 let serviceHistory = [];
 let vehicleIssues = [];
 let vehicleDocuments = [];
+let aiConfigured = true;
 
 let selectedVehicleId = null;
 let editingVehicleId = null;
@@ -261,6 +283,116 @@ function createTextElement(
     element.textContent = text;
 
     return element;
+}
+
+function appendAiMessage(role, text) {
+    if (!aiChatThread) {
+        return;
+    }
+
+    const message =
+        document.createElement("article");
+
+    message.className =
+        `ai-message ${role}`;
+
+    message.append(
+        createTextElement(
+            "strong",
+            "",
+            role === "user"
+                ? "You"
+                : "CarCare AI"
+        ),
+        createTextElement(
+            "p",
+            "",
+            text
+        )
+    );
+
+    aiChatThread.append(message);
+    aiChatThread.scrollTop =
+        aiChatThread.scrollHeight;
+}
+
+function setAiStatus(text, isError = false) {
+    if (!aiChatStatus) {
+        return;
+    }
+
+    aiChatStatus.textContent = text;
+    aiChatStatus.style.color = isError
+        ? "var(--error)"
+        : "";
+}
+
+async function askGarageAi(question) {
+    if (!question) {
+        return;
+    }
+
+    appendAiMessage("user", question);
+
+    if (aiChatInput) {
+        aiChatInput.value = "";
+    }
+
+    if (aiChatSubmitButton) {
+        aiChatSubmitButton.disabled = true;
+        aiChatSubmitButton.textContent =
+            "Thinking...";
+    }
+
+    setAiStatus(
+        "CarCare AI is reviewing your recorded garage data..."
+    );
+
+    try {
+        const data =
+            await window.apiRequest(
+                "/api/ai/chat",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        message: question
+                    })
+                }
+            );
+
+        aiConfigured =
+            data.configured !== false;
+
+        appendAiMessage(
+            "assistant",
+            data.reply
+        );
+
+        setAiStatus(
+            aiConfigured
+                ? "Reply generated from your current garage records."
+                : "AI is not configured on the server yet."
+        );
+    } catch (error) {
+        aiConfigured =
+            error.payload?.configured !== false;
+
+        appendAiMessage(
+            "assistant",
+            error.message
+        );
+
+        setAiStatus(
+            error.message,
+            true
+        );
+    } finally {
+        if (aiChatSubmitButton) {
+            aiChatSubmitButton.disabled = false;
+            aiChatSubmitButton.textContent =
+                "Ask AI";
+        }
+    }
 }
 
 function getOwnershipBadgeInfo(status) {
@@ -2176,5 +2308,31 @@ logoutButton.addEventListener(
     "click",
     logout
 );
+
+if (aiChatForm) {
+    aiChatForm.addEventListener(
+        "submit",
+        async (event) => {
+            event.preventDefault();
+
+            const question =
+                aiChatInput.value.trim();
+
+            await askGarageAi(question);
+        }
+    );
+}
+
+aiQuickActionButtons.forEach((button) => {
+    button.addEventListener(
+        "click",
+        async () => {
+            const question =
+                button.dataset.aiQuestion || "";
+
+            await askGarageAi(question);
+        }
+    );
+});
 
 loadDashboard();

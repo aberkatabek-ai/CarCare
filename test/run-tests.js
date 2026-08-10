@@ -34,6 +34,9 @@ const {
 const {
     extractDocumentSuggestions
 } = require("../src/utils/documentExtraction");
+const {
+    buildGarageAiContext
+} = require("../src/utils/garageAiContext");
 
 function runTest(name, testFn) {
     try {
@@ -539,6 +542,77 @@ runTest(
         assert.equal(
             result.suggestions.licensePlate,
             "34 ABC 123"
+        );
+    }
+);
+
+runTest(
+    "garage AI context summarizes active garage pressure",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 7,
+                    brand: "BMW",
+                    model: "420",
+                    nickname: "Coupe",
+                    current_mileage: 68000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    id: 11,
+                    vehicle_id: 7,
+                    name: "Oil service",
+                    status: "overdue"
+                }],
+                serviceHistory: [{
+                    vehicle_id: 7,
+                    service_name: "Brake service",
+                    completed_at: "2026-06-10",
+                    actual_cost: 4800
+                }],
+                issues: [{
+                    vehicle_id: 7,
+                    issue_title: "Brake vibration",
+                    risk_level: "red",
+                    status: "open"
+                }],
+                documents: [{
+                    vehicle_id: 7,
+                    title: "Insurance",
+                    renewal_status: "due_soon"
+                }],
+                expenses: [{
+                    vehicle_id: 7,
+                    amount: 1500
+                }],
+                fuelEntries: [{
+                    vehicle_id: 7,
+                    total_cost: 3200
+                }],
+                costSummary: {
+                    totalFuelCost: 3200,
+                    totalExpenseCost: 1500,
+                    totalServiceCost: 4800,
+                    totalOwnershipCost: 9500
+                }
+            });
+
+        assert.equal(
+            context.overview.activeVehicleCount,
+            1
+        );
+        assert.equal(
+            context.overview.overdueMaintenanceCount,
+            1
+        );
+        assert.equal(
+            context.vehicles[0].mechanical.urgentIssueCount,
+            1
+        );
+        assert.equal(
+            context.vehicles[0].costs.ownershipTotal,
+            9500
         );
     }
 );
