@@ -249,6 +249,7 @@ let serviceHistory = [];
 let vehicleIssues = [];
 let vehicleDocuments = [];
 let aiConfigured = true;
+let aiConversationHistory = [];
 
 let selectedVehicleId = null;
 let editingVehicleId = null;
@@ -285,7 +286,79 @@ function createTextElement(
     return element;
 }
 
-function appendAiMessage(role, text) {
+function createAiFeedbackButton(
+    label,
+    isActive,
+    onClick
+) {
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+    button.className =
+        `ai-feedback-button${isActive ? " active" : ""}`;
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+
+    return button;
+}
+
+async function saveAiFeedback(
+    conversationId,
+    feedbackStatus,
+    buttonRow
+) {
+    const feedbackNote =
+        feedbackStatus ===
+        "not_helpful"
+            ? window.prompt(
+                "What was missing or wrong in this reply?",
+                ""
+            ) || ""
+            : "";
+
+    try {
+        const data =
+            await window.apiRequest(
+                `/api/ai/conversations/${conversationId}/feedback`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        feedbackStatus,
+                        feedbackNote
+                    })
+                }
+            );
+
+        const nextStatus =
+            data.feedback.feedback_status;
+
+        buttonRow
+            .querySelectorAll(
+                ".ai-feedback-button"
+            )
+            .forEach((button) => {
+                button.classList.toggle(
+                    "active",
+                    button.dataset.status ===
+                        nextStatus
+                );
+            });
+
+        setAiStatus(data.message);
+    } catch (error) {
+        setAiStatus(
+            error.message,
+            true
+        );
+    }
+}
+
+function appendAiMessage(
+    role,
+    text,
+    options = {}
+) {
     if (!aiChatThread) {
         return;
     }
@@ -295,6 +368,11 @@ function appendAiMessage(role, text) {
 
     message.className =
         `ai-message ${role}`;
+
+    if (options.conversationId) {
+        message.dataset.conversationId =
+            String(options.conversationId);
+    }
 
     message.append(
         createTextElement(
@@ -310,6 +388,58 @@ function appendAiMessage(role, text) {
             text
         )
     );
+
+    if (
+        role === "assistant" &&
+        options.conversationId
+    ) {
+        const feedbackRow =
+            document.createElement("div");
+
+        feedbackRow.className =
+            "ai-message-feedback";
+
+        const helpfulButton =
+            createAiFeedbackButton(
+                "Helpful",
+                options.feedbackStatus ===
+                    "helpful",
+                async () => {
+                    await saveAiFeedback(
+                        options.conversationId,
+                        "helpful",
+                        feedbackRow
+                    );
+                }
+            );
+
+        helpfulButton.dataset.status =
+            "helpful";
+
+        const notHelpfulButton =
+            createAiFeedbackButton(
+                "Needs work",
+                options.feedbackStatus ===
+                    "not_helpful",
+                async () => {
+                    await saveAiFeedback(
+                        options.conversationId,
+                        "not_helpful",
+                        feedbackRow
+                    );
+                }
+            );
+
+        notHelpfulButton.dataset.status =
+            "not_helpful";
+
+        feedbackRow.append(
+            helpfulButton,
+            notHelpfulButton
+        );
+
+        message.append(feedbackRow);
+    }
 
     aiChatThread.append(message);
     aiChatThread.scrollTop =
@@ -365,8 +495,21 @@ async function askGarageAi(question) {
 
         appendAiMessage(
             "assistant",
-            data.reply
+            data.reply,
+            {
+                conversationId:
+                    data.conversation?.id,
+                feedbackStatus:
+                    data.conversation
+                        ?.feedback_status
+            }
         );
+
+        if (data.conversation) {
+            aiConversationHistory.unshift(
+                data.conversation
+            );
+        }
 
         setAiStatus(
             aiConfigured
@@ -392,6 +535,57 @@ async function askGarageAi(question) {
             aiChatSubmitButton.textContent =
                 "Ask AI";
         }
+    }
+}
+
+async function loadAiHistory() {
+    if (!aiChatThread) {
+        return;
+    }
+
+    try {
+        const data =
+            await window.apiRequest(
+                "/api/ai/history"
+            );
+
+        aiConversationHistory =
+            data.conversations || [];
+
+        if (
+            aiConversationHistory.length === 0
+        ) {
+            return;
+        }
+
+        aiChatThread.innerHTML = "";
+
+        aiConversationHistory
+            .slice()
+            .reverse()
+            .forEach((conversation) => {
+                appendAiMessage(
+                    "user",
+                    conversation.question
+                );
+
+                appendAiMessage(
+                    "assistant",
+                    conversation.reply,
+                    {
+                        conversationId:
+                            conversation.id,
+                        feedbackStatus:
+                            conversation.feedback_status
+                    }
+                );
+            });
+
+        setAiStatus(
+            "Previous AI conversations loaded. Mark the useful ones so they become training data."
+        );
+    } catch (error) {
+        console.error(error);
     }
 }
 
@@ -2336,3 +2530,4 @@ aiQuickActionButtons.forEach((button) => {
 });
 
 loadDashboard();
+loadAiHistory();

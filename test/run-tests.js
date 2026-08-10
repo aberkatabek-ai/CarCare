@@ -37,6 +37,9 @@ const {
 const {
     buildGarageAiContext
 } = require("../src/utils/garageAiContext");
+const {
+    formatConversationDatasetRow
+} = require("../src/services/aiTrainingService");
 
 function runTest(name, testFn) {
     try {
@@ -613,6 +616,51 @@ runTest(
         assert.equal(
             context.vehicles[0].costs.ownershipTotal,
             9500
+        );
+    }
+);
+
+runTest(
+    "AI dataset row formatter keeps question, answer and feedback metadata",
+    () => {
+        const row = JSON.parse(
+            formatConversationDatasetRow({
+                id: 9,
+                user_id: 3,
+                question:
+                    "What should I prioritize?",
+                reply:
+                    "Handle the overdue oil service first.",
+                garage_context: {
+                    overview: {
+                        overdueMaintenanceCount: 1
+                    }
+                },
+                model_name: "gpt-5.6-terra",
+                feedback_status: "helpful",
+                feedback_note:
+                    "Clear and actionable.",
+                helpfulness_score: 1,
+                created_at:
+                    "2026-08-10T12:00:00.000Z"
+            })
+        );
+
+        assert.equal(
+            row.messages[1].content,
+            "What should I prioritize?"
+        );
+        assert.equal(
+            row.messages[2].content,
+            "Handle the overdue oil service first."
+        );
+        assert.equal(
+            row.metadata.feedbackStatus,
+            "helpful"
+        );
+        assert.equal(
+            row.metadata.helpfulnessScore,
+            1
         );
     }
 );

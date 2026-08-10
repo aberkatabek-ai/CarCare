@@ -7,6 +7,13 @@ const {
     hasAiConfiguration,
     requestGarageAiReply
 } = require("../services/garageAiService");
+const {
+    recordAiConversation,
+    updateAiConversationFeedback,
+    getAiConversationHistory,
+    formatConversationDatasetRow,
+    getAiConversationExportRows
+} = require("../services/aiTrainingService");
 
 const aiChatLimiter = createRateLimiter({
     keyPrefix: "ai-chat",
@@ -310,6 +317,7 @@ async function chatWithGarageAi(
                 configured:
                     hasAiConfiguration(),
                 garageContext,
+                conversation: null,
                 reply:
                     "Add an active vehicle first. Then I can comment on maintenance risk, upcoming spend and document readiness."
             });
@@ -321,12 +329,22 @@ async function chatWithGarageAi(
                 garageContext
             });
 
+        const conversation =
+            await recordAiConversation({
+                userId: req.session.userId,
+                question,
+                reply: result.reply,
+                garageContext,
+                model: result.model
+            });
+
         res.json({
             success: true,
             configured: true,
             model: result.model,
             garageContext,
-            reply: result.reply
+            reply: result.reply,
+            conversation
         });
     } catch (error) {
         if (error.code === "AI_NOT_CONFIGURED") {
@@ -342,7 +360,153 @@ async function chatWithGarageAi(
     }
 }
 
+function normalizeFeedbackStatus(value) {
+    if (value === "helpful") {
+        return "helpful";
+    }
+
+    if (value === "not_helpful") {
+        return "not_helpful";
+    }
+
+    return "";
+}
+
+function normalizeOptionalFeedbackNote(value) {
+    if (typeof value !== "string") {
+        return null;
+    }
+
+    const note = value.trim();
+
+    if (!note) {
+        return null;
+    }
+
+    return note.slice(0, 1200);
+}
+
+async function saveGarageAiFeedback(
+    req,
+    res,
+    next
+) {
+    try {
+        const conversationId = Number(
+            req.params.id
+        );
+
+        if (!Number.isInteger(conversationId)) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Invalid AI conversation ID."
+            });
+        }
+
+        const feedbackStatus =
+            normalizeFeedbackStatus(
+                req.body.feedbackStatus
+            );
+
+        if (!feedbackStatus) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Feedback must be helpful or not helpful."
+            });
+        }
+
+        const feedback =
+            await updateAiConversationFeedback({
+                conversationId,
+                userId: req.session.userId,
+                feedbackStatus,
+                feedbackNote:
+                    normalizeOptionalFeedbackNote(
+                        req.body.feedbackNote
+                    )
+            });
+
+        if (!feedback) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "AI conversation was not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message:
+                feedbackStatus === "helpful"
+                    ? "Feedback saved. This reply is now a positive training example."
+                    : "Feedback saved. This reply is now marked for review.",
+            feedback
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getGarageAiHistory(
+    req,
+    res,
+    next
+) {
+    try {
+        res.json({
+            success: true,
+            conversations:
+                await getAiConversationHistory(
+                    req.session.userId
+                )
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function exportGarageAiDataset(
+    req,
+    res,
+    next
+) {
+    try {
+        const feedbackStatus =
+            normalizeFeedbackStatus(
+                req.query.feedbackStatus
+            ) || "all";
+
+        const rows =
+            await getAiConversationExportRows({
+                userId: req.session.userId,
+                feedbackStatus
+            });
+
+        const jsonl = rows
+            .map(formatConversationDatasetRow)
+            .join("\n");
+
+        res.setHeader(
+            "Content-Type",
+            "application/x-ndjson; charset=utf-8"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="carcare-ai-dataset-${feedbackStatus}.jsonl"`
+        );
+
+        res.send(jsonl);
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     aiChatLimiter,
-    chatWithGarageAi
+    chatWithGarageAi,
+    saveGarageAiFeedback,
+    getGarageAiHistory,
+    exportGarageAiDataset
 };

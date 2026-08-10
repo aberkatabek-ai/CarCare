@@ -144,3 +144,36 @@ CREATE TABLE IF NOT EXISTS vehicle_issue_media (
 
 CREATE INDEX IF NOT EXISTS idx_vehicle_issue_media_issue_id
 ON vehicle_issue_media(issue_id);
+
+CREATE TABLE IF NOT EXISTS ai_conversations (
+    id BIGSERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    question TEXT NOT NULL,
+    reply TEXT NOT NULL,
+    garage_context JSONB NOT NULL,
+    model_name VARCHAR(120),
+    feedback_status VARCHAR(20) NOT NULL DEFAULT 'unrated',
+    feedback_note TEXT,
+    helpfulness_score SMALLINT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    feedback_updated_at TIMESTAMPTZ
+);
+
+ALTER TABLE ai_conversations
+DROP CONSTRAINT IF EXISTS chk_ai_conversations_feedback_status;
+
+ALTER TABLE ai_conversations
+ADD CONSTRAINT chk_ai_conversations_feedback_status
+CHECK (
+    feedback_status IN (
+        'unrated',
+        'helpful',
+        'not_helpful'
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_user_created_at
+ON ai_conversations(user_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_feedback_status
+ON ai_conversations(feedback_status, created_at DESC);
