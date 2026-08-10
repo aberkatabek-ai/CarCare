@@ -1019,35 +1019,49 @@ a.secondary-button {
 }
 
 @media (max-width: 720px) {
-    .dashboard-header {
-        position: sticky;
-    }
-
     .dashboard-header-content {
-        align-items: center;
-        flex-wrap: wrap;
+        align-items: flex-start;
         gap: 12px;
         min-height: auto;
         padding: 14px 0;
     }
 
     .dashboard-header-content .brand.compact {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .nav-toggle {
-        display: inline-flex;
-        flex: 0 0 auto;
-    }
-
-    .header-actions {
-        display: none;
         width: 100%;
     }
 
-    .dashboard-header.menu-open .header-actions {
-        display: flex;
+    .dashboard-header .header-actions {
+        display: flex !important;
+        width: 100%;
+        flex-wrap: nowrap !important;
+        gap: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .dashboard-header .header-actions::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .dashboard-header .header-actions::-webkit-scrollbar-thumb {
+        background: rgba(31, 74, 58, 0.22);
+        border-radius: 999px;
+    }
+
+    .dashboard-header .nav-link,
+    .dashboard-header .header-actions .secondary-button,
+    .dashboard-header .header-actions button {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: max-content;
+        min-height: 42px;
+    }
+
+    .nav-toggle {
+        display: none !important;
     }
 }
 

@@ -389,20 +389,20 @@
 
 @media (max-width: 720px) {
     .dashboard-header-content {
-        align-items: center;
+        align-items: flex-start;
         gap: 14px;
     }
 
     .header-actions {
         width: 100%;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: flex-start;
     }
 
     .nav-link,
     .header-actions .secondary-button {
-        flex: 1 1 160px;
-        min-width: 0;
+        flex: 0 0 auto;
+        min-width: max-content;
     }
 
     .page-heading-card,
@@ -421,13 +421,15 @@
 
 @media (max-width: 520px) {
     .header-actions {
-        align-items: stretch;
-        flex-direction: column;
+        align-items: center;
+        flex-direction: row;
     }
 
     .nav-link,
     .header-actions button {
-        width: 100%;
+        flex: 0 0 auto;
+        min-height: 42px;
+        width: auto;
         text-align: center;
     }
 
