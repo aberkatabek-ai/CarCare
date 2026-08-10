@@ -389,11 +389,8 @@
 
 @media (max-width: 720px) {
     .dashboard-header-content {
-        align-items: flex-start;
-        flex-direction: column;
+        align-items: center;
         gap: 14px;
-
-        padding: 14px 0;
     }
 
     .header-actions {

@@ -440,6 +440,34 @@ a.secondary-button {
     min-height: 76px;
 }
 
+.nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 46px;
+    min-height: 46px;
+    padding: 0 14px;
+
+    color: var(--primary);
+    background: rgba(31, 74, 58, 0.08);
+    border: 1px solid rgba(31, 74, 58, 0.15);
+    border-radius: 12px;
+
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.nav-toggle:hover {
+    background: rgba(31, 74, 58, 0.14);
+}
+
+.nav-toggle:focus-visible {
+    outline: 2px solid rgba(31, 74, 58, 0.28);
+    outline-offset: 2px;
+}
+
 .brand.compact .brand-icon {
     width: 42px;
     height: 42px;
@@ -949,13 +977,6 @@ a.secondary-button {
         width: min(100% - 28px, 1120px);
     }
 
-    .dashboard-header-content {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
-        padding: 14px 0;
-    }
-
     .dashboard-header-content .brand.compact {
         width: 100%;
     }
@@ -994,6 +1015,39 @@ a.secondary-button {
     .page-action-link {
         width: 100%;
         text-align: center;
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard-header {
+        position: sticky;
+    }
+
+    .dashboard-header-content {
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        min-height: auto;
+        padding: 14px 0;
+    }
+
+    .dashboard-header-content .brand.compact {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .nav-toggle {
+        display: inline-flex;
+        flex: 0 0 auto;
+    }
+
+    .header-actions {
+        display: none;
+        width: 100%;
+    }
+
+    .dashboard-header.menu-open .header-actions {
+        display: flex;
     }
 }
 

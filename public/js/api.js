@@ -118,6 +118,122 @@ function getCurrentPath() {
     return pathname;
 }
 
+function ensureMobileNavigationToggle() {
+    const header =
+        window.document.querySelector(
+            ".dashboard-header"
+        );
+
+    const headerContent =
+        window.document.querySelector(
+            ".dashboard-header-content"
+        );
+
+    const headerActions =
+        window.document.querySelector(
+            ".header-actions"
+        );
+
+    if (
+        !header ||
+        !headerContent ||
+        !headerActions
+    ) {
+        return;
+    }
+
+    let toggleButton =
+        headerContent.querySelector(
+            ".nav-toggle"
+        );
+
+    if (!toggleButton) {
+        toggleButton =
+            window.document.createElement(
+                "button"
+            );
+
+        toggleButton.type = "button";
+        toggleButton.className = "nav-toggle";
+        toggleButton.setAttribute(
+            "aria-controls",
+            "header-actions"
+        );
+
+        headerActions.id =
+            headerActions.id ||
+            "header-actions";
+
+        headerContent.appendChild(
+            toggleButton
+        );
+    }
+
+    function syncMenuState(isOpen) {
+        header.classList.toggle(
+            "menu-open",
+            isOpen
+        );
+
+        toggleButton.textContent = isOpen
+            ? "Close"
+            : "Menu";
+
+        toggleButton.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+        );
+
+        toggleButton.setAttribute(
+            "aria-label",
+            isOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+        );
+    }
+
+    if (!toggleButton.dataset.bound) {
+        toggleButton.addEventListener(
+            "click",
+            () => {
+                const isOpen =
+                    !header.classList.contains(
+                        "menu-open"
+                    );
+
+                syncMenuState(isOpen);
+            }
+        );
+
+        headerActions.addEventListener(
+            "click",
+            (event) => {
+                if (
+                    event.target instanceof
+                        window.HTMLAnchorElement &&
+                    window.innerWidth <= 720
+                ) {
+                    syncMenuState(false);
+                }
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            () => {
+                if (window.innerWidth > 720) {
+                    syncMenuState(false);
+                }
+            }
+        );
+
+        toggleButton.dataset.bound =
+            "true";
+    }
+
+    syncMenuState(false);
+}
+
 function enhanceNavigation() {
     const headerActions =
         window.document.querySelector(
@@ -197,6 +313,8 @@ function enhanceNavigation() {
                 );
             }
         });
+
+    ensureMobileNavigationToggle();
 }
 
 window.apiRequest = apiRequest;
