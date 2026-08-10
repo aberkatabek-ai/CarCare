@@ -135,8 +135,9 @@ a {
 
     border-radius: 14px;
 
-    font-size: 22px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: 850;
+    letter-spacing: -0.06em;
 }
 
 .brand h1,
