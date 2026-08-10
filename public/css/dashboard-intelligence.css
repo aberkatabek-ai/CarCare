@@ -356,6 +356,171 @@
     text-align: center;
 }
 
+.garage-signals-section {
+    margin-top: 18px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+}
+
+.signal-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.signal-card {
+    min-width: 0;
+    padding: 18px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+}
+
+.signal-label {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.signal-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0 10px;
+}
+
+.signal-score {
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -0.05em;
+}
+
+.signal-tone {
+    flex-shrink: 0;
+    padding: 7px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.signal-tone.strong {
+    color: var(--success);
+    background: var(--success-background);
+}
+
+.signal-tone.stable {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.signal-tone.watch {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.signal-tone.risk {
+    color: #8f2d28;
+    background: var(--error-background);
+}
+
+.signal-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.priority-panel {
+    margin-top: 18px;
+}
+
+.priority-panel-heading {
+    margin-bottom: 16px;
+}
+
+.priority-panel-heading h3 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.priority-list {
+    display: grid;
+    gap: 12px;
+}
+
+.priority-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+}
+
+.priority-item-content {
+    min-width: 0;
+}
+
+.priority-item-content strong,
+.priority-item-content span,
+.priority-item-content p {
+    display: block;
+}
+
+.priority-item-content span {
+    margin-bottom: 6px;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.priority-item-content strong {
+    font-size: 14px;
+}
+
+.priority-item-content p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.priority-badge {
+    flex-shrink: 0;
+    padding: 7px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.priority-badge.critical {
+    color: #8f2d28;
+    background: var(--error-background);
+}
+
+.priority-badge.warning {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.priority-badge.info {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
 /*
     This also corrects the old --primaryprimary
     typo without changing style.css.
@@ -366,6 +531,11 @@
 
 @media (max-width: 1000px) {
     .statistics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .signal-grid {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
     }
@@ -394,18 +564,24 @@
         grid-template-columns: 1fr;
     }
 
+    .signal-grid {
+        grid-template-columns: 1fr;
+    }
+
     .statistic-card {
         min-height: 155px;
     }
 
     .insight-heading,
-    .overview-list-item {
+    .overview-list-item,
+    .priority-item {
         align-items: flex-start;
         flex-direction: column;
     }
 
     .overview-status,
-    .service-cost-badge {
+    .service-cost-badge,
+    .priority-badge {
         align-self: flex-start;
     }
 }

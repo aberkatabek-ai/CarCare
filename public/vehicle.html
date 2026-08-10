@@ -31,6 +31,11 @@
     ></script>
 
     <script
+        src="/js/garage-insights.js"
+        defer
+    ></script>
+
+    <script
         src="/js/vehicle.js"
         defer
     ></script>
@@ -209,6 +214,119 @@
                     <strong id="passport-record-status">
                         Live database record
                     </strong>
+                </div>
+            </section>
+
+            <section class="vehicle-insights-section">
+                <div class="vehicle-section-heading">
+                    <div>
+                        <p class="eyebrow">
+                            Status summary
+                        </p>
+
+                        <h2>How this vehicle looks today</h2>
+                    </div>
+                </div>
+
+                <div class="vehicle-signal-grid">
+                    <article class="vehicle-signal-card">
+                        <span class="signal-label">
+                            Mechanical confidence
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="vehicle-mechanical-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="vehicle-mechanical-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="vehicle-mechanical-summary">
+                            Analysing issues and service history...
+                        </p>
+                    </article>
+
+                    <article class="vehicle-signal-card">
+                        <span class="signal-label">
+                            Maintenance discipline
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="vehicle-maintenance-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="vehicle-maintenance-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="vehicle-maintenance-summary">
+                            Reviewing active plans...
+                        </p>
+                    </article>
+
+                    <article class="vehicle-signal-card">
+                        <span class="signal-label">
+                            Document readiness
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="vehicle-document-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="vehicle-document-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="vehicle-document-summary">
+                            Checking document and ownership status...
+                        </p>
+                    </article>
+                </div>
+
+                <div class="vehicle-priority-panel">
+                    <div class="vehicle-section-heading vehicle-priority-heading">
+                        <div>
+                            <p class="eyebrow">
+                                Priority list
+                            </p>
+
+                            <h2>What to do next</h2>
+                        </div>
+                    </div>
+
+                    <div
+                        id="vehicle-priority-list"
+                        class="priority-list"
+                    >
+                        <div class="overview-loading">
+                            Building this vehicle's priority list...
+                        </div>
+                    </div>
                 </div>
             </section>
 

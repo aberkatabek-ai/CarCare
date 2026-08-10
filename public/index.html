@@ -36,6 +36,11 @@
     ></script>
 
     <script
+        src="/js/garage-insights.js"
+        defer
+    ></script>
+
+    <script
         src="/js/app.js"
         defer
     ></script>
@@ -236,6 +241,113 @@
                     </p>
                 </article>
             </div>
+
+            <section class="garage-signals-section">
+                <div class="insight-heading">
+                    <div>
+                        <p class="eyebrow">Garage signals</p>
+                        <h3>Explainable status view</h3>
+                    </div>
+                </div>
+
+                <div class="signal-grid">
+                    <article class="signal-card">
+                        <span class="signal-label">
+                            Mechanical confidence
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="mechanical-signal-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="mechanical-signal-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="mechanical-signal-summary">
+                            Analysing active issues...
+                        </p>
+                    </article>
+
+                    <article class="signal-card">
+                        <span class="signal-label">
+                            Maintenance discipline
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="maintenance-signal-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="maintenance-signal-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="maintenance-signal-summary">
+                            Checking plan coverage...
+                        </p>
+                    </article>
+
+                    <article class="signal-card">
+                        <span class="signal-label">
+                            Document readiness
+                        </span>
+
+                        <div class="signal-score-row">
+                            <strong
+                                id="document-signal-score"
+                                class="signal-score"
+                            >
+                                -
+                            </strong>
+
+                            <span
+                                id="document-signal-tone"
+                                class="signal-tone"
+                            >
+                                Loading
+                            </span>
+                        </div>
+
+                        <p id="document-signal-summary">
+                            Reviewing expiry and ownership data...
+                        </p>
+                    </article>
+                </div>
+
+                <div class="priority-panel">
+                    <div class="priority-panel-heading">
+                        <div>
+                            <p class="eyebrow">Priority queue</p>
+                            <h3>What deserves attention first</h3>
+                        </div>
+                    </div>
+
+                    <div
+                        id="garage-priority-list"
+                        class="priority-list"
+                    >
+                        <div class="overview-loading">
+                            Building your garage priorities...
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <div class="dashboard-insight-grid">
                 <article class="dashboard-insight-card">

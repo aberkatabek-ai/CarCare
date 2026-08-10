@@ -148,10 +148,62 @@ const recentServiceList =
         "#recent-service-list"
     );
 
+const mechanicalSignalScore =
+    document.querySelector(
+        "#mechanical-signal-score"
+    );
+
+const mechanicalSignalTone =
+    document.querySelector(
+        "#mechanical-signal-tone"
+    );
+
+const mechanicalSignalSummary =
+    document.querySelector(
+        "#mechanical-signal-summary"
+    );
+
+const maintenanceSignalScore =
+    document.querySelector(
+        "#maintenance-signal-score"
+    );
+
+const maintenanceSignalTone =
+    document.querySelector(
+        "#maintenance-signal-tone"
+    );
+
+const maintenanceSignalSummary =
+    document.querySelector(
+        "#maintenance-signal-summary"
+    );
+
+const documentSignalScore =
+    document.querySelector(
+        "#document-signal-score"
+    );
+
+const documentSignalTone =
+    document.querySelector(
+        "#document-signal-tone"
+    );
+
+const documentSignalSummary =
+    document.querySelector(
+        "#document-signal-summary"
+    );
+
+const garagePriorityList =
+    document.querySelector(
+        "#garage-priority-list"
+    );
+
 let vehicles = [];
 let soldVehicles = [];
 let maintenancePlans = [];
 let serviceHistory = [];
+let vehicleIssues = [];
+let vehicleDocuments = [];
 
 let selectedVehicleId = null;
 let editingVehicleId = null;
@@ -251,6 +303,36 @@ function formatDashboardDate(value) {
         );
 }
 
+function requestOptionalList(
+    url,
+    responseProperties
+) {
+    return window.apiRequest(url)
+        .then((data) => {
+            const propertyNames = Array.isArray(
+                responseProperties
+            )
+                ? responseProperties
+                : [responseProperties];
+
+            for (const propertyName of propertyNames) {
+                if (Array.isArray(data[propertyName])) {
+                    return data[propertyName];
+                }
+            }
+
+            return [];
+        })
+        .catch((error) => {
+            console.warn(
+                `Optional dashboard source failed: ${url}`,
+                error
+            );
+
+            return [];
+        });
+}
+
 function getDisplayName(user) {
     return (
         user.preferred_name ||
@@ -346,6 +428,175 @@ function createOverviewEmptyState(
     );
 
     return emptyState;
+}
+
+function formatSignalScore(score) {
+    return Number(score).toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }
+    );
+}
+
+function applySignal(
+    scoreElement,
+    toneElement,
+    summaryElement,
+    metric
+) {
+    scoreElement.textContent =
+        formatSignalScore(metric.score);
+    toneElement.textContent = metric.toneLabel;
+    toneElement.className =
+        `signal-tone ${metric.tone}`;
+    summaryElement.textContent =
+        metric.summary;
+}
+
+function createPriorityItem(priority) {
+    const item =
+        document.createElement("article");
+
+    item.className = "priority-item";
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "priority-item-content";
+
+    content.append(
+        createTextElement(
+            "span",
+            "",
+            `${priority.area} | ${priority.vehicleName}`
+        ),
+        createTextElement(
+            "strong",
+            "",
+            priority.title
+        ),
+        createTextElement(
+            "p",
+            "",
+            priority.detail
+        )
+    );
+
+    const badge =
+        createTextElement(
+            "span",
+            `priority-badge ${priority.level}`,
+            priority.level === "critical"
+                ? "Now"
+                : priority.level === "warning"
+                    ? "Soon"
+                    : "Monitor"
+        );
+
+    item.append(content, badge);
+
+    return item;
+}
+
+function renderGarageSignals() {
+    if (!window.garageInsights) {
+        return;
+    }
+
+    const vehicleInsightList =
+        vehicles.map((vehicleRecord) =>
+            window.garageInsights.assessVehicle({
+                vehicle: vehicleRecord,
+                maintenancePlans:
+                    maintenancePlans.filter(
+                        (plan) =>
+                            String(
+                                plan.vehicle_id
+                            ) ===
+                            String(
+                                vehicleRecord.id
+                            )
+                    ),
+                serviceHistory:
+                    serviceHistory.filter(
+                        (record) =>
+                            String(
+                                record.vehicle_id
+                            ) ===
+                            String(
+                                vehicleRecord.id
+                            )
+                    ),
+                issues: vehicleIssues.filter(
+                    (issue) =>
+                        String(
+                            issue.vehicle_id
+                        ) ===
+                        String(
+                            vehicleRecord.id
+                        )
+                ),
+                documents:
+                    vehicleDocuments.filter(
+                        (documentRecord) =>
+                            String(
+                                documentRecord.vehicle_id
+                            ) ===
+                            String(
+                                vehicleRecord.id
+                            )
+                    )
+            })
+        );
+
+    const summary =
+        window.garageInsights.summarizeGarage(
+            vehicleInsightList
+        );
+
+    applySignal(
+        mechanicalSignalScore,
+        mechanicalSignalTone,
+        mechanicalSignalSummary,
+        summary.metrics.mechanicalConfidence
+    );
+
+    applySignal(
+        maintenanceSignalScore,
+        maintenanceSignalTone,
+        maintenanceSignalSummary,
+        summary.metrics.maintenanceDiscipline
+    );
+
+    applySignal(
+        documentSignalScore,
+        documentSignalTone,
+        documentSignalSummary,
+        summary.metrics.documentReadiness
+    );
+
+    garagePriorityList.innerHTML = "";
+
+    if (summary.priorities.length === 0) {
+        garagePriorityList.append(
+            createOverviewEmptyState(
+                "OK",
+                "No urgent garage priority",
+                "Your active vehicles do not currently show a critical or upcoming issue."
+            )
+        );
+
+        return;
+    }
+
+    summary.priorities.forEach((priority) => {
+        garagePriorityList.append(
+            createPriorityItem(priority)
+        );
+    });
 }
 
 function renderMaintenanceOverview() {
@@ -570,9 +821,24 @@ function renderDashboardOverview() {
                 plan.status === "due_soon"
         );
 
+    const openIssues = vehicleIssues.filter(
+        (issue) => issue.status !== "repaired"
+    );
+
+    const documentAlerts =
+        vehicleDocuments.filter(
+            (documentRecord) =>
+                documentRecord.renewal_status ===
+                    "expired" ||
+                documentRecord.renewal_status ===
+                    "due_soon"
+        );
+
     const attentionCount =
         overduePlans.length +
-        dueSoonPlans.length;
+        dueSoonPlans.length +
+        openIssues.length +
+        documentAlerts.length;
 
     const totalServiceCost =
         serviceHistory.reduce(
@@ -608,11 +874,12 @@ function renderDashboardOverview() {
 
     if (attentionCount === 0) {
         attentionStatisticDetail.textContent =
-            "No maintenance needs attention";
+            "No tracked issue currently needs attention";
     } else {
         attentionStatisticDetail.textContent =
             `${overduePlans.length} overdue • ` +
-            `${dueSoonPlans.length} due soon`;
+            `${openIssues.length} issues • ` +
+            `${documentAlerts.length} documents`;
     }
 
     serviceCostStatistic.textContent =
@@ -629,6 +896,7 @@ function renderDashboardOverview() {
     dashboardLastUpdated.textContent =
         "Updated just now";
 
+    renderGarageSignals();
     renderMaintenanceOverview();
     renderRecentServices();
 }
@@ -1077,7 +1345,9 @@ async function loadDashboard() {
             vehicleData,
             soldVehicleData,
             maintenanceData,
-            historyData
+            historyData,
+            issueData,
+            documentData
         ] = await Promise.all([
             window.apiRequest(
                 "/api/auth/me"
@@ -1096,6 +1366,16 @@ async function loadDashboard() {
 
             window.apiRequest(
                 "/api/service-history"
+            ),
+
+            requestOptionalList(
+                "/api/issues",
+                "issues"
+            ),
+
+            requestOptionalList(
+                "/api/documents",
+                "documents"
             )
         ]);
 
@@ -1119,6 +1399,10 @@ async function loadDashboard() {
 
         serviceHistory =
             historyData.serviceHistory;
+
+        vehicleIssues = issueData;
+
+        vehicleDocuments = documentData;
 
         renderVehicles();
         renderSoldVehicles();

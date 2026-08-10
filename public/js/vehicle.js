@@ -119,6 +119,56 @@ const vehicleTotalCost = document.querySelector(
     "#vehicle-total-cost"
 );
 
+const vehicleMechanicalScore =
+    document.querySelector(
+        "#vehicle-mechanical-score"
+    );
+
+const vehicleMechanicalTone =
+    document.querySelector(
+        "#vehicle-mechanical-tone"
+    );
+
+const vehicleMechanicalSummary =
+    document.querySelector(
+        "#vehicle-mechanical-summary"
+    );
+
+const vehicleMaintenanceScore =
+    document.querySelector(
+        "#vehicle-maintenance-score"
+    );
+
+const vehicleMaintenanceTone =
+    document.querySelector(
+        "#vehicle-maintenance-tone"
+    );
+
+const vehicleMaintenanceSummary =
+    document.querySelector(
+        "#vehicle-maintenance-summary"
+    );
+
+const vehicleDocumentScore =
+    document.querySelector(
+        "#vehicle-document-score"
+    );
+
+const vehicleDocumentTone =
+    document.querySelector(
+        "#vehicle-document-tone"
+    );
+
+const vehicleDocumentSummary =
+    document.querySelector(
+        "#vehicle-document-summary"
+    );
+
+const vehiclePriorityList =
+    document.querySelector(
+        "#vehicle-priority-list"
+    );
+
 const mileageRecordCount = document.querySelector(
     "#mileage-record-count"
 );
@@ -533,6 +583,83 @@ function createEmptyState(icon, title, description) {
     return emptyState;
 }
 
+function formatSignalScore(score) {
+    return Number(score).toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }
+    );
+}
+
+function applySignal(
+    scoreElement,
+    toneElement,
+    summaryElement,
+    metric
+) {
+    if (
+        !scoreElement ||
+        !toneElement ||
+        !summaryElement
+    ) {
+        return;
+    }
+
+    scoreElement.textContent =
+        formatSignalScore(metric.score);
+    toneElement.textContent = metric.toneLabel;
+    toneElement.className =
+        `signal-tone ${metric.tone}`;
+    summaryElement.textContent =
+        metric.summary;
+}
+
+function createPriorityItem(priority) {
+    const item = createElement(
+        "article",
+        "priority-item"
+    );
+
+    const content = createElement(
+        "div",
+        "priority-item-content"
+    );
+
+    content.append(
+        createElement(
+            "span",
+            "",
+            priority.area
+        ),
+        createElement(
+            "strong",
+            "",
+            priority.title
+        ),
+        createElement(
+            "p",
+            "",
+            priority.detail
+        )
+    );
+
+    const badge = createElement(
+        "span",
+        `priority-badge ${priority.level}`,
+        priority.level === "critical"
+            ? "Now"
+            : priority.level === "warning"
+                ? "Soon"
+                : "Monitor"
+    );
+
+    item.append(content, badge);
+
+    return item;
+}
+
 function createInformationItem(label, value) {
     const information = createElement(
         "div",
@@ -726,6 +853,70 @@ function calculateTotals() {
         ownershipCost:
             serviceCost + fuelCost + expenseCost
     };
+}
+
+function renderVehicleInsights() {
+    if (!window.garageInsights || !vehicle) {
+        return;
+    }
+
+    const insight =
+        window.garageInsights.assessVehicle({
+            vehicle,
+            maintenancePlans,
+            serviceHistory,
+            issues: vehicleIssues,
+            documents: vehicleDocuments,
+            fuelRecords,
+            expenseRecords
+        });
+
+    applySignal(
+        vehicleMechanicalScore,
+        vehicleMechanicalTone,
+        vehicleMechanicalSummary,
+        insight.metrics.mechanicalConfidence
+    );
+
+    applySignal(
+        vehicleMaintenanceScore,
+        vehicleMaintenanceTone,
+        vehicleMaintenanceSummary,
+        insight.metrics.maintenanceDiscipline
+    );
+
+    applySignal(
+        vehicleDocumentScore,
+        vehicleDocumentTone,
+        vehicleDocumentSummary,
+        insight.metrics.documentReadiness
+    );
+
+    if (!vehiclePriorityList) {
+        return;
+    }
+
+    vehiclePriorityList.innerHTML = "";
+
+    if (insight.priorities.length === 0) {
+        vehiclePriorityList.append(
+            createEmptyState(
+                "OK",
+                "No urgent next step",
+                "This vehicle does not currently show a critical or near-term issue."
+            )
+        );
+
+        return;
+    }
+
+    insight.priorities
+        .slice(0, 5)
+        .forEach((priority) => {
+            vehiclePriorityList.append(
+                createPriorityItem(priority)
+            );
+        });
 }
 
 function renderSummary() {
@@ -1689,6 +1880,7 @@ function renderExpenses() {
 
 function renderVehiclePage() {
     renderVehicleHeader();
+    renderVehicleInsights();
     renderSummary();
     renderMileageHistory();
     renderMaintenancePlans();
@@ -2070,6 +2262,7 @@ if (ownershipVerificationForm) {
                 };
 
                 renderVehicleHeader();
+                renderVehicleInsights();
 
                 showOwnershipMessage(
                     `${data.message} Score: ${data.verification.score}`,
