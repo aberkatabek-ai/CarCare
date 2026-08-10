@@ -173,6 +173,26 @@ const vehiclePriorityList =
     document.querySelector(
         "#vehicle-priority-list"
     );
+const vehicleForecast30Total =
+    document.querySelector(
+        "#vehicle-forecast-30-total"
+    );
+const vehicleForecast90Total =
+    document.querySelector(
+        "#vehicle-forecast-90-total"
+    );
+const vehicleForecast30Summary =
+    document.querySelector(
+        "#vehicle-forecast-30-summary"
+    );
+const vehicleForecast90Summary =
+    document.querySelector(
+        "#vehicle-forecast-90-summary"
+    );
+const vehicleForecastList =
+    document.querySelector(
+        "#vehicle-forecast-list"
+    );
 
 const mileageRecordCount = document.querySelector(
     "#mileage-record-count"
@@ -665,6 +685,47 @@ function createPriorityItem(priority) {
     return item;
 }
 
+function createForecastItem(item) {
+    const card = createElement(
+        "article",
+        "priority-item"
+    );
+
+    const content = createElement(
+        "div",
+        "priority-item-content"
+    );
+
+    content.append(
+        createElement(
+            "span",
+            "",
+            item.type
+        ),
+        createElement(
+            "strong",
+            "",
+            item.title
+        ),
+        createElement(
+            "p",
+            "",
+            item.detail
+        )
+    );
+
+    card.append(
+        content,
+        createElement(
+            "span",
+            "priority-badge warning",
+            formatCost(item.amount)
+        )
+    );
+
+    return card;
+}
+
 function createInformationItem(label, value) {
     const information = createElement(
         "div",
@@ -920,6 +981,75 @@ function renderVehicleInsights() {
         .forEach((priority) => {
             vehiclePriorityList.append(
                 createPriorityItem(priority)
+            );
+        });
+}
+
+function renderVehicleForecast() {
+    if (!window.garageInsights || !vehicle) {
+        return;
+    }
+
+    const forecast =
+        window.garageInsights.buildUpcomingCostForecast({
+            vehicle,
+            maintenancePlans,
+            serviceHistory,
+            issues: vehicleIssues,
+            documents: vehicleDocuments
+        });
+
+    if (
+        vehicleForecast30Total &&
+        vehicleForecast90Total
+    ) {
+        vehicleForecast30Total.textContent =
+            formatCost(
+                forecast.next30DaysTotal
+            );
+        vehicleForecast90Total.textContent =
+            formatCost(
+                forecast.next90DaysTotal
+            );
+    }
+
+    if (vehicleForecast30Summary) {
+        vehicleForecast30Summary.textContent =
+            forecast.next30DaysTotal > 0
+                ? "Likely spend that may land within the next month."
+                : "No immediate tracked cost pressure was found.";
+    }
+
+    if (vehicleForecast90Summary) {
+        vehicleForecast90Summary.textContent =
+            forecast.next90DaysTotal > 0
+                ? "Wider budget estimate from maintenance, documents and open issues."
+                : "Nothing material is forecast from tracked items yet.";
+    }
+
+    if (!vehicleForecastList) {
+        return;
+    }
+
+    vehicleForecastList.innerHTML = "";
+
+    if (forecast.items.length === 0) {
+        vehicleForecastList.append(
+            createEmptyState(
+                "₺",
+                "No approaching cost estimate",
+                "Tracked maintenance, documents and issues do not currently suggest a near-term spend."
+            )
+        );
+
+        return;
+    }
+
+    forecast.items
+        .slice(0, 5)
+        .forEach((item) => {
+            vehicleForecastList.append(
+                createForecastItem(item)
             );
         });
 }
@@ -1898,6 +2028,7 @@ function renderExpenses() {
 function renderVehiclePage() {
     renderVehicleHeader();
     renderVehicleInsights();
+    renderVehicleForecast();
     renderSummary();
     renderMileageHistory();
     renderMaintenancePlans();

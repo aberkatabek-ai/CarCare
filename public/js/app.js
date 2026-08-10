@@ -197,6 +197,24 @@ const garagePriorityList =
     document.querySelector(
         "#garage-priority-list"
     );
+const forecast30Total = document.querySelector(
+    "#forecast-30-total"
+);
+const forecast90Total = document.querySelector(
+    "#forecast-90-total"
+);
+const forecast30Summary =
+    document.querySelector(
+        "#forecast-30-summary"
+    );
+const forecast90Summary =
+    document.querySelector(
+        "#forecast-90-summary"
+    );
+const garageForecastList =
+    document.querySelector(
+        "#garage-forecast-list"
+    );
 
 const garageStatusBadge =
     document.querySelector(
@@ -575,6 +593,48 @@ function createPriorityItem(priority) {
     return item;
 }
 
+function createForecastItem(item) {
+    const forecastItem =
+        document.createElement("article");
+
+    forecastItem.className =
+        "priority-item";
+
+    const content =
+        document.createElement("div");
+    content.className =
+        "priority-item-content";
+
+    content.append(
+        createTextElement(
+            "span",
+            "",
+            `${item.type} | ${item.vehicleName}`
+        ),
+        createTextElement(
+            "strong",
+            "",
+            item.title
+        ),
+        createTextElement(
+            "p",
+            "",
+            item.detail
+        )
+    );
+
+    const badge =
+        createTextElement(
+            "span",
+            "priority-badge warning",
+            formatCurrency(item.amount)
+        );
+
+    forecastItem.append(content, badge);
+
+    return forecastItem;
+}
+
 function renderGarageSignals() {
     if (!window.garageInsights) {
         return;
@@ -669,6 +729,87 @@ function renderGarageSignals() {
     summary.priorities.forEach((priority) => {
         garagePriorityList.append(
             createPriorityItem(priority)
+        );
+    });
+}
+
+function renderGarageForecast() {
+    if (!window.garageInsights) {
+        return;
+    }
+
+    const forecasts = vehicles.map((vehicleRecord) =>
+        window.garageInsights.buildUpcomingCostForecast({
+            vehicle: vehicleRecord,
+            maintenancePlans:
+                maintenancePlans.filter(
+                    (plan) =>
+                        String(plan.vehicle_id) ===
+                        String(vehicleRecord.id)
+                ),
+            serviceHistory:
+                serviceHistory.filter(
+                    (record) =>
+                        String(
+                            record.vehicle_id
+                        ) ===
+                        String(vehicleRecord.id)
+                ),
+            issues: vehicleIssues.filter(
+                (issue) =>
+                    String(issue.vehicle_id) ===
+                    String(vehicleRecord.id)
+            ),
+            documents:
+                vehicleDocuments.filter(
+                    (documentRecord) =>
+                        String(
+                            documentRecord.vehicle_id
+                        ) ===
+                        String(vehicleRecord.id)
+                )
+        })
+    );
+
+    const summary =
+        window.garageInsights.summarizeCostForecast(
+            forecasts
+        );
+
+    forecast30Total.textContent =
+        formatCurrency(
+            summary.next30DaysTotal
+        );
+    forecast90Total.textContent =
+        formatCurrency(
+            summary.next90DaysTotal
+        );
+    forecast30Summary.textContent =
+        summary.next30DaysTotal > 0
+            ? "Likely spend that may hit within the next month."
+            : "No immediate tracked cost pressure was found.";
+    forecast90Summary.textContent =
+        summary.next90DaysTotal > 0
+            ? "Wider budget view including short-term and near-term items."
+            : "Nothing significant is forecast from tracked items yet.";
+
+    garageForecastList.innerHTML = "";
+
+    if (summary.items.length === 0) {
+        garageForecastList.append(
+            createOverviewEmptyState(
+                "₺",
+                "No approaching cost pressure",
+                "Tracked maintenance, documents and issues do not currently suggest a near-term cost spike."
+            )
+        );
+
+        return;
+    }
+
+    summary.items.forEach((item) => {
+        garageForecastList.append(
+            createForecastItem(item)
         );
     });
 }
@@ -978,6 +1119,7 @@ function renderDashboardOverview() {
     });
 
     renderGarageSignals();
+    renderGarageForecast();
     renderMaintenanceOverview();
     renderRecentServices();
 }

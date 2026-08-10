@@ -121,6 +121,326 @@
         return 2;
     }
 
+    const documentCostDefaults = {
+        registration: 1500,
+        inspection: 2600,
+        insurance: 8500,
+        casco: 14000,
+        emission: 900,
+        tax: 4500,
+        warranty: 0,
+        other: 2000
+    };
+
+    const issueCostDefaults = {
+        brakes: 4500,
+        steering: 6000,
+        suspension: 5500,
+        transmission: 12000,
+        engine: 15000,
+        electrical: 3500,
+        cooling: 3000,
+        tires: 5000,
+        exhaust: 2500,
+        body: 4000,
+        other: 2500
+    };
+
+    function average(numbers) {
+        if (!numbers.length) {
+            return 0;
+        }
+
+        return (
+            numbers.reduce(
+                (total, number) => total + number,
+                0
+            ) / numbers.length
+        );
+    }
+
+    function getMaintenancePlanEstimatedCost(
+        plan,
+        serviceHistory
+    ) {
+        const directEstimate = toNumber(
+            plan.estimated_cost
+        );
+
+        if (directEstimate > 0) {
+            return directEstimate;
+        }
+
+        const matchingHistoryCosts =
+            serviceHistory
+                .filter(
+                    (record) =>
+                        record.maintenance_plan_id ===
+                            plan.id &&
+                        toNumber(
+                            record.actual_cost
+                        ) > 0
+                )
+                .map((record) =>
+                    toNumber(record.actual_cost)
+                );
+
+        if (matchingHistoryCosts.length > 0) {
+            return average(
+                matchingHistoryCosts
+            );
+        }
+
+        const categoryHistoryCosts =
+            serviceHistory
+                .filter(
+                    (record) =>
+                        String(
+                            record.category || ""
+                        ).toLowerCase() ===
+                            String(
+                                plan.category || ""
+                            ).toLowerCase() &&
+                        toNumber(
+                            record.actual_cost
+                        ) > 0
+                )
+                .map((record) =>
+                    toNumber(record.actual_cost)
+                );
+
+        if (categoryHistoryCosts.length > 0) {
+            return average(
+                categoryHistoryCosts
+            );
+        }
+
+        return plan.is_critical ? 4500 : 2500;
+    }
+
+    function getIssueEstimatedCost(
+        issue,
+        serviceHistory
+    ) {
+        const relatedHistoryCosts =
+            serviceHistory
+                .filter(
+                    (record) =>
+                        String(
+                            record.service_name || ""
+                        )
+                            .toLowerCase()
+                            .includes(
+                                String(
+                                    issue.issue_title || ""
+                                ).toLowerCase()
+                            ) &&
+                        toNumber(
+                            record.actual_cost
+                        ) > 0
+                )
+                .map((record) =>
+                    toNumber(record.actual_cost)
+                );
+
+        if (relatedHistoryCosts.length > 0) {
+            return average(
+                relatedHistoryCosts
+            );
+        }
+
+        return (
+            issueCostDefaults[
+                issue.category
+            ] || issueCostDefaults.other
+        );
+    }
+
+    function classifyForecastWindow(daysAway) {
+        if (daysAway <= 30) {
+            return "30d";
+        }
+
+        if (daysAway <= 90) {
+            return "90d";
+        }
+
+        return null;
+    }
+
+    function buildUpcomingCostForecast(input) {
+        const vehicle = input.vehicle || {};
+        const maintenancePlans =
+            input.maintenancePlans || [];
+        const serviceHistory =
+            input.serviceHistory || [];
+        const issues = input.issues || [];
+        const documents = input.documents || [];
+        const today = input.today || new Date();
+
+        const forecastItems = [];
+
+        maintenancePlans
+            .filter(
+                (plan) =>
+                    plan.status === "overdue" ||
+                    plan.status === "due_soon"
+            )
+            .forEach((plan) => {
+                const daysAway =
+                    plan.status === "overdue"
+                        ? 0
+                        : Math.max(
+                            0,
+                            daysUntil(
+                                plan.next_due_date,
+                                today
+                            ) ?? 30
+                        );
+                const windowKey =
+                    classifyForecastWindow(
+                        daysAway
+                    );
+
+                if (!windowKey) {
+                    return;
+                }
+
+                forecastItems.push({
+                    type: "maintenance",
+                    windowKey,
+                    vehicleName:
+                        getVehicleName(vehicle),
+                    title: plan.name,
+                    amount:
+                        getMaintenancePlanEstimatedCost(
+                            plan,
+                            serviceHistory
+                        ),
+                    detail:
+                        plan.status === "overdue"
+                            ? "Overdue maintenance is likely to need budget immediately."
+                            : "Upcoming maintenance window."
+                });
+            });
+
+        documents
+            .filter(
+                (documentRecord) =>
+                    documentRecord.renewal_status ===
+                        "expired" ||
+                    documentRecord.renewal_status ===
+                        "due_soon"
+            )
+            .forEach((documentRecord) => {
+                const daysAway = Math.max(
+                    0,
+                    toNumber(
+                        documentRecord.days_remaining
+                    )
+                );
+                const windowKey =
+                    classifyForecastWindow(
+                        daysAway
+                    );
+
+                if (!windowKey) {
+                    return;
+                }
+
+                forecastItems.push({
+                    type: "document",
+                    windowKey,
+                    vehicleName:
+                        getVehicleName(vehicle),
+                    title: documentRecord.title,
+                    amount:
+                        documentCostDefaults[
+                            documentRecord
+                                .document_type
+                        ] ||
+                        documentCostDefaults.other,
+                    detail:
+                        documentRecord.renewal_status ===
+                        "expired"
+                            ? "Expired document should be renewed as soon as possible."
+                            : "Renewal is approaching."
+                });
+            });
+
+        issues
+            .filter(
+                (issue) =>
+                    issue.status !== "repaired" &&
+                    (
+                        issue.risk_level === "red" ||
+                        issue.risk_level ===
+                            "orange"
+                    )
+            )
+            .forEach((issue) => {
+                const windowKey =
+                    issue.risk_level === "red"
+                        ? "30d"
+                        : "90d";
+
+                forecastItems.push({
+                    type: "issue",
+                    windowKey,
+                    vehicleName:
+                        getVehicleName(vehicle),
+                    title: issue.issue_title,
+                    amount:
+                        getIssueEstimatedCost(
+                            issue,
+                            serviceHistory
+                        ),
+                    detail:
+                        issue.risk_level === "red"
+                            ? "Urgent mechanical risk may convert into repair spend very soon."
+                            : "Open issue likely turns into workshop cost soon."
+                });
+            });
+
+        const next30DaysTotal =
+            forecastItems
+                .filter(
+                    (item) =>
+                        item.windowKey === "30d"
+                )
+                .reduce(
+                    (total, item) =>
+                        total + item.amount,
+                    0
+                );
+        const next90DaysTotal =
+            forecastItems
+                .filter(
+                    (item) =>
+                        item.windowKey === "30d" ||
+                        item.windowKey === "90d"
+                )
+                .reduce(
+                    (total, item) =>
+                        total + item.amount,
+                    0
+                );
+
+        return {
+            vehicleId: vehicle.id,
+            vehicleName: getVehicleName(vehicle),
+            next30DaysTotal,
+            next90DaysTotal,
+            items: forecastItems
+                .sort(
+                    (firstItem, secondItem) =>
+                        firstItem.amount -
+                        secondItem.amount
+                )
+                .reverse()
+        };
+    }
+
     function assessVehicle(input) {
         const vehicle = input.vehicle || {};
         const maintenancePlans =
@@ -587,8 +907,57 @@
         };
     }
 
+    function summarizeCostForecast(
+        vehicleForecasts
+    ) {
+        if (
+            !Array.isArray(vehicleForecasts) ||
+            vehicleForecasts.length === 0
+        ) {
+            return {
+                next30DaysTotal: 0,
+                next90DaysTotal: 0,
+                items: []
+            };
+        }
+
+        return {
+            next30DaysTotal:
+                vehicleForecasts.reduce(
+                    (total, forecast) =>
+                        total +
+                        forecast.next30DaysTotal,
+                    0
+                ),
+            next90DaysTotal:
+                vehicleForecasts.reduce(
+                    (total, forecast) =>
+                        total +
+                        forecast.next90DaysTotal,
+                    0
+                ),
+            items: vehicleForecasts
+                .flatMap((forecast) =>
+                    forecast.items.map((item) => ({
+                        ...item,
+                        detail:
+                            `${forecast.vehicleName}: ` +
+                            item.detail
+                    }))
+                )
+                .sort(
+                    (firstItem, secondItem) =>
+                        secondItem.amount -
+                        firstItem.amount
+                )
+                .slice(0, 6)
+        };
+    }
+
     window.garageInsights = {
         assessVehicle,
-        summarizeGarage
+        summarizeGarage,
+        buildUpcomingCostForecast,
+        summarizeCostForecast
     };
 })();
