@@ -786,6 +786,25 @@
     .last-updated {
         white-space: normal;
     }
+
+    .forecast-card strong {
+        font-size: 28px;
+    }
+
+    .ai-panel {
+        padding: 18px;
+    }
+
+    .ai-quick-actions {
+        flex-direction: column;
+    }
+
+    .ai-quick-action,
+    .ai-export-link {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
 }
 
 @media (max-width: 520px) {
@@ -799,6 +818,7 @@
 
     .statistic-card {
         min-height: 155px;
+        padding: 18px;
     }
 
     .insight-heading,
@@ -817,5 +837,13 @@
     .service-cost-badge,
     .priority-badge {
         align-self: flex-start;
+    }
+
+    .priority-item-content span,
+    .priority-item-content strong,
+    .priority-item-content p {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
     }
 }

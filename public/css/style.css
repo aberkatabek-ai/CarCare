@@ -1102,6 +1102,13 @@ a.secondary-button {
         padding: 21px;
     }
 
+    .welcome-link-button,
+    .welcome-actions .status-badge {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
     .vehicle-list-heading,
     .vehicle-card-header,
     .modal-actions {

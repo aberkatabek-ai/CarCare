@@ -656,6 +656,15 @@
     .cost-entry-actions a {
         width: 100%;
     }
+
+    .chart-series-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .chart-series-value {
+        justify-self: flex-start;
+    }
 }
 
 @media (max-width: 520px) {
@@ -675,5 +684,18 @@
 
     .cost-panel {
         padding: 20px;
+    }
+
+    .cost-chart-panel {
+        min-height: auto;
+    }
+
+    .cost-summary-card,
+    .cost-entry-card {
+        padding: 18px;
+    }
+
+    .cost-list-heading span {
+        align-self: flex-start;
     }
 }

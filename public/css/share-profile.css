@@ -254,4 +254,23 @@
     .share-readiness-row {
         grid-template-columns: 1fr;
     }
+
+    .share-profile-container {
+        width: min(100% - 20px, 1120px);
+        padding: 22px 0 44px;
+    }
+
+    .share-hero,
+    .share-stat-card,
+    .share-panel {
+        padding: 18px;
+    }
+
+    .share-hero h1 {
+        font-size: clamp(28px, 9vw, 40px);
+    }
+
+    .share-hero p:not(.share-eyebrow) {
+        font-size: 16px;
+    }
 }
