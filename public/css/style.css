@@ -540,6 +540,21 @@ a.secondary-button {
     white-space: nowrap;
 }
 
+.status-badge.warning {
+    color: #7d6a44;
+    background: #efe2c4;
+}
+
+.status-badge.risk {
+    color: #8f2d28;
+    background: var(--error-background);
+}
+
+.status-badge.stable {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
 /* Dashboard sections */
 
 .dashboard-section {

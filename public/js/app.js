@@ -198,6 +198,11 @@ const garagePriorityList =
         "#garage-priority-list"
     );
 
+const garageStatusBadge =
+    document.querySelector(
+        "#garage-status-badge"
+    );
+
 let vehicles = [];
 let soldVehicles = [];
 let maintenancePlans = [];
@@ -453,6 +458,75 @@ function applySignal(
         `signal-tone ${metric.tone}`;
     summaryElement.textContent =
         metric.summary;
+}
+
+function updateGarageStatusBadge({
+    overduePlans,
+    dueSoonPlans,
+    openIssues,
+    documentAlerts
+}) {
+    if (!garageStatusBadge) {
+        return;
+    }
+
+    const criticalIssues = openIssues.filter(
+        (issue) => issue.risk_level === "red"
+    );
+    const expiredDocuments =
+        documentAlerts.filter(
+            (documentRecord) =>
+                documentRecord.renewal_status ===
+                "expired"
+        );
+
+    if (
+        criticalIssues.length > 0 ||
+        overduePlans.length > 0 ||
+        expiredDocuments.length > 0
+    ) {
+        const totalCritical =
+            criticalIssues.length +
+            overduePlans.length +
+            expiredDocuments.length;
+
+        garageStatusBadge.textContent =
+            `${totalCritical} item` +
+            `${totalCritical === 1 ? "" : "s"} need attention`;
+        garageStatusBadge.className =
+            "status-badge risk";
+        return;
+    }
+
+    if (
+        dueSoonPlans.length > 0 ||
+        documentAlerts.length > 0
+    ) {
+        if (dueSoonPlans.length > 0) {
+            garageStatusBadge.textContent =
+                "Next service due soon";
+        } else {
+            garageStatusBadge.textContent =
+                "Documents need a check soon";
+        }
+
+        garageStatusBadge.className =
+            "status-badge warning";
+        return;
+    }
+
+    if (vehicles.length > 0) {
+        garageStatusBadge.textContent =
+            "Garage looks healthy";
+        garageStatusBadge.className =
+            "status-badge stable";
+        return;
+    }
+
+    garageStatusBadge.textContent =
+        "Add your first vehicle";
+    garageStatusBadge.className =
+        "status-badge";
 }
 
 function createPriorityItem(priority) {
@@ -895,6 +969,13 @@ function renderDashboardOverview() {
 
     dashboardLastUpdated.textContent =
         "Updated just now";
+
+    updateGarageStatusBadge({
+        overduePlans,
+        dueSoonPlans,
+        openIssues,
+        documentAlerts
+    });
 
     renderGarageSignals();
     renderMaintenanceOverview();
