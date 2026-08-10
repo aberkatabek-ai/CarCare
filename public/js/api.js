@@ -195,7 +195,9 @@ function ensureMobileNavigationToggle() {
     if (!toggleButton.dataset.bound) {
         toggleButton.addEventListener(
             "click",
-            () => {
+            (event) => {
+                event.stopPropagation();
+
                 const isOpen =
                     !header.classList.contains(
                         "menu-open"
@@ -213,6 +215,37 @@ function ensureMobileNavigationToggle() {
                         window.HTMLAnchorElement &&
                     window.innerWidth <= 720
                 ) {
+                    syncMenuState(false);
+                }
+            }
+        );
+
+        window.document.addEventListener(
+            "click",
+            (event) => {
+                if (
+                    window.innerWidth > 720 ||
+                    !header.classList.contains(
+                        "menu-open"
+                    )
+                ) {
+                    return;
+                }
+
+                if (
+                    header.contains(event.target)
+                ) {
+                    return;
+                }
+
+                syncMenuState(false);
+            }
+        );
+
+        window.document.addEventListener(
+            "keydown",
+            (event) => {
+                if (event.key === "Escape") {
                     syncMenuState(false);
                 }
             }

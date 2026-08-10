@@ -1019,49 +1019,63 @@ a.secondary-button {
 }
 
 @media (max-width: 720px) {
+    .dashboard-header {
+        overflow: visible;
+    }
+
     .dashboard-header-content {
-        align-items: flex-start;
+        position: relative;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
         gap: 12px;
         min-height: auto;
         padding: 14px 0;
     }
 
     .dashboard-header-content .brand.compact {
-        width: 100%;
+        flex: 1;
+        min-width: 0;
     }
 
     .dashboard-header .header-actions {
-        display: flex !important;
-        width: 100%;
-        flex-wrap: nowrap !important;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        left: 0;
+        z-index: 30;
+
+        display: none !important;
+        flex-direction: column;
+        align-items: stretch;
         gap: 8px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-    }
+        width: 100%;
+        padding: 12px;
 
-    .dashboard-header .header-actions::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .dashboard-header .header-actions::-webkit-scrollbar-thumb {
-        background: rgba(31, 74, 58, 0.22);
-        border-radius: 999px;
+        background: rgba(252, 250, 245, 0.98);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 20px 40px rgba(18, 20, 23, 0.14);
+        backdrop-filter: blur(12px);
     }
 
     .dashboard-header .nav-link,
     .dashboard-header .header-actions .secondary-button,
     .dashboard-header .header-actions button {
         flex: 0 0 auto !important;
-        width: auto !important;
-        min-width: max-content;
+        width: 100% !important;
         min-height: 42px;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .dashboard-header.menu-open .header-actions {
+        display: flex !important;
     }
 
     .nav-toggle {
-        display: none !important;
+        display: inline-flex !important;
+        flex: 0 0 auto;
     }
 }
 

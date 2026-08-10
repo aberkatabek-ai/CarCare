@@ -389,20 +389,7 @@
 
 @media (max-width: 720px) {
     .dashboard-header-content {
-        align-items: flex-start;
-        gap: 14px;
-    }
-
-    .header-actions {
-        width: 100%;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-    }
-
-    .nav-link,
-    .header-actions .secondary-button {
-        flex: 0 0 auto;
-        min-width: max-content;
+        gap: 12px;
     }
 
     .page-heading-card,
@@ -420,19 +407,6 @@
 }
 
 @media (max-width: 520px) {
-    .header-actions {
-        align-items: center;
-        flex-direction: row;
-    }
-
-    .nav-link,
-    .header-actions button {
-        flex: 0 0 auto;
-        min-height: 42px;
-        width: auto;
-        text-align: center;
-    }
-
     .maintenance-details {
         grid-template-columns: 1fr;
     }
