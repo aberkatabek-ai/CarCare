@@ -6,7 +6,8 @@ const {
     createDocument,
     updateDocument,
     deleteDocument,
-    downloadDocumentFile
+    downloadDocumentFile,
+    extractDocumentDetails
 } = require(
     "../controllers/documentController"
 );
@@ -24,6 +25,10 @@ router.use(requireAuth);
 router.get("/", getDocuments);
 
 router.post("/", createDocument);
+router.post(
+    "/extract-details",
+    extractDocumentDetails
+);
 
 router.get("/:id", getDocumentById);
 router.get("/:id/file", downloadDocumentFile);

@@ -10,6 +10,11 @@ const exportBuyerPackageButton = document.querySelector(
     "#export-buyer-package-button"
 );
 
+const shareVehicleProfileButton =
+    document.querySelector(
+        "#share-vehicle-profile-button"
+    );
+
 const pageLoading = document.querySelector(
     "#vehicle-page-loading"
 );
@@ -1593,6 +1598,18 @@ function renderIssues() {
                 );
             }
 
+            if (
+                issue.recurring_issue_detected
+            ) {
+                card.append(
+                    createElement(
+                        "p",
+                        "passport-record-note",
+                        `Recurring issue: ${issue.previous_similar_issue_count} similar record${issue.previous_similar_issue_count === 1 ? "" : "s"} were reported before this one.`
+                    )
+                );
+            }
+
             list.append(card);
         });
 
@@ -2128,6 +2145,44 @@ async function exportBuyerPackage() {
         `/buyer-package.html?id=${vehicle.id}`;
 }
 
+async function copyVehicleShareLink() {
+    if (
+        !vehicle ||
+        !shareVehicleProfileButton
+    ) {
+        return;
+    }
+
+    shareVehicleProfileButton.disabled = true;
+    shareVehicleProfileButton.textContent =
+        "Preparing...";
+
+    try {
+        const data = await window.apiRequest(
+            `/api/vehicles/${vehicle.id}/share-link`
+        );
+
+        await window.navigator.clipboard.writeText(
+            data.shareUrl
+        );
+
+        shareVehicleProfileButton.textContent =
+            "Link copied";
+
+        window.setTimeout(() => {
+            shareVehicleProfileButton.textContent =
+                "Copy share link";
+        }, 1800);
+    } catch (error) {
+        shareVehicleProfileButton.textContent =
+            "Copy share link";
+        window.alert(error.message);
+    } finally {
+        shareVehicleProfileButton.disabled =
+            false;
+    }
+}
+
 if (ownershipDocumentFileInput) {
     ownershipDocumentFileInput.addEventListener(
         "change",
@@ -2302,6 +2357,13 @@ if (exportBuyerPackageButton) {
     exportBuyerPackageButton.addEventListener(
         "click",
         exportBuyerPackage
+    );
+}
+
+if (shareVehicleProfileButton) {
+    shareVehicleProfileButton.addEventListener(
+        "click",
+        copyVehicleShareLink
     );
 }
 

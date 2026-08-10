@@ -27,6 +27,13 @@ const {
     calculateVehicleCurrentMileage,
     shouldRejectBackdatedMileageEntry
 } = require("../src/utils/mileageState");
+const {
+    createVehicleShareToken,
+    verifyVehicleShareToken
+} = require("../src/utils/shareTokens");
+const {
+    extractDocumentSuggestions
+} = require("../src/utils/documentExtraction");
 
 function runTest(name, testFn) {
     try {
@@ -485,6 +492,54 @@ runTest(
 
         assert.equal(result.status, "failed");
         assert.equal(result.plateMatch, false);
+    }
+);
+
+runTest(
+    "vehicle share tokens round-trip correctly",
+    () => {
+        const token =
+            createVehicleShareToken(42);
+        const verification =
+            verifyVehicleShareToken(token);
+
+        assert.deepEqual(verification, {
+            vehicleId: 42
+        });
+    }
+);
+
+runTest(
+    "document extraction infers key document fields",
+    () => {
+        const result =
+            extractDocumentSuggestions({
+                ocrText:
+                    "TRAFIK SIGORTA POLICE NO AXA-998877\nBaslangic 10.08.2026\nBitis 10.08.2027\n34 ABC 123",
+                fileName: "traffic-policy.pdf",
+                documentType: "insurance"
+            });
+
+        assert.equal(
+            result.suggestions.documentType,
+            "insurance"
+        );
+        assert.equal(
+            result.suggestions.documentNumber,
+            "AXA-998877"
+        );
+        assert.equal(
+            result.suggestions.startDate,
+            "2026-08-10"
+        );
+        assert.equal(
+            result.suggestions.expiryDate,
+            "2027-08-10"
+        );
+        assert.equal(
+            result.suggestions.licensePlate,
+            "34 ABC 123"
+        );
     }
 );
 

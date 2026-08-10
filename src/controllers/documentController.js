@@ -5,6 +5,12 @@ const {
     removeStoredDocument,
     resolveStoredDocumentAbsolutePath
 } = require("../utils/documentUpload");
+const {
+    recognizeDocumentText
+} = require("../utils/ocr");
+const {
+    extractDocumentSuggestions
+} = require("../utils/documentExtraction");
 
 const allowedDocumentTypes = new Set([
     "registration",
@@ -1160,11 +1166,85 @@ async function downloadDocumentFile(
     }
 }
 
+async function extractDocumentDetails(
+    req,
+    res,
+    next
+) {
+    let storedFile = null;
+
+    try {
+        const fileValidation =
+            normalizeOptionalFilePayload(
+                req.body.file
+            );
+
+        if (fileValidation.error) {
+            return res.status(400).json({
+                success: false,
+                message: fileValidation.error
+            });
+        }
+
+        if (!fileValidation.value) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Upload a document file before running auto-fill."
+            });
+        }
+
+        storedFile =
+            await saveUploadedDocument(
+                fileValidation.value
+            );
+
+        const ocrText =
+            await recognizeDocumentText(
+                storedFile.absolutePath
+            );
+
+        const extraction =
+            extractDocumentSuggestions({
+                ocrText,
+                fileName:
+                    fileValidation.value
+                        .originalName,
+                documentType:
+                    typeof req.body.documentType ===
+                    "string"
+                        ? req.body.documentType
+                              .trim()
+                              .toLowerCase()
+                        : null
+            });
+
+        res.json({
+            success: true,
+            suggestions:
+                extraction.suggestions,
+            detectedFieldCount:
+                extraction.detectedFieldCount,
+            previewText:
+                extraction.previewText
+        });
+    } catch (error) {
+        next(error);
+    } finally {
+        if (storedFile) {
+            await removeStoredDocument(
+                storedFile.storedName
+            );
+        }
+    }
+}
+
 module.exports = {
     getDocuments,
     getDocumentById,
     createDocument,
     updateDocument,
     deleteDocument,
-    downloadDocumentFile
+    downloadDocumentFile,
+    extractDocumentDetails
 };

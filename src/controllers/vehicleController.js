@@ -14,6 +14,10 @@ const {
 const {
     evaluateOwnershipVerification
 } = require("../utils/ownershipVerification");
+const {
+    createVehicleShareToken,
+    verifyVehicleShareToken
+} = require("../utils/shareTokens");
 
 const ACTIVE_VEHICLE_STATUS = "active";
 const SOLD_VEHICLE_STATUS = "sold";
@@ -117,6 +121,140 @@ function mapVehicleRow(vehicle) {
         current_mileage: vehicle.current_mileage,
         created_at: vehicle.created_at,
         updated_at: vehicle.updated_at
+    };
+}
+
+async function buildVehicleDataPackage(
+    vehicleId
+) {
+    const vehicleResult = await db.query(
+        `SELECT
+            id,
+            brand,
+            model,
+            model_year,
+            nickname,
+            license_plate,
+            vehicle_status,
+            ownership_status,
+            ownership_verified_at,
+            ownership_verification_score,
+            ownership_failure_reason,
+            sold_at,
+            current_mileage,
+            created_at,
+            updated_at
+         FROM vehicles
+         WHERE id = $1`,
+        [vehicleId]
+    );
+
+    if (vehicleResult.rows.length === 0) {
+        return null;
+    }
+
+    const [
+        mileageResult,
+        serviceResult,
+        documentResult,
+        issueResult,
+        fuelResult,
+        expenseResult
+    ] = await Promise.all([
+        db.query(
+            `SELECT
+                previous_mileage,
+                new_mileage,
+                COALESCE(
+                    to_jsonb(mh)->>'recorded_at',
+                    to_jsonb(mh)->>'created_at'
+                ) AS recorded_at
+             FROM mileage_history mh
+             WHERE vehicle_id = $1
+             ORDER BY mh.id DESC`,
+            [vehicleId]
+        ),
+        db.query(
+            `SELECT
+                service_name,
+                completed_at,
+                completed_at_mileage,
+                actual_cost,
+                service_provider,
+                notes
+             FROM service_history
+             WHERE vehicle_id = $1
+             ORDER BY completed_at DESC, id DESC`,
+            [vehicleId]
+        ),
+        db.query(
+            `SELECT
+                document_type,
+                title,
+                provider,
+                expiry_date,
+                reminder_days,
+                notes
+             FROM vehicle_documents
+             WHERE vehicle_id = $1
+             ORDER BY expiry_date ASC, id DESC`,
+            [vehicleId]
+        ),
+        db.query(
+            `SELECT
+                issue_title,
+                category,
+                status,
+                risk_level,
+                description,
+                created_at,
+                resolved_at,
+                resolution_notes
+             FROM vehicle_issues
+             WHERE vehicle_id = $1
+             ORDER BY created_at DESC`,
+            [vehicleId]
+        ),
+        db.query(
+            `SELECT
+                filled_at,
+                odometer_km,
+                liters,
+                total_cost,
+                station,
+                notes
+             FROM fuel_entries
+             WHERE vehicle_id = $1
+             ORDER BY filled_at DESC, id DESC`,
+            [vehicleId]
+        ),
+        db.query(
+            `SELECT
+                expense_type,
+                title,
+                amount,
+                expense_date,
+                odometer_km,
+                provider,
+                notes
+             FROM vehicle_expenses
+             WHERE vehicle_id = $1
+             ORDER BY expense_date DESC, id DESC`,
+            [vehicleId]
+        )
+    ]);
+
+    return {
+        exported_at: new Date().toISOString(),
+        vehicle: mapVehicleRow(
+            vehicleResult.rows[0]
+        ),
+        mileage_history: mileageResult.rows,
+        service_history: serviceResult.rows,
+        documents: documentResult.rows,
+        issues: issueResult.rows,
+        fuel_history: fuelResult.rows,
+        expenses: expenseResult.rows
     };
 }
 
@@ -278,22 +416,7 @@ async function exportBuyerHandoffPackage(
         }
 
         const vehicleResult = await db.query(
-            `SELECT
-                id,
-                brand,
-                model,
-                model_year,
-                nickname,
-                license_plate,
-                vehicle_status,
-                ownership_status,
-                ownership_verified_at,
-                ownership_verification_score,
-                ownership_failure_reason,
-                sold_at,
-                current_mileage,
-                created_at,
-                updated_at
+            `SELECT id
              FROM vehicles
              WHERE id = $1
                AND user_id = $2`,
@@ -310,116 +433,106 @@ async function exportBuyerHandoffPackage(
             });
         }
 
-        const [
-            mileageResult,
-            serviceResult,
-            documentResult,
-            issueResult,
-            fuelResult,
-            expenseResult
-        ] = await Promise.all([
-            db.query(
-                `SELECT
-                    previous_mileage,
-                    new_mileage,
-                    COALESCE(
-                        to_jsonb(mh)->>'recorded_at',
-                        to_jsonb(mh)->>'created_at'
-                    ) AS recorded_at
-                 FROM mileage_history mh
-                 WHERE vehicle_id = $1
-                 ORDER BY mh.id DESC`,
-                [vehicleId]
-            ),
-            db.query(
-                `SELECT
-                    service_name,
-                    completed_at,
-                    completed_at_mileage,
-                    actual_cost,
-                    service_provider,
-                    notes
-                 FROM service_history
-                 WHERE vehicle_id = $1
-                 ORDER BY completed_at DESC, id DESC`,
-                [vehicleId]
-            ),
-            db.query(
-                `SELECT
-                    document_type,
-                    title,
-                    provider,
-                    expiry_date,
-                    reminder_days,
-                    notes
-                 FROM vehicle_documents
-                 WHERE vehicle_id = $1
-                 ORDER BY expiry_date ASC, id DESC`,
-                [vehicleId]
-            ),
-            db.query(
-                `SELECT
-                    issue_title,
-                    category,
-                    status,
-                    risk_level,
-                    description,
-                    created_at,
-                    resolved_at,
-                    resolution_notes
-                 FROM vehicle_issues
-                 WHERE vehicle_id = $1
-                 ORDER BY created_at DESC`,
-                [vehicleId]
-            ),
-            db.query(
-                `SELECT
-                    filled_at,
-                    odometer_km,
-                    liters,
-                    total_cost,
-                    station,
-                    notes
-                 FROM fuel_entries
-                 WHERE vehicle_id = $1
-                 ORDER BY filled_at DESC, id DESC`,
-                [vehicleId]
-            ),
-            db.query(
-                `SELECT
-                    expense_type,
-                    title,
-                    amount,
-                    expense_date,
-                    odometer_km,
-                    provider,
-                    notes
-                 FROM vehicle_expenses
-                 WHERE vehicle_id = $1
-                 ORDER BY expense_date DESC, id DESC`,
-                [vehicleId]
-            )
-        ]);
+        const dataPackage =
+            await buildVehicleDataPackage(
+                vehicleId
+            );
 
         res.json({
             success: true,
-            package: {
-                exported_at: new Date().toISOString(),
-                vehicle: mapVehicleRow(
-                    vehicleResult.rows[0]
-                ),
-                mileage_history:
-                    mileageResult.rows,
-                service_history:
-                    serviceResult.rows,
-                documents:
-                    documentResult.rows,
-                issues: issueResult.rows,
-                fuel_history:
-                    fuelResult.rows,
-                expenses:
-                    expenseResult.rows
-            }
+            package: dataPackage
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getVehicleShareLink(
+    req,
+    res,
+    next
+) {
+    try {
+        const vehicleId = parseVehicleId(
+            req.params.id
+        );
+
+        if (vehicleId === null) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid vehicle ID."
+            });
+        }
+
+        const result = await db.query(
+            `SELECT id
+             FROM vehicles
+             WHERE id = $1
+               AND user_id = $2`,
+            [
+                vehicleId,
+                req.session.userId
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Vehicle was not found."
+            });
+        }
+
+        const token =
+            createVehicleShareToken(vehicleId);
+
+        res.json({
+            success: true,
+            token,
+            shareUrl:
+                `${req.protocol}://${req.get(
+                    "host"
+                )}/share.html?token=${token}`
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getSharedVehicleProfile(
+    req,
+    res,
+    next
+) {
+    try {
+        const verification =
+            verifyVehicleShareToken(
+                req.params.token
+            );
+
+        if (!verification) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "This shared vehicle profile link is invalid."
+            });
+        }
+
+        const profile =
+            await buildVehicleDataPackage(
+                verification.vehicleId
+            );
+
+        if (!profile) {
+            return res.status(404).json({
+                success: false,
+                message:
+                    "This shared vehicle profile is no longer available."
+            });
+        }
+
+        res.json({
+            success: true,
+            profile
         });
     } catch (error) {
         next(error);
@@ -1427,6 +1540,8 @@ module.exports = {
     getVehicleArchive,
     getVehicleById,
     exportBuyerHandoffPackage,
+    getVehicleShareLink,
+    getSharedVehicleProfile,
     getMileageHistory,
     createVehicle,
     updateVehicle,

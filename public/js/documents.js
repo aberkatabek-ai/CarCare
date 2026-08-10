@@ -70,6 +70,11 @@ const documentFileHelp =
         "#document-file-help"
     );
 
+const documentAutofillButton =
+    window.document.querySelector(
+        "#document-autofill-button"
+    );
+
 const startDateInput =
     window.document.querySelector(
         "#document-start-date"
@@ -735,9 +740,62 @@ function renderPassports() {
             }
         );
 
+        const shareVehicleButton =
+            window.document.createElement(
+                "button"
+            );
+
+        shareVehicleButton.type =
+            "button";
+
+        shareVehicleButton.className =
+            "secondary-button";
+
+        shareVehicleButton.textContent =
+            "Copy share link";
+
+        shareVehicleButton.addEventListener(
+            "click",
+            async () => {
+                shareVehicleButton.disabled =
+                    true;
+                shareVehicleButton.textContent =
+                    "Preparing...";
+
+                try {
+                    const data =
+                        await window.apiRequest(
+                            `/api/vehicles/${vehicle.id}/share-link`
+                        );
+
+                    await window.navigator.clipboard.writeText(
+                        data.shareUrl
+                    );
+
+                    shareVehicleButton.textContent =
+                        "Link copied";
+
+                    window.setTimeout(() => {
+                        shareVehicleButton.textContent =
+                            "Copy share link";
+                    }, 1800);
+                } catch (error) {
+                    window.alert(
+                        error.message
+                    );
+                    shareVehicleButton.textContent =
+                        "Copy share link";
+                } finally {
+                    shareVehicleButton.disabled =
+                        false;
+                }
+            }
+        );
+
         actions.append(
             viewPassportButton,
-            openVehicleButton
+            openVehicleButton,
+            shareVehicleButton
         );
 
         passportCard.append(
@@ -1293,6 +1351,137 @@ function replaceDocumentRecord(
         );
 }
 
+async function autofillDocumentFromFile() {
+    clearMessage();
+
+    if (!uploadedFilePayload) {
+        showMessage(
+            "Select a document file before using auto-fill."
+        );
+        return;
+    }
+
+    if (!documentAutofillButton) {
+        return;
+    }
+
+    documentAutofillButton.disabled = true;
+    documentAutofillButton.textContent =
+        "Reading file...";
+
+    try {
+        const data = await window.apiRequest(
+            "/api/documents/extract-details",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    file: uploadedFilePayload,
+                    documentType:
+                        documentTypeSelect.value
+                })
+            }
+        );
+
+        const suggestions =
+            data.suggestions || {};
+
+        if (
+            !documentTypeSelect.value &&
+            suggestions.documentType
+        ) {
+            documentTypeSelect.value =
+                suggestions.documentType;
+        }
+
+        if (
+            !titleInput.value.trim() ||
+            titleInput.value === generatedTitle
+        ) {
+            titleInput.value =
+                suggestions.title ||
+                titleInput.value;
+            generatedTitle =
+                titleInput.value;
+        }
+
+        if (
+            !providerInput.value.trim() &&
+            suggestions.provider
+        ) {
+            providerInput.value =
+                suggestions.provider;
+        }
+
+        if (
+            !documentNumberInput.value.trim() &&
+            suggestions.documentNumber
+        ) {
+            documentNumberInput.value =
+                suggestions.documentNumber;
+        }
+
+        if (
+            !startDateInput.value &&
+            suggestions.startDate
+        ) {
+            startDateInput.value =
+                suggestions.startDate;
+        }
+
+        if (
+            !expiryDateInput.value &&
+            suggestions.expiryDate
+        ) {
+            expiryDateInput.value =
+                suggestions.expiryDate;
+            startDateInput.max =
+                suggestions.expiryDate;
+        }
+
+        if (
+            suggestions.licensePlate &&
+            vehicleSelect.value
+        ) {
+            const selectedVehicle =
+                vehicles.find(
+                    (vehicle) =>
+                        String(vehicle.id) ===
+                        String(
+                            vehicleSelect.value
+                        )
+                );
+
+            if (
+                selectedVehicle &&
+                !selectedVehicle.license_plate
+            ) {
+                showMessage(
+                    `Auto-fill found plate ${suggestions.licensePlate}. You may want to save it on the vehicle record too.`,
+                    "success"
+                );
+            }
+        }
+
+        if (data.detectedFieldCount === 0) {
+            showMessage(
+                "The file was read, but no reliable field could be extracted."
+            );
+        } else {
+            showMessage(
+                `${data.detectedFieldCount} field${data.detectedFieldCount === 1 ? "" : "s"} extracted from the file.`,
+                "success"
+            );
+        }
+    } catch (error) {
+        showMessage(error.message);
+    } finally {
+        documentAutofillButton.disabled =
+            false;
+        documentAutofillButton.textContent =
+            "Auto-fill from file";
+    }
+}
+
 async function verifyOwnershipFromDocument(
     documentRecord
 ) {
@@ -1559,6 +1748,13 @@ cancelDocumentEditButton
         "click",
         resetDocumentForm
     );
+
+if (documentAutofillButton) {
+    documentAutofillButton.addEventListener(
+        "click",
+        autofillDocumentFromFile
+    );
+}
 
 documentForm.addEventListener(
     "submit",

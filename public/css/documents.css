@@ -270,6 +270,10 @@
     font-size: 12px;
 }
 
+.document-autofill-button {
+    margin-top: 12px;
+}
+
 .document-notes-group {
     grid-column: 1 / -1;
 }

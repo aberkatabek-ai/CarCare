@@ -5,6 +5,7 @@ const {
     getVehicleArchive,
     getVehicleById,
     exportBuyerHandoffPackage,
+    getVehicleShareLink,
     getMileageHistory,
     createVehicle,
     updateVehicle,
@@ -39,6 +40,7 @@ router.get(
     "/:id/handoff-package",
     exportBuyerHandoffPackage
 );
+router.get("/:id/share-link", getVehicleShareLink);
 router.post("/", createVehicle);
 router.post(
     "/:id/verify-ownership",

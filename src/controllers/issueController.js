@@ -145,6 +145,69 @@ function parseBoolean(value, defaultValue) {
     return defaultValue;
 }
 
+function buildIssueRecurrenceKey(issue) {
+    return [
+        issue.vehicle_id,
+        issue.category,
+        normalizeComparableText(
+            issue.issue_title
+        )
+    ].join("::");
+}
+
+function attachIssueRecurrence(rows) {
+    const groups = new Map();
+
+    rows.forEach((row) => {
+        const key =
+            buildIssueRecurrenceKey(row);
+        const issueList =
+            groups.get(key) || [];
+
+        issueList.push(row);
+        groups.set(key, issueList);
+    });
+
+    groups.forEach((issueList) => {
+        issueList.sort(
+            (firstIssue, secondIssue) =>
+                new Date(firstIssue.created_at) -
+                new Date(secondIssue.created_at)
+        );
+    });
+
+    return rows.map((row) => {
+        const issueList = groups.get(
+            buildIssueRecurrenceKey(row)
+        ) || [row];
+        const currentIndex =
+            issueList.findIndex(
+                (issue) => issue.id === row.id
+            );
+        const previousSimilarIssues =
+            currentIndex <= 0
+                ? []
+                : issueList.slice(0, currentIndex);
+        const lastSimilarIssue =
+            previousSimilarIssues[
+                previousSimilarIssues.length - 1
+            ] || null;
+
+        return {
+            ...row,
+            recurring_issue_detected:
+                previousSimilarIssues.length >
+                0,
+            previous_similar_issue_count:
+                previousSimilarIssues.length,
+            last_similar_issue_at:
+                lastSimilarIssue
+                    ? lastSimilarIssue.created_at
+                    : null
+        };
+    });
+}
+
 function calculateRiskLevel({
     category,
     severity,
@@ -344,8 +407,10 @@ async function findOwnedIssue(
         ]
     );
 
-    const issues = await attachIssueMedia(
-        result.rows
+    const issues = attachIssueRecurrence(
+        await attachIssueMedia(
+            result.rows
+        )
     );
 
     return issues[0] || null;
@@ -383,7 +448,8 @@ async function getIssues(
                 v.model_year,
                 v.nickname,
                 v.license_plate,
-                v.current_mileage
+            v.current_mileage,
+            v.vehicle_status
              FROM vehicle_issues AS vi
              INNER JOIN vehicles AS v
                 ON v.id = vi.vehicle_id
@@ -408,8 +474,10 @@ async function getIssues(
 
         res.json({
             success: true,
-            issues: await attachIssueMedia(
-                result.rows
+            issues: attachIssueRecurrence(
+                await attachIssueMedia(
+                    result.rows
+                )
             )
         });
     } catch (error) {

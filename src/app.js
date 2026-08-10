@@ -36,6 +36,11 @@ const documentRoutes = require(
 const costRoutes = require(
     "./routes/costRoutes"
 );
+const {
+    getSharedVehicleProfile
+} = require(
+    "./controllers/vehicleController"
+);
 
 const {
     notFound,
@@ -160,6 +165,11 @@ app.get(
             next(error);
         }
     }
+);
+
+app.get(
+    "/api/public/vehicle-share/:token",
+    getSharedVehicleProfile
 );
 
 app.use(

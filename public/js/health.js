@@ -1213,6 +1213,32 @@ function renderIssues() {
             card.append(resolution);
         }
 
+        if (
+            issue.recurring_issue_detected
+        ) {
+            const recurrence =
+                createElement(
+                    "div",
+                    "issue-note-box"
+                );
+
+            recurrence.append(
+                createElement(
+                    "span",
+                    "",
+                    "Recurring issue"
+                ),
+
+                createElement(
+                    "p",
+                    "",
+                    `${issue.previous_similar_issue_count} similar record${issue.previous_similar_issue_count === 1 ? "" : "s"} were reported before this issue.`
+                )
+            );
+
+            card.append(recurrence);
+        }
+
         const footer = createElement(
             "div",
             "issue-card-footer"
