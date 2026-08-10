@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 
 const {
+    getNameValidationError,
     getPasswordValidationError,
     validateRegistration,
     validateProfileUpdate,
@@ -30,6 +31,22 @@ function runTest(name, testFn) {
         process.exitCode = 1;
     }
 }
+
+runTest(
+    "registration rejects inappropriate full names",
+    () => {
+        const result = validateRegistration({
+            fullName: "Fuck Tester",
+            email: "test@example.com",
+            password: "StrongPass1!"
+        });
+
+        assert.equal(
+            result.error,
+            "Full name contains inappropriate words."
+        );
+    }
+);
 
 runTest(
     "registration rejects passwords shorter than 8 characters",
@@ -179,6 +196,38 @@ runTest(
 );
 
 runTest(
+    "profile update rejects inappropriate preferred names",
+    () => {
+        const result = validateProfileUpdate({
+            fullName: "Berk Acar",
+            preferredName: "slut mode",
+            email: "test@example.com"
+        });
+
+        assert.equal(
+            result.error,
+            "Preferred name contains inappropriate words."
+        );
+    }
+);
+
+runTest(
+    "profile update rejects leetspeak inappropriate preferred names",
+    () => {
+        const result = validateProfileUpdate({
+            fullName: "Berk Acar",
+            preferredName: "b1tch mode",
+            email: "test@example.com"
+        });
+
+        assert.equal(
+            result.error,
+            "Preferred name contains inappropriate words."
+        );
+    }
+);
+
+runTest(
     "password update rejects reused password",
     () => {
         const result = validatePasswordUpdate({
@@ -254,6 +303,32 @@ runTest(
         assert.equal(
             result.error,
             "New password must contain at least one special character."
+        );
+    }
+);
+
+runTest(
+    "name validation helper catches disguised blocked terms",
+    () => {
+        assert.equal(
+            getNameValidationError(
+                "S!i.k_t-i/r",
+                "Full name"
+            ),
+            "Full name contains inappropriate words."
+        );
+    }
+);
+
+runTest(
+    "name validation helper catches leetspeak blocked terms",
+    () => {
+        assert.equal(
+            getNameValidationError(
+                "b1tch rider",
+                "Full name"
+            ),
+            "Full name contains inappropriate words."
         );
     }
 );

@@ -10,8 +10,83 @@ function normalizeEmail(value) {
         : "";
 }
 
+const blockedNameTerms = [
+    "amcik",
+    "ananisikim",
+    "anus",
+    "bastard",
+    "bitch",
+    "bok",
+    "dick",
+    "escort",
+    "fuck",
+    "fucking",
+    "gavat",
+    "got",
+    "ibnelik",
+    "ibne",
+    "kahpe",
+    "orospucocuk",
+    "orospu",
+    "penis",
+    "pic",
+    "piç",
+    "porn",
+    "pussy",
+    "salak",
+    "sex",
+    "serefsiz",
+    "shit",
+    "sik",
+    "sikis",
+    "sikik",
+    "siktir",
+    "slut",
+    "yarak",
+    "yarrak"
+];
+
 const passwordRequirementsText =
     "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
+
+function normalizeModerationText(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/0/g, "o")
+        .replace(/1/g, "i")
+        .replace(/3/g, "e")
+        .replace(/4/g, "a")
+        .replace(/5/g, "s")
+        .replace(/7/g, "t")
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z]/g, "");
+}
+
+function getNameValidationError(
+    value,
+    label = "Name"
+) {
+    const normalizedValue =
+        normalizeModerationText(value);
+
+    if (!normalizedValue) {
+        return null;
+    }
+
+    const hasBlockedTerm =
+        blockedNameTerms.some((term) =>
+            normalizedValue.includes(
+                normalizeModerationText(term)
+            )
+        );
+
+    if (hasBlockedTerm) {
+        return `${label} contains inappropriate words.`;
+    }
+
+    return null;
+}
 
 function getPasswordValidationError(
     password,
@@ -63,6 +138,18 @@ function validateRegistration(data) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return {
             error: "Please enter a valid email address."
+        };
+    }
+
+    const fullNameError =
+        getNameValidationError(
+            fullName,
+            "Full name"
+        );
+
+    if (fullNameError) {
+        return {
+            error: fullNameError
         };
     }
 
@@ -118,6 +205,18 @@ function validateProfileUpdate(data) {
         };
     }
 
+    const fullNameError =
+        getNameValidationError(
+            fullName,
+            "Full name"
+        );
+
+    if (fullNameError) {
+        return {
+            error: fullNameError
+        };
+    }
+
     if (
         preferredName !== null &&
         preferredName.length > 60
@@ -126,6 +225,20 @@ function validateProfileUpdate(data) {
             error:
                 "Preferred name must be shorter than 60 characters."
         };
+    }
+
+    if (preferredName !== null) {
+        const preferredNameError =
+            getNameValidationError(
+                preferredName,
+                "Preferred name"
+            );
+
+        if (preferredNameError) {
+            return {
+                error: preferredNameError
+            };
+        }
     }
 
     return {
@@ -258,6 +371,7 @@ function validatePasswordReset(data) {
 }
 
 module.exports = {
+    getNameValidationError,
     passwordRequirementsText,
     getPasswordValidationError,
     normalizeEmail,
