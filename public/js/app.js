@@ -215,6 +215,37 @@ const garageForecastList =
     document.querySelector(
         "#garage-forecast-list"
     );
+const expenseTopCategory =
+    document.querySelector(
+        "#expense-top-category"
+    );
+const expenseTopCategorySummary =
+    document.querySelector(
+        "#expense-top-category-summary"
+    );
+const expenseTopVehicle =
+    document.querySelector(
+        "#expense-top-vehicle"
+    );
+const expenseTopVehicleSummary =
+    document.querySelector(
+        "#expense-top-vehicle-summary"
+    );
+const upcomingWorkList =
+    document.querySelector(
+        "#upcoming-work-list"
+    );
+const saleReadinessList =
+    document.querySelector(
+        "#sale-readiness-list"
+    );
+const vehicleHealthList =
+    document.querySelector(
+        "#vehicle-health-list"
+    );
+const dataGapList = document.querySelector(
+    "#data-gap-list"
+);
 
 const garageStatusBadge =
     document.querySelector(
@@ -248,6 +279,9 @@ let maintenancePlans = [];
 let serviceHistory = [];
 let vehicleIssues = [];
 let vehicleDocuments = [];
+let fuelEntries = [];
+let vehicleExpenses = [];
+let ownershipCostSummary = {};
 let aiConfigured = true;
 let aiConversationHistory = [];
 
@@ -712,6 +746,94 @@ function getRecordVehicleName(record) {
     return `${record.brand} ${record.model}`;
 }
 
+function getVehicleDisplayName(vehicle) {
+    if (!vehicle) {
+        return "Vehicle";
+    }
+
+    if (vehicle.nickname) {
+        return vehicle.nickname;
+    }
+
+    return `${vehicle.brand} ${vehicle.model}`;
+}
+
+function safeNumber(value) {
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : 0;
+}
+
+function getDaysUntilDate(value) {
+    if (!value) {
+        return null;
+    }
+
+    const today = new Date();
+    const normalizedToday = new Date(
+        `${today.toISOString().slice(0, 10)}T00:00:00Z`
+    );
+    const targetDate = new Date(
+        `${String(value).slice(0, 10)}T00:00:00Z`
+    );
+
+    if (Number.isNaN(targetDate.getTime())) {
+        return null;
+    }
+
+    return Math.round(
+        (targetDate - normalizedToday) /
+        (24 * 60 * 60 * 1000)
+    );
+}
+
+function createMetricCard(
+    eyebrow,
+    title,
+    detail,
+    badgeText,
+    badgeClassName = "priority-badge info"
+) {
+    const card =
+        document.createElement("article");
+
+    card.className = "priority-item";
+
+    const content =
+        document.createElement("div");
+    content.className =
+        "priority-item-content";
+
+    content.append(
+        createTextElement(
+            "span",
+            "",
+            eyebrow
+        ),
+        createTextElement(
+            "strong",
+            "",
+            title
+        ),
+        createTextElement(
+            "p",
+            "",
+            detail
+        )
+    );
+
+    const badge =
+        createTextElement(
+            "span",
+            badgeClassName,
+            badgeText
+        );
+
+    card.append(content, badge);
+
+    return card;
+}
+
 function getPlanDeadline(plan) {
     const deadlineInformation = [];
 
@@ -1140,6 +1262,555 @@ function renderGarageForecast() {
     });
 }
 
+function renderExpenseIntelligence() {
+    const categoryTotals = new Map();
+    const vehicleTotals = new Map();
+
+    vehicleExpenses.forEach((expense) => {
+        const category =
+            expense.expense_type || "other";
+        const amount = safeNumber(
+            expense.amount
+        );
+
+        categoryTotals.set(
+            category,
+            (categoryTotals.get(category) || 0) +
+                amount
+        );
+    });
+
+    fuelEntries.forEach((entry) => {
+        const amount = safeNumber(
+            entry.total_cost
+        );
+        const vehicleKey = String(
+            entry.vehicle_id
+        );
+
+        vehicleTotals.set(
+            vehicleKey,
+            (vehicleTotals.get(vehicleKey) || 0) +
+                amount
+        );
+    });
+
+    vehicleExpenses.forEach((expense) => {
+        const amount = safeNumber(
+            expense.amount
+        );
+        const vehicleKey = String(
+            expense.vehicle_id
+        );
+
+        vehicleTotals.set(
+            vehicleKey,
+            (vehicleTotals.get(vehicleKey) || 0) +
+                amount
+        );
+    });
+
+    serviceHistory.forEach((record) => {
+        const amount = safeNumber(
+            record.actual_cost
+        );
+        const vehicleKey = String(
+            record.vehicle_id
+        );
+
+        vehicleTotals.set(
+            vehicleKey,
+            (vehicleTotals.get(vehicleKey) || 0) +
+                amount
+        );
+
+        categoryTotals.set(
+            "service",
+            (categoryTotals.get("service") || 0) +
+                amount
+        );
+    });
+
+    const topCategory =
+        [...categoryTotals.entries()]
+            .sort(
+                (firstEntry, secondEntry) =>
+                    secondEntry[1] - firstEntry[1]
+            )[0] || null;
+
+    if (!topCategory) {
+        expenseTopCategory.textContent =
+            "No data";
+        expenseTopCategorySummary.textContent =
+            "Add fuel, service or expense records to understand the spending mix.";
+    } else {
+        expenseTopCategory.textContent =
+            topCategory[0];
+        expenseTopCategorySummary.textContent =
+            `${formatCurrency(topCategory[1])} is your largest tracked cost bucket so far.`;
+    }
+
+    const topVehicleEntry =
+        [...vehicleTotals.entries()]
+            .sort(
+                (firstEntry, secondEntry) =>
+                    secondEntry[1] - firstEntry[1]
+            )[0] || null;
+
+    if (!topVehicleEntry) {
+        expenseTopVehicle.textContent =
+            "No data";
+        expenseTopVehicleSummary.textContent =
+            "Vehicle-level cost pressure appears here once ownership records accumulate.";
+        return;
+    }
+
+    const vehicle = vehicles.find(
+        (item) =>
+            String(item.id) ===
+            topVehicleEntry[0]
+    );
+
+    expenseTopVehicle.textContent =
+        getVehicleDisplayName(vehicle);
+    expenseTopVehicleSummary.textContent =
+        `${formatCurrency(topVehicleEntry[1])} is the highest tracked spend concentration across your active garage.`;
+}
+
+function renderUpcomingWorkTimeline() {
+    upcomingWorkList.innerHTML = "";
+
+    const items = [];
+
+    maintenancePlans
+        .filter(
+            (plan) =>
+                plan.status === "overdue" ||
+                plan.status === "due_soon"
+        )
+        .forEach((plan) => {
+            const daysAway =
+                plan.status === "overdue"
+                    ? -1
+                    : getDaysUntilDate(
+                        plan.next_due_date
+                    );
+
+            items.push({
+                sortKey:
+                    daysAway === null
+                        ? 999
+                        : daysAway,
+                card: createMetricCard(
+                    `maintenance | ${getPlanVehicleName(plan)}`,
+                    plan.name,
+                    plan.status === "overdue"
+                        ? "This service is already past target and should be planned immediately."
+                        : `Expected soon. ${getPlanDeadline(plan)}`,
+                    plan.status === "overdue"
+                        ? "Overdue"
+                        : "Soon",
+                    `priority-badge ${plan.status === "overdue" ? "critical" : "warning"}`
+                )
+            });
+        });
+
+    vehicleDocuments
+        .filter(
+            (documentRecord) =>
+                documentRecord.renewal_status ===
+                    "expired" ||
+                documentRecord.renewal_status ===
+                    "due_soon"
+        )
+        .forEach((documentRecord) => {
+            const vehicle = vehicles.find(
+                (item) =>
+                    String(item.id) ===
+                    String(
+                        documentRecord.vehicle_id
+                    )
+            );
+            const daysRemaining = safeNumber(
+                documentRecord.days_remaining
+            );
+
+            items.push({
+                sortKey: daysRemaining,
+                card: createMetricCard(
+                    `documents | ${getVehicleDisplayName(vehicle)}`,
+                    documentRecord.title,
+                    daysRemaining < 0
+                        ? `${Math.abs(daysRemaining)} days overdue. Renew this before buyer-facing or operational issues grow.`
+                        : `${daysRemaining} days remaining before renewal pressure becomes critical.`,
+                    daysRemaining < 0
+                        ? "Expired"
+                        : `${daysRemaining}d`,
+                    `priority-badge ${daysRemaining < 0 ? "critical" : "warning"}`
+                )
+            });
+        });
+
+    vehicleIssues
+        .filter(
+            (issue) =>
+                issue.status !== "repaired"
+        )
+        .forEach((issue) => {
+            items.push({
+                sortKey:
+                    issue.risk_level === "red"
+                        ? -2
+                        : 14,
+                card: createMetricCard(
+                    `issue | ${getRecordVehicleName(issue)}`,
+                    issue.issue_title,
+                    issue.risk_level === "red"
+                        ? "Urgent mechanical attention should come before less critical garage work."
+                        : "Keep this issue visible before it turns into downtime or a larger repair.",
+                    issue.risk_level === "red"
+                        ? "Urgent"
+                        : "Monitor",
+                    `priority-badge ${issue.risk_level === "red" ? "critical" : "warning"}`
+                )
+            });
+        });
+
+    if (items.length === 0) {
+        upcomingWorkList.append(
+            createOverviewEmptyState(
+                "OK",
+                "No near-term work pileup",
+                "Nothing currently stands out across maintenance, documents or open issues."
+            )
+        );
+        return;
+    }
+
+    items
+        .sort(
+            (firstItem, secondItem) =>
+                firstItem.sortKey -
+                secondItem.sortKey
+        )
+        .slice(0, 8)
+        .forEach((item) => {
+            upcomingWorkList.append(
+                item.card
+            );
+        });
+}
+
+function renderSaleReadiness() {
+    saleReadinessList.innerHTML = "";
+
+    if (!window.garageInsights || vehicles.length === 0) {
+        saleReadinessList.append(
+            createOverviewEmptyState(
+                "S",
+                "No active vehicle to prepare",
+                "Add an active vehicle before using buyer-facing readiness checks."
+            )
+        );
+        return;
+    }
+
+    const readinessCards = vehicles.map(
+        (vehicle) => {
+            const plans =
+                maintenancePlans.filter(
+                    (plan) =>
+                        String(plan.vehicle_id) ===
+                        String(vehicle.id)
+                );
+            const history =
+                serviceHistory.filter(
+                    (record) =>
+                        String(record.vehicle_id) ===
+                        String(vehicle.id)
+                );
+            const issues =
+                vehicleIssues.filter(
+                    (issue) =>
+                        String(issue.vehicle_id) ===
+                        String(vehicle.id)
+                );
+            const documents =
+                vehicleDocuments.filter(
+                    (documentRecord) =>
+                        String(
+                            documentRecord.vehicle_id
+                        ) ===
+                        String(vehicle.id)
+                );
+            const openIssues = issues.filter(
+                (issue) =>
+                    issue.status !== "repaired"
+            );
+            const expiredDocuments =
+                documents.filter(
+                    (documentRecord) =>
+                        documentRecord.renewal_status ===
+                        "expired"
+                );
+            const overduePlans = plans.filter(
+                (plan) =>
+                    plan.status === "overdue"
+            );
+
+            let score = 10;
+            const blockers = [];
+
+            if (openIssues.length > 0) {
+                score -= 3;
+                blockers.push(
+                    `${openIssues.length} open issue`
+                );
+            }
+
+            if (expiredDocuments.length > 0) {
+                score -= 2.5;
+                blockers.push(
+                    `${expiredDocuments.length} expired document`
+                );
+            }
+
+            if (overduePlans.length > 0) {
+                score -= 2;
+                blockers.push(
+                    `${overduePlans.length} overdue maintenance item`
+                );
+            }
+
+            if (history.length === 0) {
+                score -= 1.5;
+                blockers.push(
+                    "no service history"
+                );
+            }
+
+            if (
+                vehicle.ownership_status !==
+                "verified"
+            ) {
+                score -= 1;
+                blockers.push(
+                    "ownership not verified"
+                );
+            }
+
+            const finalScore = Math.max(
+                0,
+                Math.round(score * 10) / 10
+            );
+            const readyText =
+                blockers.length === 0
+                    ? "Buyer-facing profile looks clean with no obvious trust blockers."
+                    : `Before sharing this vehicle, fix ${blockers.slice(0, 2).join(" and ")}.`;
+
+            return createMetricCard(
+                `sale prep | ${getVehicleDisplayName(vehicle)}`,
+                "Buyer confidence readiness",
+                readyText,
+                `${finalScore}/10`,
+                `priority-badge ${finalScore >= 8 ? "info" : finalScore >= 6 ? "warning" : "critical"}`
+            );
+        }
+    );
+
+    readinessCards.forEach((card) => {
+        saleReadinessList.append(card);
+    });
+}
+
+function renderVehicleHealthSnapshots() {
+    vehicleHealthList.innerHTML = "";
+
+    if (!window.garageInsights || vehicles.length === 0) {
+        vehicleHealthList.append(
+            createOverviewEmptyState(
+                "V",
+                "No vehicle snapshot yet",
+                "Add an active vehicle to generate health summaries."
+            )
+        );
+        return;
+    }
+
+    vehicles.forEach((vehicle) => {
+        const insight =
+            window.garageInsights.assessVehicle({
+                vehicle,
+                maintenancePlans:
+                    maintenancePlans.filter(
+                        (plan) =>
+                            String(plan.vehicle_id) ===
+                            String(vehicle.id)
+                    ),
+                serviceHistory:
+                    serviceHistory.filter(
+                        (record) =>
+                            String(record.vehicle_id) ===
+                            String(vehicle.id)
+                    ),
+                issues: vehicleIssues.filter(
+                    (issue) =>
+                        String(issue.vehicle_id) ===
+                        String(vehicle.id)
+                ),
+                documents:
+                    vehicleDocuments.filter(
+                        (documentRecord) =>
+                            String(
+                                documentRecord.vehicle_id
+                            ) ===
+                            String(vehicle.id)
+                    )
+            });
+
+        const score = (
+            insight.metrics
+                .mechanicalConfidence.score +
+            insight.metrics
+                .maintenanceDiscipline.score +
+            insight.metrics
+                .documentReadiness.score
+        ) / 3;
+
+        const summary = [
+            insight.metrics.mechanicalConfidence
+                .summary,
+            insight.metrics.maintenanceDiscipline
+                .summary
+        ].join(" ");
+
+        vehicleHealthList.append(
+            createMetricCard(
+                `snapshot | ${getVehicleDisplayName(vehicle)}`,
+                "Short health summary",
+                summary,
+                `${score.toFixed(1)}/10`,
+                `priority-badge ${score >= 8 ? "info" : score >= 6 ? "warning" : "critical"}`
+            )
+        );
+    });
+}
+
+function renderDataGaps() {
+    dataGapList.innerHTML = "";
+
+    const gaps = [];
+
+    vehicles.forEach((vehicle) => {
+        const vehicleName =
+            getVehicleDisplayName(vehicle);
+        const plans =
+            maintenancePlans.filter(
+                (plan) =>
+                    String(plan.vehicle_id) ===
+                    String(vehicle.id)
+            );
+        const history =
+            serviceHistory.filter(
+                (record) =>
+                    String(record.vehicle_id) ===
+                    String(vehicle.id)
+            );
+        const docs =
+            vehicleDocuments.filter(
+                (documentRecord) =>
+                    String(
+                        documentRecord.vehicle_id
+                    ) ===
+                    String(vehicle.id)
+            );
+        const fuel =
+            fuelEntries.filter(
+                (entry) =>
+                    String(entry.vehicle_id) ===
+                    String(vehicle.id)
+            );
+
+        if (plans.length === 0) {
+            gaps.push(
+                createMetricCard(
+                    `data gap | ${vehicleName}`,
+                    "No maintenance baseline",
+                    "Recurring service planning is missing, so maintenance insights are less reliable.",
+                    "Missing",
+                    "priority-badge warning"
+                )
+            );
+        }
+
+        if (history.length === 0) {
+            gaps.push(
+                createMetricCard(
+                    `data gap | ${vehicleName}`,
+                    "No completed service history",
+                    "Buyer trust and forecast quality both improve when past workshop work is recorded.",
+                    "History",
+                    "priority-badge warning"
+                )
+            );
+        }
+
+        if (docs.length === 0) {
+            gaps.push(
+                createMetricCard(
+                    `data gap | ${vehicleName}`,
+                    "No document tracking",
+                    "Expiry-related readiness cannot be trusted until core documents are recorded.",
+                    "Docs",
+                    "priority-badge warning"
+                )
+            );
+        }
+
+        if (fuel.length === 0) {
+            gaps.push(
+                createMetricCard(
+                    `data gap | ${vehicleName}`,
+                    "No fuel records",
+                    "Ownership cost and usage efficiency analysis stay shallow without fill-up data.",
+                    "Fuel",
+                    "priority-badge info"
+                )
+            );
+        }
+
+        if (
+            vehicle.ownership_status !==
+            "verified"
+        ) {
+            gaps.push(
+                createMetricCard(
+                    `data gap | ${vehicleName}`,
+                    "Ownership not verified",
+                    "Plate verification is still missing, which weakens buyer-facing confidence.",
+                    "Trust",
+                    "priority-badge info"
+                )
+            );
+        }
+    });
+
+    if (gaps.length === 0) {
+        dataGapList.append(
+            createOverviewEmptyState(
+                "OK",
+                "No major data weakness found",
+                "This garage has enough structure for stronger insights and buyer-facing presentation."
+            )
+        );
+        return;
+    }
+
+    gaps.slice(0, 8).forEach((gapCard) => {
+        dataGapList.append(gapCard);
+    });
+}
+
 function renderMaintenanceOverview() {
     maintenanceOverviewList.innerHTML = "";
 
@@ -1448,6 +2119,11 @@ function renderDashboardOverview() {
     renderGarageForecast();
     renderMaintenanceOverview();
     renderRecentServices();
+    renderExpenseIntelligence();
+    renderUpcomingWorkTimeline();
+    renderSaleReadiness();
+    renderVehicleHealthSnapshots();
+    renderDataGaps();
 }
 
 function createDetail(label, value) {
@@ -1896,7 +2572,10 @@ async function loadDashboard() {
             maintenanceData,
             historyData,
             issueData,
-            documentData
+            documentData,
+            fuelData,
+            expenseData,
+            ownershipCostData
         ] = await Promise.all([
             window.apiRequest(
                 "/api/auth/me"
@@ -1925,6 +2604,17 @@ async function loadDashboard() {
             requestOptionalList(
                 "/api/documents",
                 "documents"
+            ),
+            requestOptionalList(
+                "/api/costs/fuel",
+                "fuelEntries"
+            ),
+            requestOptionalList(
+                "/api/costs/expenses",
+                "expenses"
+            ),
+            window.apiRequest(
+                "/api/costs/summary"
             )
         ]);
 
@@ -1952,6 +2642,10 @@ async function loadDashboard() {
         vehicleIssues = issueData;
 
         vehicleDocuments = documentData;
+        fuelEntries = fuelData;
+        vehicleExpenses = expenseData;
+        ownershipCostSummary =
+            ownershipCostData.summary || {};
 
         renderVehicles();
         renderSoldVehicles();

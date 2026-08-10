@@ -105,12 +105,25 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.share-grid-highlight {
+    margin-top: 18px;
+}
+
 .share-stat-card,
 .share-panel {
     padding: 22px;
     background: rgba(247, 243, 237, 0.98);
     border: 1px solid var(--border);
     border-radius: 22px;
+}
+
+.share-panel-emphasis {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(247, 243, 237, 0.98),
+            rgba(230, 237, 233, 0.95)
+        );
 }
 
 .share-stat-card span {
@@ -133,6 +146,48 @@
 .share-panel-heading h2 {
     margin: 6px 0 0;
     font-size: 22px;
+}
+
+.share-readiness-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 18px;
+    align-items: center;
+}
+
+.share-readiness-score {
+    padding: 18px;
+    background: rgba(31, 74, 58, 0.08);
+    border: 1px solid rgba(31, 74, 58, 0.12);
+    border-radius: 18px;
+}
+
+.share-readiness-score span,
+.share-readiness-score strong {
+    display: block;
+}
+
+.share-readiness-score span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.share-readiness-score strong {
+    margin-top: 10px;
+    font-size: 34px;
+}
+
+.share-readiness-summary {
+    color: var(--text);
+    line-height: 1.7;
+}
+
+.share-trust-list,
+.share-timeline-list {
+    display: grid;
+    gap: 12px;
 }
 
 .share-detail-grid {
@@ -167,11 +222,6 @@
     font-size: 14px;
 }
 
-.share-timeline-list {
-    display: grid;
-    gap: 12px;
-}
-
 .share-timeline-item strong {
     font-size: 14px;
 }
@@ -199,5 +249,9 @@
     .share-hero {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .share-readiness-row {
+        grid-template-columns: 1fr;
     }
 }
