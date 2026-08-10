@@ -33,12 +33,16 @@ const fuelList = window.document.querySelector("#fuel-entry-list");
 const expenseList = window.document.querySelector("#expense-entry-list");
 const fuelEntryCount = window.document.querySelector("#fuel-entry-count");
 const expenseEntryCount = window.document.querySelector("#expense-entry-count");
+const monthlyCostChart = window.document.querySelector("#monthly-cost-chart");
+const categoryBreakdownChart = window.document.querySelector("#category-breakdown-chart");
+const vehicleCostChart = window.document.querySelector("#vehicle-cost-chart");
 
 let vehicles = [];
 let fuelEntries = [];
 let expenses = [];
 let costSummary = {};
 let generatedExpenseTitle = "";
+let serviceRecords = [];
 
 const expenseTypeNames = {
     insurance: "Traffic insurance",
@@ -140,6 +144,54 @@ function createDetail(label, value) {
     );
 
     return detail;
+}
+
+function createBarChartRow({
+    label,
+    valueText,
+    percentage,
+    tone
+}) {
+    const row = createElement("div", "chart-series-row");
+    const track = createElement("div", "chart-bar-track");
+    const fill = createElement(
+        "div",
+        `chart-bar-fill ${tone}`
+    );
+
+    fill.style.width = `${Math.max(6, percentage)}%`;
+    track.append(fill);
+
+    row.append(
+        createElement("span", "chart-series-label", label),
+        track,
+        createElement("span", "chart-series-value", valueText)
+    );
+
+    return row;
+}
+
+function setChartEmptyState(element, message) {
+    element.innerHTML = "";
+    element.append(
+        createElement("div", "cost-chart-empty", message)
+    );
+}
+
+function getMonthKey(value) {
+    return String(value).slice(0, 7);
+}
+
+function formatMonthKey(value) {
+    const [year, month] = value.split("-");
+    const date = new Date(
+        `${year}-${month}-01T00:00:00`
+    );
+
+    return date.toLocaleDateString("en-GB", {
+        month: "short",
+        year: "2-digit"
+    });
 }
 
 function setDefaultDates() {
@@ -288,6 +340,266 @@ function renderSummary() {
 
     expenseSummary.textContent =
         `${Number(costSummary.expenseCount) || 0} additional expenses`;
+}
+
+function renderMonthlyCostChart() {
+    if (!monthlyCostChart) {
+        return;
+    }
+
+    const totalsByMonth = new Map();
+
+    fuelEntries.forEach((entry) => {
+        const monthKey = getMonthKey(entry.filled_at);
+        totalsByMonth.set(
+            monthKey,
+            (totalsByMonth.get(monthKey) || 0) +
+                Number(entry.total_cost || 0)
+        );
+    });
+
+    expenses.forEach((expenseRecord) => {
+        const monthKey = getMonthKey(
+            expenseRecord.expense_date
+        );
+        totalsByMonth.set(
+            monthKey,
+            (totalsByMonth.get(monthKey) || 0) +
+                Number(expenseRecord.amount || 0)
+        );
+    });
+
+    serviceRecords.forEach((record) => {
+        const monthKey = getMonthKey(
+            record.completed_at
+        );
+        totalsByMonth.set(
+            monthKey,
+            (totalsByMonth.get(monthKey) || 0) +
+                Number(record.actual_cost || 0)
+        );
+    });
+
+    const rows = [...totalsByMonth.entries()]
+        .sort((firstItem, secondItem) =>
+            firstItem[0].localeCompare(secondItem[0])
+        )
+        .slice(-6);
+
+    if (rows.length === 0) {
+        setChartEmptyState(
+            monthlyCostChart,
+            "Add fuel, service or expense records to start seeing the monthly ownership trend."
+        );
+        return;
+    }
+
+    const maxValue = Math.max(
+        ...rows.map(([, total]) => total),
+        1
+    );
+    const list = createElement("div", "chart-series-list");
+
+    rows.forEach(([monthKey, total]) => {
+        list.append(
+            createBarChartRow({
+                label: formatMonthKey(monthKey),
+                valueText: formatCurrency(total),
+                percentage:
+                    (total / maxValue) * 100,
+                tone: "trend"
+            })
+        );
+    });
+
+    monthlyCostChart.innerHTML = "";
+    monthlyCostChart.append(
+        list,
+        createElement(
+            "p",
+            "chart-summary-note",
+            `Highest month in view: ${formatCurrency(maxValue)}.`
+        )
+    );
+}
+
+function renderCategoryBreakdownChart() {
+    if (!categoryBreakdownChart) {
+        return;
+    }
+
+    const categoryTotals = new Map();
+
+    categoryTotals.set(
+        "fuel",
+        fuelEntries.reduce(
+            (total, entry) =>
+                total +
+                Number(entry.total_cost || 0),
+            0
+        )
+    );
+    categoryTotals.set(
+        "service",
+        serviceRecords.reduce(
+            (total, record) =>
+                total +
+                Number(record.actual_cost || 0),
+            0
+        )
+    );
+
+    expenses.forEach((expenseRecord) => {
+        const category =
+            expenseTypeNames[
+                expenseRecord.expense_type
+            ] || "Other";
+
+        categoryTotals.set(
+            category,
+            (categoryTotals.get(category) || 0) +
+                Number(expenseRecord.amount || 0)
+        );
+    });
+
+    const rows = [...categoryTotals.entries()]
+        .filter(([, total]) => total > 0)
+        .sort(
+            (firstItem, secondItem) =>
+                secondItem[1] - firstItem[1]
+        )
+        .slice(0, 6);
+
+    if (rows.length === 0) {
+        setChartEmptyState(
+            categoryBreakdownChart,
+            "Category mix appears after the first tracked ownership costs are added."
+        );
+        return;
+    }
+
+    const grandTotal = rows.reduce(
+        (total, [, value]) => total + value,
+        0
+    );
+    const list = createElement("div", "chart-series-list");
+
+    rows.forEach(([label, total]) => {
+        list.append(
+            createBarChartRow({
+                label,
+                valueText: formatCurrency(total),
+                percentage:
+                    (total / grandTotal) * 100,
+                tone: "category"
+            })
+        );
+    });
+
+    categoryBreakdownChart.innerHTML = "";
+    categoryBreakdownChart.append(
+        list,
+        createElement(
+            "p",
+            "chart-summary-note",
+            `${rows[0][0]} currently leads the spending mix at ${formatCurrency(rows[0][1])}.`
+        )
+    );
+}
+
+function renderVehicleCostChart() {
+    if (!vehicleCostChart) {
+        return;
+    }
+
+    const totalsByVehicle = new Map();
+
+    vehicles.forEach((vehicle) => {
+        totalsByVehicle.set(
+            String(vehicle.id),
+            0
+        );
+    });
+
+    fuelEntries.forEach((entry) => {
+        const key = String(entry.vehicle_id);
+        totalsByVehicle.set(
+            key,
+            (totalsByVehicle.get(key) || 0) +
+                Number(entry.total_cost || 0)
+        );
+    });
+
+    expenses.forEach((expenseRecord) => {
+        const key = String(expenseRecord.vehicle_id);
+        totalsByVehicle.set(
+            key,
+            (totalsByVehicle.get(key) || 0) +
+                Number(expenseRecord.amount || 0)
+        );
+    });
+
+    serviceRecords.forEach((record) => {
+        const key = String(record.vehicle_id);
+        totalsByVehicle.set(
+            key,
+            (totalsByVehicle.get(key) || 0) +
+                Number(record.actual_cost || 0)
+        );
+    });
+
+    const rows = vehicles
+        .map((vehicle) => ({
+            label: getVehicleName(vehicle),
+            total:
+                totalsByVehicle.get(
+                    String(vehicle.id)
+                ) || 0
+        }))
+        .filter((row) => row.total > 0)
+        .sort(
+            (firstRow, secondRow) =>
+                secondRow.total - firstRow.total
+        );
+
+    if (rows.length === 0) {
+        setChartEmptyState(
+            vehicleCostChart,
+            "Vehicle-to-vehicle comparison appears after you start tracking ownership cost on active vehicles."
+        );
+        return;
+    }
+
+    const maxValue = Math.max(
+        ...rows.map((row) => row.total),
+        1
+    );
+    const list = createElement("div", "chart-series-list");
+
+    rows.forEach((row) => {
+        list.append(
+            createBarChartRow({
+                label:
+                    row.label.length > 12
+                        ? `${row.label.slice(0, 12)}...`
+                        : row.label,
+                valueText: formatCurrency(row.total),
+                percentage:
+                    (row.total / maxValue) * 100,
+                tone: "vehicle"
+            })
+        );
+    });
+
+    vehicleCostChart.innerHTML = "";
+    vehicleCostChart.append(
+        list,
+        createElement(
+            "p",
+            "chart-summary-note",
+            `${rows[0].label} is currently the most expensive active vehicle to own in tracked data.`
+        )
+    );
 }
 
 function createEmptyState(icon, title, description) {
@@ -453,23 +765,28 @@ function renderExpenses() {
 
 function renderCostCenter() {
     renderSummary();
+    renderMonthlyCostChart();
+    renderCategoryBreakdownChart();
+    renderVehicleCostChart();
     renderFuelEntries();
     renderExpenses();
 }
 
 async function refreshCostData() {
-    const [vehicleData, fuelData, expenseData, summaryData] =
+    const [vehicleData, fuelData, expenseData, summaryData, serviceData] =
         await Promise.all([
             window.apiRequest("/api/vehicles"),
             window.apiRequest("/api/costs/fuel"),
             window.apiRequest("/api/costs/expenses"),
-            window.apiRequest("/api/costs/summary")
+            window.apiRequest("/api/costs/summary"),
+            window.apiRequest("/api/service-history")
         ]);
 
     vehicles = vehicleData.vehicles;
     fuelEntries = fuelData.fuelEntries;
     expenses = expenseData.expenses;
     costSummary = summaryData.summary;
+    serviceRecords = serviceData.serviceHistory;
 
     populateVehicleSelections();
     renderCostCenter();
