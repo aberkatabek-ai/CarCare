@@ -118,6 +118,72 @@ function getCurrentPath() {
     return pathname;
 }
 
+function enhanceBrandNavigation() {
+    const brand =
+        window.document.querySelector(
+            ".dashboard-header .brand.compact"
+        );
+
+    if (!brand) {
+        return;
+    }
+
+    const dashboardPath = "/index.html";
+    const currentPath =
+        getCurrentPath();
+    const shouldNavigate =
+        currentPath !== dashboardPath;
+
+    brand.classList.toggle(
+        "brand-link",
+        shouldNavigate
+    );
+
+    if (!shouldNavigate) {
+        brand.removeAttribute("role");
+        brand.removeAttribute("tabindex");
+        brand.removeAttribute("aria-label");
+        return;
+    }
+
+    brand.setAttribute("role", "link");
+    brand.setAttribute("tabindex", "0");
+    brand.setAttribute(
+        "aria-label",
+        "Go to dashboard"
+    );
+
+    if (brand.dataset.dashboardBound) {
+        return;
+    }
+
+    const navigateToDashboard = () => {
+        window.location.href =
+            dashboardPath;
+    };
+
+    brand.addEventListener(
+        "click",
+        navigateToDashboard
+    );
+
+    brand.addEventListener(
+        "keydown",
+        (event) => {
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+                event.preventDefault();
+                navigateToDashboard();
+            }
+        }
+    );
+
+    brand.dataset.dashboardBound =
+        "true";
+}
+
 function ensureMobileNavigationToggle() {
     const header =
         window.document.querySelector(
@@ -347,6 +413,7 @@ function enhanceNavigation() {
             }
         });
 
+    enhanceBrandNavigation();
     ensureMobileNavigationToggle();
 }
 
