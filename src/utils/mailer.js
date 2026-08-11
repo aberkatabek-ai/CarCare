@@ -160,30 +160,46 @@ function openSmtpSocket(host, port, secure) {
 
 function getSmtpSocket(options, callback) {
     openSmtpSocket(
-        process.env.SMTP_HOST,
-        Number(process.env.SMTP_PORT),
+        options.host,
+        Number(options.port),
         options.secure
     )
         .then((connection) =>
-            callback(null, { connection })
+            callback(null, {
+                connection,
+                secured: Boolean(
+                    options.secure
+                )
+            })
         )
         .catch((error) => callback(error));
 }
 
-function getTransportOptions() {
+function getTransportOptions(
+    overrides = {}
+) {
     return {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
+        host:
+            overrides.host ||
+            process.env.SMTP_HOST,
+        port:
+            Number(
+                overrides.port ??
+                    process.env.SMTP_PORT
+            ) || 587,
         secure:
-            String(
+            overrides.secure ??
+            (String(
                 process.env.SMTP_SECURE || ""
-            ).toLowerCase() === "true",
+            ).toLowerCase() === "true"),
         connectionTimeout: 15000,
         greetingTimeout: 15000,
         socketTimeout: 20000,
         dnsTimeout: 10000,
         tls: {
-            servername: process.env.SMTP_HOST
+            servername:
+                overrides.host ||
+                process.env.SMTP_HOST
         },
         getSocket: getSmtpSocket,
         auth: {
@@ -218,6 +234,14 @@ async function getTransporter() {
     return transporterPromise;
 }
 
+function createTransporter(
+    overrides = {}
+) {
+    return nodemailer.createTransport(
+        getTransportOptions(overrides)
+    );
+}
+
 function isProduction() {
     return process.env.NODE_ENV === "production";
 }
@@ -232,6 +256,84 @@ function getFromAddress() {
         process.env.SMTP_USER ||
         "no-reply@carcare.local"
     );
+}
+
+function isGmailSmtpFallbackCandidate(
+    error
+) {
+    if (
+        process.env.SMTP_HOST !==
+        "smtp.gmail.com"
+    ) {
+        return false;
+    }
+
+    if (
+        Number(process.env.SMTP_PORT) !==
+        587
+    ) {
+        return false;
+    }
+
+    if (
+        String(
+            process.env.SMTP_SECURE || ""
+        ).toLowerCase() === "true"
+    ) {
+        return false;
+    }
+
+    const message = String(
+        error?.message || ""
+    ).toLowerCase();
+    const code = String(
+        error?.code || ""
+    ).toUpperCase();
+
+    if (code === "EAUTH") {
+        return false;
+    }
+
+    return (
+        code === "ETIMEDOUT" ||
+        code === "ESOCKET" ||
+        code === "ECONNECTION" ||
+        message.includes("timed out") ||
+        message.includes("enetunreach")
+    );
+}
+
+async function sendMailWithFallback(
+    message
+) {
+    const transporter =
+        await getTransporter();
+
+    try {
+        return await transporter.sendMail(
+            message
+        );
+    } catch (error) {
+        transporterPromise = null;
+
+        if (
+            !isGmailSmtpFallbackCandidate(
+                error
+            )
+        ) {
+            throw error;
+        }
+
+        const fallbackTransporter =
+            createTransporter({
+                port: 465,
+                secure: true
+            });
+
+        return fallbackTransporter.sendMail(
+            message
+        );
+    }
 }
 
 async function sendPasswordResetCode({
@@ -282,9 +384,9 @@ async function sendPasswordResetCode({
             };
         }
 
-        const transporter = await getTransporter();
-
-        await transporter.sendMail(message);
+        await sendMailWithFallback(
+            message
+        );
 
         return {
             delivered: true,
@@ -292,8 +394,6 @@ async function sendPasswordResetCode({
             mode: "smtp"
         };
     } catch (error) {
-        transporterPromise = null;
-
         if (isProduction()) {
             throw error;
         }
@@ -454,9 +554,7 @@ async function sendReminderDigestEmail({
         };
     }
 
-    const transporter = await getTransporter();
-
-    await transporter.sendMail(message);
+    await sendMailWithFallback(message);
 
     return {
         delivered: true,
