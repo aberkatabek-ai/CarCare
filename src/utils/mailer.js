@@ -1,7 +1,130 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+const net = require("net");
+const tls = require("tls");
 
 let transporterPromise = null;
 let lastSentMail = null;
+
+function openSmtpSocket(host, port, secure) {
+    return new Promise((resolve, reject) => {
+        dns.resolve4(host, (dnsError, addresses) => {
+            if (dnsError) {
+                reject(dnsError);
+                return;
+            }
+
+            const ipv4Addresses = Array.isArray(
+                addresses
+            )
+                ? addresses.filter(Boolean)
+                : [];
+
+            if (ipv4Addresses.length === 0) {
+                reject(
+                    new Error(
+                        `No IPv4 SMTP addresses were found for ${host}.`
+                    )
+                );
+                return;
+            }
+
+            let currentIndex = 0;
+
+            function tryNextAddress(lastError) {
+                if (
+                    currentIndex >=
+                    ipv4Addresses.length
+                ) {
+                    reject(
+                        lastError ||
+                            new Error(
+                                `Could not connect to any IPv4 SMTP address for ${host}.`
+                            )
+                    );
+                    return;
+                }
+
+                const address =
+                    ipv4Addresses[currentIndex];
+
+                currentIndex += 1;
+
+                const socket = secure
+                    ? tls.connect({
+                        host: address,
+                        port,
+                        family: 4,
+                        servername: host
+                    })
+                    : net.connect({
+                        host: address,
+                        port,
+                        family: 4
+                    });
+
+                const timeoutMs = 15000;
+
+                socket.setTimeout(timeoutMs);
+
+                const handleFailure = (error) => {
+                    socket.destroy();
+                    tryNextAddress(error);
+                };
+
+                socket.once(
+                    "error",
+                    handleFailure
+                );
+
+                socket.once("timeout", () => {
+                    handleFailure(
+                        new Error(
+                            `SMTP connection timed out after ${timeoutMs} ms.`
+                        )
+                    );
+                });
+
+                if (secure) {
+                    socket.once(
+                        "secureConnect",
+                        () => {
+                            socket.removeListener(
+                                "error",
+                                handleFailure
+                            );
+                            socket.setTimeout(0);
+                            resolve(socket);
+                        }
+                    );
+                } else {
+                    socket.once("connect", () => {
+                        socket.removeListener(
+                            "error",
+                            handleFailure
+                        );
+                        socket.setTimeout(0);
+                        resolve(socket);
+                    });
+                }
+            }
+
+            tryNextAddress();
+        });
+    });
+}
+
+function getSmtpSocket(options, callback) {
+    openSmtpSocket(
+        process.env.SMTP_HOST,
+        Number(process.env.SMTP_PORT),
+        options.secure
+    )
+        .then((connection) =>
+            callback(null, { connection })
+        )
+        .catch((error) => callback(error));
+}
 
 function getTransportOptions() {
     return {
@@ -11,7 +134,14 @@ function getTransportOptions() {
             String(
                 process.env.SMTP_SECURE || ""
             ).toLowerCase() === "true",
-        family: 4,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
+        dnsTimeout: 10000,
+        tls: {
+            servername: process.env.SMTP_HOST
+        },
+        getSocket: getSmtpSocket,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS
@@ -34,17 +164,11 @@ async function getTransporter() {
     }
 
     if (!transporterPromise) {
-        transporterPromise =
-            nodemailer
-                .createTransport(
-                    getTransportOptions()
-                )
-                .verify()
-                .then(() =>
-                    nodemailer.createTransport(
-                        getTransportOptions()
-                    )
-                );
+        transporterPromise = Promise.resolve(
+            nodemailer.createTransport(
+                getTransportOptions()
+            )
+        );
     }
 
     return transporterPromise;
