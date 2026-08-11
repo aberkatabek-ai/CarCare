@@ -535,9 +535,40 @@ a.secondary-button {
     font-size: 28px;
 }
 
+.welcome-email-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .muted-text {
     margin: 0;
     color: var(--muted);
+}
+
+.email-visibility-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        transform 150ms ease,
+        border-color 150ms ease,
+        background 150ms ease;
+}
+
+.email-visibility-button:hover,
+.email-visibility-button:focus-visible {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: #a39681;
+    transform: translateY(-1px);
 }
 
 .status-badge {

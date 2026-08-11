@@ -5,6 +5,10 @@ const userNameElement = document.querySelector(
 const userEmailElement = document.querySelector(
     "#user-email"
 );
+const toggleEmailVisibilityButton =
+    document.querySelector(
+        "#toggle-email-visibility"
+    );
 
 const logoutButton = document.querySelector(
     "#logout-button"
@@ -287,6 +291,8 @@ let aiConversationHistory = [];
 
 let selectedVehicleId = null;
 let editingVehicleId = null;
+let userEmailAddress = "";
+let isUserEmailVisible = true;
 
 function showMessage(
     element,
@@ -301,6 +307,44 @@ function showMessage(
 function clearMessage(element) {
     element.textContent = "";
     element.className = "form-message";
+}
+
+function getMaskedEmail(email) {
+    return String(email || "").replace(
+        /./g,
+        "*"
+    );
+}
+
+function renderUserEmail() {
+    if (!userEmailElement) {
+        return;
+    }
+
+    userEmailElement.textContent =
+        userEmailAddress
+            ? isUserEmailVisible
+                ? userEmailAddress
+                : getMaskedEmail(
+                    userEmailAddress
+                )
+            : "Loading account...";
+
+    if (!toggleEmailVisibilityButton) {
+        return;
+    }
+
+    const nextActionLabel =
+        isUserEmailVisible
+            ? "Hide email address"
+            : "Show email address";
+
+    toggleEmailVisibilityButton.setAttribute(
+        "aria-label",
+        nextActionLabel
+    );
+    toggleEmailVisibilityButton.title =
+        nextActionLabel;
 }
 
 function createTextElement(
@@ -756,6 +800,21 @@ function getVehicleDisplayName(vehicle) {
     }
 
     return `${vehicle.brand} ${vehicle.model}`;
+}
+
+if (toggleEmailVisibilityButton) {
+    toggleEmailVisibilityButton.addEventListener(
+        "click",
+        () => {
+            if (!userEmailAddress) {
+                return;
+            }
+
+            isUserEmailVisible =
+                !isUserEmailVisible;
+            renderUserEmail();
+        }
+    );
 }
 
 function safeNumber(value) {
@@ -2623,8 +2682,9 @@ async function loadDashboard() {
                 userData.user
             );
 
-        userEmailElement.textContent =
+        userEmailAddress =
             userData.user.email;
+        renderUserEmail();
 
         vehicles =
             vehicleData.vehicles;
