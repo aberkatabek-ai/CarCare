@@ -55,10 +55,7 @@ function isProduction() {
 }
 
 function canSendRealMail() {
-    return (
-        isProduction() &&
-        hasSmtpConfiguration()
-    );
+    return hasSmtpConfiguration();
 }
 
 function getFromAddress() {
