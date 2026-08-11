@@ -102,6 +102,12 @@ async function sendPasswordResetCode({
 
     try {
         if (!canSendRealMail()) {
+            if (isProduction()) {
+                throw new Error(
+                    "SMTP is not configured for production password reset delivery."
+                );
+            }
+
             console.log(
                 `[mail:dev] Password reset code for ${to}: ${code}`
             );
@@ -268,6 +274,12 @@ async function sendReminderDigestEmail({
     };
 
     if (!canSendRealMail()) {
+        if (isProduction()) {
+            throw new Error(
+                "SMTP is not configured for production reminder delivery."
+            );
+        }
+
         console.log(
             `[mail:dev] Reminder summary prepared for ${to}.`
         );
