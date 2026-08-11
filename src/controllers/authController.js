@@ -716,8 +716,7 @@ async function requestPasswordReset(
 
             if (
                 process.env.NODE_ENV !==
-                    "production" &&
-                deliveryResult.fallback
+                "production"
             ) {
                 debugCode = resetCode.code;
             }

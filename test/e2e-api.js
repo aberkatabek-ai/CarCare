@@ -425,6 +425,19 @@ async function main() {
         `Document delete failed: ${JSON.stringify(deleteDocument.data)}`
     );
 
+    const sellVehicle =
+        await client.request(
+            `/api/vehicles/${vehicleId}/sell`,
+            {
+                method: "PATCH"
+            }
+        );
+
+    assert(
+        sellVehicle.status === 200,
+        `Vehicle sell failed: ${JSON.stringify(sellVehicle.data)}`
+    );
+
     const deleteVehicle =
         await client.request(
             `/api/vehicles/${vehicleId}`,

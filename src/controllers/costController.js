@@ -535,14 +535,6 @@ async function getLatestMileageEventDate(
             FROM service_history
             WHERE vehicle_id = $1
 
-            UNION ALL
-
-            SELECT COALESCE(
-                (to_jsonb(mh)->>'recorded_at')::DATE,
-                created_at::DATE
-            ) AS event_date
-            FROM mileage_history mh
-            WHERE vehicle_id = $1
          ) AS mileage_events`,
         [vehicleId]
     );

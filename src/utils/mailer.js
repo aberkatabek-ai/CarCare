@@ -56,6 +56,13 @@ function isProduction() {
     return process.env.NODE_ENV === "production";
 }
 
+function canSendRealMail() {
+    return (
+        isProduction() &&
+        hasSmtpConfiguration()
+    );
+}
+
 function getFromAddress() {
     return (
         process.env.SMTP_FROM ||
@@ -94,9 +101,7 @@ async function sendPasswordResetCode({
     };
 
     try {
-        const transporter = await getTransporter();
-
-        if (!transporter) {
+        if (!canSendRealMail()) {
             console.log(
                 `[mail:dev] Password reset code for ${to}: ${code}`
             );
@@ -107,6 +112,8 @@ async function sendPasswordResetCode({
                 mode: "log"
             };
         }
+
+        const transporter = await getTransporter();
 
         await transporter.sendMail(message);
 
@@ -260,9 +267,7 @@ async function sendReminderDigestEmail({
             "<p>Open CarCare to review and update your records.</p>"
     };
 
-    const transporter = await getTransporter();
-
-    if (!transporter) {
+    if (!canSendRealMail()) {
         console.log(
             `[mail:dev] Reminder summary prepared for ${to}.`
         );
@@ -273,6 +278,8 @@ async function sendReminderDigestEmail({
             mode: "log"
         };
     }
+
+    const transporter = await getTransporter();
 
     await transporter.sendMail(message);
 
