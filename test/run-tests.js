@@ -41,6 +41,9 @@ const {
 const {
     formatConversationDatasetRow
 } = require("../src/services/aiTrainingService");
+const {
+    shouldExposePasswordResetCode
+} = require("../src/utils/passwordResetDelivery");
 
 function runTest(name, testFn) {
     try {
@@ -357,6 +360,48 @@ runTest(
         assert.equal(
             result.error,
             "New password must contain at least one special character."
+        );
+    }
+);
+
+runTest(
+    "password reset code is exposed outside production",
+    () => {
+        assert.equal(
+            shouldExposePasswordResetCode({
+                nodeEnv: "development",
+                fallbackEnabled: false,
+                deliveryFailed: false
+            }),
+            true
+        );
+    }
+);
+
+runTest(
+    "password reset code stays hidden in production when fallback is disabled",
+    () => {
+        assert.equal(
+            shouldExposePasswordResetCode({
+                nodeEnv: "production",
+                fallbackEnabled: false,
+                deliveryFailed: true
+            }),
+            false
+        );
+    }
+);
+
+runTest(
+    "password reset code is exposed in production only when fallback is enabled and delivery fails",
+    () => {
+        assert.equal(
+            shouldExposePasswordResetCode({
+                nodeEnv: "production",
+                fallbackEnabled: true,
+                deliveryFailed: true
+            }),
+            true
         );
     }
 );

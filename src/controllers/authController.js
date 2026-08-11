@@ -18,9 +18,11 @@ const {
     consumePasswordResetCode
 } = require("../utils/passwordReset");
 const {
-    sendPasswordResetCode,
-    hasSmtpConfiguration
+    sendPasswordResetCode
 } = require("../utils/mailer");
+const {
+    shouldExposePasswordResetCode
+} = require("../utils/passwordResetDelivery");
 
 let preferredNameColumnState = null;
 let remindersEnabledColumnState = null;
@@ -703,6 +705,7 @@ async function requestPasswordReset(
             process.env
                 .ALLOW_PASSWORD_RESET_CODE_FALLBACK ===
             "true";
+        let deliveryFailed = false;
 
         if (user) {
             const resetCode =
@@ -724,17 +727,32 @@ async function requestPasswordReset(
                     "Password reset mail delivery failed:",
                     deliveryError.message
                 );
+                deliveryFailed = true;
 
-                if (allowResetCodeFallback) {
-                    debugCode = resetCode.code;
+                if (
+                    shouldExposePasswordResetCode({
+                        nodeEnv:
+                            process.env.NODE_ENV,
+                        fallbackEnabled:
+                            allowResetCodeFallback,
+                        deliveryFailed
+                    })
+                ) {
+                    debugCode =
+                        resetCode.code;
                     responseMessage =
                         "Email delivery is temporarily unavailable. Use the verification code shown below to reset your password.";
                 }
             }
 
             if (
-                process.env.NODE_ENV !==
-                    "production" &&
+                shouldExposePasswordResetCode({
+                    nodeEnv:
+                        process.env.NODE_ENV,
+                    fallbackEnabled:
+                        allowResetCodeFallback,
+                    deliveryFailed
+                }) &&
                 !debugCode
             ) {
                 debugCode = resetCode.code;
