@@ -8,15 +8,8 @@ let lastSentMail = null;
 
 function openSmtpSocket(host, port, secure) {
     return new Promise((resolve, reject) => {
-        dns.resolve4(host, (dnsError, addresses) => {
-            if (dnsError) {
-                reject(dnsError);
-                return;
-            }
-
-            const ipv4Addresses = Array.isArray(
-                addresses
-            )
+        function connectWithAddresses(addresses) {
+            const ipv4Addresses = Array.isArray(addresses)
                 ? addresses.filter(Boolean)
                 : [];
 
@@ -110,6 +103,57 @@ function openSmtpSocket(host, port, secure) {
             }
 
             tryNextAddress();
+        }
+
+        dns.resolve4(host, (dnsError, addresses) => {
+            if (
+                !dnsError &&
+                Array.isArray(addresses) &&
+                addresses.length > 0
+            ) {
+                connectWithAddresses(addresses);
+                return;
+            }
+
+            dns.lookup(
+                host,
+                {
+                    family: 4,
+                    all: true
+                },
+                (lookupError, records) => {
+                    if (lookupError) {
+                        reject(
+                            dnsError || lookupError
+                        );
+                        return;
+                    }
+
+                    const lookupAddresses =
+                        Array.isArray(records)
+                            ? records.map(
+                                (record) =>
+                                    record.address
+                            )
+                            : [];
+
+                    if (
+                        lookupAddresses.length === 0
+                    ) {
+                        reject(
+                            dnsError ||
+                                new Error(
+                                    `No IPv4 SMTP addresses were found for ${host}.`
+                                )
+                        );
+                        return;
+                    }
+
+                    connectWithAddresses(
+                        lookupAddresses
+                    );
+                }
+            );
         });
     });
 }
