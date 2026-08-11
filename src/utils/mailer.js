@@ -3,6 +3,22 @@ const nodemailer = require("nodemailer");
 let transporterPromise = null;
 let lastSentMail = null;
 
+function getTransportOptions() {
+    return {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure:
+            String(
+                process.env.SMTP_SECURE || ""
+            ).toLowerCase() === "true",
+        family: 4,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    };
+}
+
 function hasSmtpConfiguration() {
     return Boolean(
         process.env.SMTP_HOST &&
@@ -20,32 +36,14 @@ async function getTransporter() {
     if (!transporterPromise) {
         transporterPromise =
             nodemailer
-                .createTransport({
-                    host: process.env.SMTP_HOST,
-                    port: Number(process.env.SMTP_PORT),
-                    secure:
-                        String(
-                            process.env.SMTP_SECURE || ""
-                        ).toLowerCase() === "true",
-                    auth: {
-                        user: process.env.SMTP_USER,
-                        pass: process.env.SMTP_PASS
-                    }
-                })
+                .createTransport(
+                    getTransportOptions()
+                )
                 .verify()
                 .then(() =>
-                    nodemailer.createTransport({
-                        host: process.env.SMTP_HOST,
-                        port: Number(process.env.SMTP_PORT),
-                        secure:
-                            String(
-                                process.env.SMTP_SECURE || ""
-                            ).toLowerCase() === "true",
-                        auth: {
-                            user: process.env.SMTP_USER,
-                            pass: process.env.SMTP_PASS
-                        }
-                    })
+                    nodemailer.createTransport(
+                        getTransportOptions()
+                    )
                 );
     }
 
