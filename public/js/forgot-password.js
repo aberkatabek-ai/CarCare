@@ -173,7 +173,7 @@ if (forgotPasswordForm) {
                 showFormMessage(
                     forgotMessage,
                     response.debugCode
-                        ? `SMTP is not configured yet. Development code: ${response.debugCode}`
+                        ? `${response.message} Verification code: ${response.debugCode}`
                         : response.message,
                     "success"
                 );

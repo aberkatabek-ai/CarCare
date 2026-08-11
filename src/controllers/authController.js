@@ -697,6 +697,12 @@ async function requestPasswordReset(
 
         const user = result.rows[0] || null;
         let debugCode = undefined;
+        let responseMessage =
+            "If that email exists, a verification code has been sent.";
+        const allowResetCodeFallback =
+            process.env
+                .ALLOW_PASSWORD_RESET_CODE_FALLBACK ===
+            "true";
 
         if (user) {
             const resetCode =
@@ -705,18 +711,31 @@ async function requestPasswordReset(
                     email: user.email
                 });
 
-            const deliveryResult =
+            try {
                 await sendPasswordResetCode({
-                to: user.email,
-                fullName: user.full_name,
-                code: resetCode.code,
-                expiresInMinutes:
-                    resetCode.expiresInMinutes
+                    to: user.email,
+                    fullName: user.full_name,
+                    code: resetCode.code,
+                    expiresInMinutes:
+                        resetCode.expiresInMinutes
                 });
+            } catch (deliveryError) {
+                console.error(
+                    "Password reset mail delivery failed:",
+                    deliveryError.message
+                );
+
+                if (allowResetCodeFallback) {
+                    debugCode = resetCode.code;
+                    responseMessage =
+                        "Email delivery is temporarily unavailable. Use the verification code shown below to reset your password.";
+                }
+            }
 
             if (
                 process.env.NODE_ENV !==
-                "production"
+                    "production" &&
+                !debugCode
             ) {
                 debugCode = resetCode.code;
             }
@@ -724,8 +743,7 @@ async function requestPasswordReset(
 
         res.json({
             success: true,
-            message:
-                "If that email exists, a verification code has been sent.",
+            message: responseMessage,
             ...(debugCode
                 ? {
                     debugCode
