@@ -1,0 +1,2107 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CarCare API",
+    "version": "1.0.0",
+    "description": "Swagger setup for testing the CarCare backend. Authentication is session-cookie based: call /api/auth/login first, then use the protected endpoints from the same browser session."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Current origin"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Vehicles"
+    },
+    {
+      "name": "Maintenance"
+    },
+    {
+      "name": "Service History"
+    },
+    {
+      "name": "Issues"
+    },
+    {
+      "name": "Documents"
+    },
+    {
+      "name": "Costs"
+    },
+    {
+      "name": "AI"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "carcare.sid"
+      }
+    },
+    "schemas": {
+      "ApiMessage": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "preferred_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "reminders_enabled": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "model_year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "nickname": {
+            "type": "string",
+            "nullable": true
+          },
+          "license_plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "vehicle_status": {
+            "type": "string"
+          },
+          "ownership_status": {
+            "type": "string"
+          },
+          "current_mileage": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MaintenancePlan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "interval_km": {
+            "type": "integer",
+            "nullable": true
+          },
+          "interval_months": {
+            "type": "integer",
+            "nullable": true
+          },
+          "last_service_km": {
+            "type": "integer",
+            "nullable": true
+          },
+          "last_service_date": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServiceRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "service_name": {
+            "type": "string"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "completed_at_mileage": {
+            "type": "integer"
+          },
+          "actual_cost": {
+            "type": "number",
+            "nullable": true
+          }
+        }
+      },
+      "Issue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "issue_title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "document_type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "document_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "start_date": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiry_date": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FuelEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "filled_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "odometer_km": {
+            "type": "integer"
+          },
+          "liters": {
+            "type": "number"
+          },
+          "total_cost": {
+            "type": "number"
+          }
+        }
+      },
+      "Expense": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "type": "integer"
+          },
+          "expense_type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "expense_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "AiConversation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "question": {
+            "type": "string"
+          },
+          "reply": {
+            "type": "string"
+          },
+          "feedback_status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "fullName",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateVehicleRequest": {
+        "type": "object",
+        "required": [
+          "brand",
+          "model",
+          "currentMileage"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "modelYear": {
+            "type": "integer"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "licensePlate": {
+            "type": "string"
+          },
+          "currentMileage": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreateMaintenancePlanRequest": {
+        "type": "object",
+        "required": [
+          "vehicleId",
+          "name",
+          "category"
+        ],
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "intervalKm": {
+            "type": "integer"
+          },
+          "intervalMonths": {
+            "type": "integer"
+          },
+          "lastServiceKm": {
+            "type": "integer"
+          },
+          "lastServiceDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "estimatedCost": {
+            "type": "number"
+          },
+          "isCritical": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateFuelEntryRequest": {
+        "type": "object",
+        "required": [
+          "vehicleId",
+          "filledAt",
+          "odometerKm",
+          "liters",
+          "totalCost"
+        ],
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "filledAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "odometerKm": {
+            "type": "integer"
+          },
+          "liters": {
+            "type": "number"
+          },
+          "totalCost": {
+            "type": "number"
+          },
+          "isFullTank": {
+            "type": "boolean"
+          },
+          "station": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateExpenseRequest": {
+        "type": "object",
+        "required": [
+          "vehicleId",
+          "expenseType",
+          "title",
+          "amount",
+          "expenseDate"
+        ],
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "expenseType": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "expenseDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "odometerKm": {
+            "type": "integer"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Check API health",
+        "responses": {
+          "200": {
+            "description": "Health response"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in and create a session cookie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Get current user",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/profile": {
+      "patch": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update profile",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": "string"
+                  },
+                  "preferredName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated"
+          }
+        }
+      }
+    },
+    "/api/auth/password": {
+      "patch": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update password",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated"
+          }
+        }
+      }
+    },
+    "/api/auth/reminder-settings": {
+      "patch": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update reminder preferences",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "remindersEnabled": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reminder settings updated"
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Request a password reset code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset code queued"
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Reset password with verification code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset"
+          }
+        }
+      }
+    },
+    "/api/auth/account": {
+      "delete": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Delete current account",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account deleted"
+          }
+        }
+      }
+    },
+    "/api/vehicles": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "List active vehicles",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle list"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Create a vehicle",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle created"
+          }
+        }
+      }
+    },
+    "/api/vehicles/archive": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "List sold vehicles",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archived vehicles"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Get a vehicle by id",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle detail"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Update a vehicle",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Delete a sold vehicle",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle deleted"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/sell": {
+      "patch": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Mark vehicle as sold",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle marked as sold"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/mileage": {
+      "patch": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Update vehicle mileage",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newMileage": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mileage updated"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/mileage-history": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Get mileage history",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mileage history"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/share-link": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Generate a share link",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Share link response"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/handoff-package": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Export buyer handoff package",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Buyer package"
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}/verify-ownership": {
+      "post": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Verify ownership",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "object",
+                    "description": "Optional base64 file payload"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ownership verification result"
+          }
+        }
+      }
+    },
+    "/api/public/vehicle-share/{token}": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Get public shared vehicle profile",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public vehicle profile"
+          }
+        }
+      }
+    },
+    "/api/maintenance-plans": {
+      "get": {
+        "tags": [
+          "Maintenance"
+        ],
+        "summary": "List maintenance plans",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maintenance plans"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Maintenance"
+        ],
+        "summary": "Create maintenance plan",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMaintenancePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Maintenance plan created"
+          }
+        }
+      }
+    },
+    "/api/maintenance-plans/{id}": {
+      "delete": {
+        "tags": [
+          "Maintenance"
+        ],
+        "summary": "Delete maintenance plan",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maintenance plan deleted"
+          }
+        }
+      }
+    },
+    "/api/service-history": {
+      "get": {
+        "tags": [
+          "Service History"
+        ],
+        "summary": "List service history",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service history"
+          }
+        }
+      }
+    },
+    "/api/service-history/complete/{planId}": {
+      "post": {
+        "tags": [
+          "Service History"
+        ],
+        "summary": "Complete maintenance and create service history record",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "completedAt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "completedAtMileage": {
+                    "type": "integer"
+                  },
+                  "actualCost": {
+                    "type": "number"
+                  },
+                  "serviceProvider": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Maintenance completed"
+          }
+        }
+      }
+    },
+    "/api/issues": {
+      "get": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "List vehicle issues",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue list"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Create a vehicle issue",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehicleId": {
+                    "type": "integer"
+                  },
+                  "issueTitle": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "occursWhen": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string"
+                  },
+                  "warningLight": {
+                    "type": "string"
+                  },
+                  "canDriveNormally": {
+                    "type": "boolean"
+                  },
+                  "isWorsening": {
+                    "type": "boolean"
+                  },
+                  "photos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Issue created"
+          }
+        }
+      }
+    },
+    "/api/issues/{id}": {
+      "get": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Get issue detail",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue detail"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Delete an issue",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue deleted"
+          }
+        }
+      }
+    },
+    "/api/issues/{id}/diagnosis": {
+      "patch": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Add mechanic diagnosis",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mechanicDiagnosis": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Diagnosis saved"
+          }
+        }
+      }
+    },
+    "/api/issues/{id}/repair": {
+      "patch": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Mark issue repaired",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "completedAt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "completedAtMileage": {
+                    "type": "integer"
+                  },
+                  "actualCost": {
+                    "type": "number"
+                  },
+                  "serviceProvider": {
+                    "type": "string"
+                  },
+                  "resolutionNotes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Issue repaired"
+          }
+        }
+      }
+    },
+    "/api/issues/media/{mediaId}/file": {
+      "get": {
+        "tags": [
+          "Issues"
+        ],
+        "summary": "Download issue media",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "mediaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue media file"
+          }
+        }
+      }
+    },
+    "/api/documents": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "List documents",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document list"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Create document",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehicleId": {
+                    "type": "integer"
+                  },
+                  "documentType": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "documentNumber": {
+                    "type": "string"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "expiryDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "reminderDays": {
+                    "type": "integer"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "object",
+                    "description": "Optional base64 file payload"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Document created"
+          }
+        }
+      }
+    },
+    "/api/documents/extract-details": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Extract document details from uploaded payload",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentType": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extraction result"
+          }
+        }
+      }
+    },
+    "/api/documents/{id}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Get document detail",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document detail"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Update document",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Delete document",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document deleted"
+          }
+        }
+      }
+    },
+    "/api/documents/{id}/file": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Download document file",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document file"
+          }
+        }
+      }
+    },
+    "/api/costs/summary": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "Get ownership cost summary",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cost summary"
+          }
+        }
+      }
+    },
+    "/api/costs/fuel": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "List fuel entries",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fuel entries"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "Create fuel entry",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFuelEntryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Fuel entry created"
+          }
+        }
+      }
+    },
+    "/api/costs/fuel/{id}": {
+      "delete": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "Delete fuel entry",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fuel entry deleted"
+          }
+        }
+      }
+    },
+    "/api/costs/expenses": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "List expenses",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expense list"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "Create expense",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Expense created"
+          }
+        }
+      }
+    },
+    "/api/costs/expenses/{id}": {
+      "delete": {
+        "tags": [
+          "Costs"
+        ],
+        "summary": "Delete expense",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expense deleted"
+          }
+        }
+      }
+    },
+    "/api/ai/chat": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Chat with CarCare AI",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI reply"
+          }
+        }
+      }
+    },
+    "/api/ai/history": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Get AI conversation history",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation history"
+          }
+        }
+      }
+    },
+    "/api/ai/dataset": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Export AI dataset",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "feedbackStatus",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dataset export"
+          }
+        }
+      }
+    },
+    "/api/ai/conversations/{id}/feedback": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Save AI feedback",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feedbackStatus": {
+                    "type": "string"
+                  },
+                  "feedbackNote": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback saved"
+          }
+        }
+      }
+    }
+  }
+}

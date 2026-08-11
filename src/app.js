@@ -143,6 +143,10 @@ app.use(
     )
 );
 
+app.get("/api/docs", (req, res) => {
+    res.redirect("/swagger.html");
+});
+
 app.get(
     "/api/health",
     async (req, res, next) => {

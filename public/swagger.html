@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>CarCare API Docs</title>
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css"
+    >
+    <style>
+        html,
+        body {
+            margin: 0;
+            background: #f7f3ea;
+        }
+
+        .swagger-topbar-note {
+            padding: 14px 18px;
+            color: #1f2327;
+            background: #efe2c4;
+            border-bottom: 1px solid #cfbe94;
+            font:
+                14px/1.5 "Segoe UI",
+                system-ui,
+                sans-serif;
+        }
+
+        .swagger-topbar-note code {
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="swagger-topbar-note">
+        Login first with <code>/api/auth/login</code>. Protected requests then use the same browser session cookie automatically.
+        If the page fails to render, your browser is likely blocking the Swagger UI CDN.
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        window.addEventListener("load", () => {
+            window.SwaggerUIBundle({
+                url: "/openapi.json",
+                dom_id: "#swagger-ui",
+                deepLinking: true,
+                persistAuthorization: true,
+                displayRequestDuration: true,
+                docExpansion: "list",
+                tryItOutEnabled: true,
+                requestInterceptor: (request) => {
+                    request.credentials = "same-origin";
+                    return request;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
