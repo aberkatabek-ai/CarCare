@@ -508,6 +508,50 @@ async function main() {
         `Login after password reset failed: ${JSON.stringify(loginAfterReset.data)}`
     );
 
+    const deleteAccount =
+        await client.request(
+            "/api/auth/account",
+            {
+                method: "DELETE",
+                body: JSON.stringify({
+                    currentPassword:
+                        resetPasswordValue
+                })
+            }
+        );
+
+    assert(
+        deleteAccount.status === 200,
+        `Delete account failed: ${JSON.stringify(deleteAccount.data)}`
+    );
+
+    const meAfterDelete =
+        await client.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        meAfterDelete.status === 401,
+        `Session was not cleared after account deletion: ${JSON.stringify(meAfterDelete.data)}`
+    );
+
+    const loginAfterDelete =
+        await client.request(
+            "/api/auth/login",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email,
+                    password: resetPasswordValue
+                })
+            }
+        );
+
+    assert(
+        loginAfterDelete.status === 401,
+        `Deleted account could still log in: ${JSON.stringify(loginAfterDelete.data)}`
+    );
+
     console.log(
         JSON.stringify(
             {

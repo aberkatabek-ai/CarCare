@@ -6,6 +6,7 @@ const {
     validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
+    validateDeleteAccount,
     validateForgotPasswordRequest,
     validatePasswordReset
 } = require("../src/utils/profileValidation");
@@ -309,6 +310,19 @@ runTest(
         assert.equal(
             result.value.email,
             "test@example.com"
+        );
+    }
+);
+
+runTest(
+    "delete account requires current password",
+    () => {
+        const result =
+            validateDeleteAccount({});
+
+        assert.equal(
+            result.error,
+            "Current password is required to delete your account."
         );
     }
 );

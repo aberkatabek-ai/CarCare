@@ -370,6 +370,27 @@ function validatePasswordReset(data) {
     };
 }
 
+function validateDeleteAccount(data) {
+    const currentPassword =
+        typeof data.currentPassword ===
+        "string"
+            ? data.currentPassword
+            : "";
+
+    if (!currentPassword) {
+        return {
+            error:
+                "Current password is required to delete your account."
+        };
+    }
+
+    return {
+        value: {
+            currentPassword
+        }
+    };
+}
+
 module.exports = {
     getNameValidationError,
     passwordRequirementsText,
@@ -379,6 +400,7 @@ module.exports = {
     validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
+    validateDeleteAccount,
     validateForgotPasswordRequest,
     validatePasswordReset
 };

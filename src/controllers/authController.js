@@ -1,11 +1,15 @@
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const {
+    removeStoredDocument
+} = require("../utils/documentUpload");
+const {
     normalizeEmail,
     normalizeName,
     validateRegistration,
     validateProfileUpdate,
     validatePasswordUpdate,
+    validateDeleteAccount,
     validateForgotPasswordRequest,
     validatePasswordReset
 } = require("../utils/profileValidation");
@@ -132,6 +136,18 @@ function createUserSession(req, userId) {
 
                 resolve();
             });
+        });
+    });
+}
+
+function destroyUserSession(req) {
+    return new Promise((resolve, reject) => {
+        req.session.destroy((error) => {
+            if (error) {
+                return reject(error);
+            }
+
+            resolve();
         });
     });
 }
@@ -520,6 +536,140 @@ async function updateReminderSettings(
     }
 }
 
+async function deleteAccount(req, res, next) {
+    const client = await db.connect();
+    let shouldReleaseClient = true;
+    let transactionStarted = false;
+
+    try {
+        const validation =
+            validateDeleteAccount(req.body);
+
+        if (validation.error) {
+            shouldReleaseClient = false;
+            client.release();
+            return res.status(400).json({
+                success: false,
+                message: validation.error
+            });
+        }
+
+        const { currentPassword } =
+            validation.value;
+
+        const userResult = await client.query(
+            `SELECT id, password_hash
+             FROM users
+             WHERE id = $1`,
+            [req.session.userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            shouldReleaseClient = false;
+            client.release();
+            return res.status(404).json({
+                success: false,
+                message: "User was not found."
+            });
+        }
+
+        const user = userResult.rows[0];
+        const passwordMatches =
+            await bcrypt.compare(
+                currentPassword,
+                user.password_hash
+            );
+
+        if (!passwordMatches) {
+            shouldReleaseClient = false;
+            client.release();
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Current password is incorrect."
+            });
+        }
+
+        const fileResult = await client.query(
+            `SELECT stored_file_name
+             FROM vehicle_documents
+             WHERE vehicle_id IN (
+                SELECT id
+                FROM vehicles
+                WHERE user_id = $1
+             )
+               AND stored_file_name IS NOT NULL
+
+             UNION ALL
+
+             SELECT media.stored_file_name
+             FROM vehicle_issue_media media
+             INNER JOIN vehicle_issues issue
+                ON issue.id = media.issue_id
+             WHERE issue.user_id = $1
+
+             UNION ALL
+
+             SELECT ownership_stored_file_name
+             FROM vehicles
+             WHERE user_id = $1
+               AND ownership_stored_file_name IS NOT NULL`,
+            [req.session.userId]
+        );
+
+        await client.query("BEGIN");
+        transactionStarted = true;
+
+        const deleteResult = await client.query(
+            `DELETE FROM users
+             WHERE id = $1
+             RETURNING id`,
+            [req.session.userId]
+        );
+
+        if (deleteResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+            transactionStarted = false;
+            shouldReleaseClient = false;
+            client.release();
+            return res.status(404).json({
+                success: false,
+                message: "User was not found."
+            });
+        }
+
+        await client.query("COMMIT");
+        transactionStarted = false;
+        shouldReleaseClient = false;
+        client.release();
+
+        await destroyUserSession(req);
+        res.clearCookie("carcare.sid");
+
+        for (const row of fileResult.rows) {
+            await removeStoredDocument(
+                row.stored_file_name
+            );
+        }
+
+        res.json({
+            success: true,
+            message:
+                "Account deleted successfully."
+        });
+    } catch (error) {
+        if (transactionStarted) {
+            await client.query("ROLLBACK");
+        }
+
+        if (shouldReleaseClient) {
+            client.release();
+        }
+
+        next(error);
+    }
+}
+
 async function requestPasswordReset(
     req,
     res,
@@ -655,6 +805,7 @@ module.exports = {
     updateProfile,
     updatePassword,
     updateReminderSettings,
+    deleteAccount,
     requestPasswordReset,
     resetPassword
 };

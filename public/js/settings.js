@@ -34,6 +34,16 @@ const remindersEnabledInput = document.querySelector(
 const reminderSettingsMessage = document.querySelector(
     "#reminder-settings-message"
 );
+const deleteAccountForm = document.querySelector(
+    "#delete-account-form"
+);
+const deleteAccountMessage = document.querySelector(
+    "#delete-account-message"
+);
+const deleteAccountConfirmationInput =
+    document.querySelector(
+        "#delete-account-confirmation"
+    );
 const passwordRequirementsMessage =
     "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
 
@@ -354,3 +364,77 @@ logoutButton.addEventListener(
 );
 
 loadSettings();
+
+if (deleteAccountForm) {
+    deleteAccountForm.addEventListener(
+        "submit",
+        async (event) => {
+            event.preventDefault();
+            clearMessage(
+                deleteAccountMessage
+            );
+
+            const confirmation =
+                window.confirm(
+                    "Delete your account permanently? This will remove all vehicles, documents and account history."
+                );
+
+            if (!confirmation) {
+                return;
+            }
+
+            const submitButton =
+                deleteAccountForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+            const formData = new FormData(
+                deleteAccountForm
+            );
+
+            if (
+                !deleteAccountConfirmationInput ||
+                !deleteAccountConfirmationInput.checked
+            ) {
+                showMessage(
+                    deleteAccountMessage,
+                    "You must confirm that account deletion is permanent."
+                );
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent =
+                "Deleting...";
+
+            try {
+                const data =
+                    await window.apiRequest(
+                        "/api/auth/account",
+                        {
+                            method: "DELETE",
+                            body: JSON.stringify({
+                                currentPassword:
+                                    formData.get(
+                                        "currentPassword"
+                                    )
+                            })
+                        }
+                    );
+
+                window.alert(data.message);
+                window.location.href =
+                    "/register.html";
+            } catch (error) {
+                showMessage(
+                    deleteAccountMessage,
+                    error.message
+                );
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent =
+                    "Delete account";
+            }
+        }
+    );
+}

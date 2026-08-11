@@ -8,6 +8,7 @@ const {
     updateProfile,
     updatePassword,
     updateReminderSettings,
+    deleteAccount,
     requestPasswordReset,
     resetPassword
 } = require("../controllers/authController");
@@ -57,6 +58,12 @@ router.patch(
     "/reminder-settings",
     requireAuth,
     updateReminderSettings
+);
+router.delete(
+    "/account",
+    requireAuth,
+    authWriteLimiter,
+    deleteAccount
 );
 
 module.exports = router;

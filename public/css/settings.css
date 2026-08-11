@@ -62,6 +62,10 @@
     padding: 30px;
 }
 
+.settings-panel-danger {
+    border-color: rgba(150, 52, 43, 0.22);
+}
+
 .settings-panel-heading {
     margin-bottom: 24px;
 }
@@ -113,6 +117,52 @@
     margin: 0;
     color: var(--muted);
     line-height: 1.5;
+}
+
+.settings-danger-card {
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #f7e6e1;
+    border: 1px solid rgba(150, 52, 43, 0.24);
+    border-radius: 18px;
+}
+
+.settings-danger-card strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #8f3028;
+}
+
+.settings-danger-card p {
+    margin: 0;
+    color: #6d4138;
+    line-height: 1.5;
+}
+
+.settings-danger-confirmation {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: #5b443d;
+    line-height: 1.5;
+}
+
+.settings-danger-confirmation input {
+    margin-top: 4px;
+    accent-color: #96342b;
+}
+
+.settings-danger-button {
+    color: #fff;
+    background: #96342b;
+    border-color: #96342b;
+}
+
+.settings-danger-button:hover,
+.settings-danger-button:focus-visible {
+    background: #7e2b23;
+    border-color: #7e2b23;
 }
 
 .settings-switch {
