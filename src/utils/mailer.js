@@ -72,11 +72,6 @@ function getTransportOptions(
     const auth = getSmtpAuth();
 
     return {
-        ...(isGmailHost(host)
-            ? {
-                service: "gmail"
-            }
-            : {}),
         host,
         name: host,
         port,
