@@ -914,11 +914,15 @@ runTest(
 
         assert.match(
             reply,
-            /Priority now:/i
+            /Focus now/i
         );
         assert.match(
             reply,
             /urgent issue/i
+        );
+        assert.match(
+            reply,
+            /riskiest vehicle/i
         );
     }
 );
@@ -975,6 +979,60 @@ runTest(
         assert.match(
             reply,
             /9,500 TL/i
+        );
+    }
+);
+
+runTest(
+    "local garage AI reply supports Turkish prompts",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 9,
+                    brand: "Mercedes",
+                    model: "C200",
+                    nickname: "Sedan",
+                    current_mileage: 91000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    id: 12,
+                    vehicle_id: 9,
+                    name: "Triger bakimi",
+                    status: "overdue"
+                }],
+                serviceHistory: [],
+                issues: [],
+                documents: [{
+                    vehicle_id: 9,
+                    title: "Sigorta",
+                    renewal_status: "due_soon"
+                }],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Su an neye oncelik vermeliyim?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Simdi odaklan/i
+        );
+        assert.match(
+            reply,
+            /bakim/i
         );
     }
 );

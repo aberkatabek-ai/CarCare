@@ -288,6 +288,7 @@ let vehicleExpenses = [];
 let ownershipCostSummary = {};
 let aiConfigured = true;
 let aiConversationHistory = [];
+let aiMode = "openai";
 
 let selectedVehicleId = null;
 let editingVehicleId = null;
@@ -535,6 +536,14 @@ function setAiStatus(text, isError = false) {
         : "";
 }
 
+function getAiReadyStatus() {
+    if (aiMode === "local") {
+        return "Reply generated from your recorded garage signals and local assistant rules.";
+    }
+
+    return "Reply generated from your current garage records.";
+}
+
 async function askGarageAi(question) {
     if (!question) {
         return;
@@ -553,7 +562,9 @@ async function askGarageAi(question) {
     }
 
     setAiStatus(
-        "CarCare AI is reviewing your recorded garage data..."
+        aiMode === "local"
+            ? "CarCare Assistant is reviewing your recorded garage data..."
+            : "CarCare AI is reviewing your recorded garage data..."
     );
 
     try {
@@ -570,6 +581,8 @@ async function askGarageAi(question) {
 
         aiConfigured =
             data.configured !== false;
+        aiMode =
+            data.aiMode || "openai";
 
         appendAiMessage(
             "assistant",
@@ -591,12 +604,15 @@ async function askGarageAi(question) {
 
         setAiStatus(
             aiConfigured
-                ? "Reply generated from your current garage records."
+                ? getAiReadyStatus()
                 : "AI is not configured on the server yet."
         );
     } catch (error) {
         aiConfigured =
             error.payload?.configured !== false;
+        aiMode =
+            error.payload?.aiMode ||
+            aiMode;
 
         appendAiMessage(
             "assistant",
