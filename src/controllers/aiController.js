@@ -314,8 +314,11 @@ async function chatWithGarageAi(
         if (garageContext.overview.activeVehicleCount === 0) {
             return res.json({
                 success: true,
-                configured:
-                    hasAiConfiguration(),
+                configured: true,
+                aiMode:
+                    hasAiConfiguration()
+                        ? "openai"
+                        : "local",
                 garageContext,
                 conversation: null,
                 reply:
@@ -341,21 +344,17 @@ async function chatWithGarageAi(
         res.json({
             success: true,
             configured: true,
+            aiMode:
+                result.model ===
+                "carcare-local-rules"
+                    ? "local"
+                    : "openai",
             model: result.model,
             garageContext,
             reply: result.reply,
             conversation
         });
     } catch (error) {
-        if (error.code === "AI_NOT_CONFIGURED") {
-            return res.status(503).json({
-                success: false,
-                configured: false,
-                message:
-                    "CarCare AI is not configured yet. Add OPENAI_API_KEY on the server to enable it."
-            });
-        }
-
         next(error);
     }
 }

@@ -36,9 +36,6 @@ const {
     extractDocumentSuggestions
 } = require("../src/utils/documentExtraction");
 const {
-    buildGarageAiContext
-} = require("../src/utils/garageAiContext");
-const {
     formatConversationDatasetRow
 } = require("../src/services/aiTrainingService");
 const {
@@ -49,6 +46,10 @@ const {
     getGmailApiSenderEmail,
     getSmtpAuth
 } = require("../src/utils/mailer");
+const {
+    buildLocalGarageReply,
+    buildGarageAiContext
+} = require("../src/services/garageAiService");
 
 function runTest(name, testFn) {
     try {
@@ -863,6 +864,117 @@ runTest(
         assert.equal(
             context.vehicles[0].costs.ownershipTotal,
             9500
+        );
+    }
+);
+
+runTest(
+    "local garage AI reply prioritizes urgent issues",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 7,
+                    brand: "BMW",
+                    model: "420",
+                    nickname: "Coupe",
+                    current_mileage: 68000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    id: 11,
+                    vehicle_id: 7,
+                    name: "Oil service",
+                    status: "overdue"
+                }],
+                serviceHistory: [],
+                issues: [{
+                    vehicle_id: 7,
+                    issue_title: "Brake vibration",
+                    risk_level: "red",
+                    status: "open"
+                }],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "What should I do first?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Priority now:/i
+        );
+        assert.match(
+            reply,
+            /urgent issue/i
+        );
+    }
+);
+
+runTest(
+    "local garage AI reply can summarize cost questions",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 7,
+                    brand: "BMW",
+                    model: "420",
+                    nickname: "Coupe",
+                    current_mileage: 68000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [],
+                serviceHistory: [{
+                    vehicle_id: 7,
+                    service_name: "Brake service",
+                    completed_at: "2026-06-10",
+                    actual_cost: 4800
+                }],
+                issues: [],
+                documents: [],
+                expenses: [{
+                    vehicle_id: 7,
+                    amount: 1500
+                }],
+                fuelEntries: [{
+                    vehicle_id: 7,
+                    total_cost: 3200
+                }],
+                costSummary: {
+                    totalFuelCost: 3200,
+                    totalExpenseCost: 1500,
+                    totalServiceCost: 4800,
+                    totalOwnershipCost: 9500
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "What is my current cost situation?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Tracked ownership cost is/i
+        );
+        assert.match(
+            reply,
+            /9,500 TL/i
         );
     }
 );
