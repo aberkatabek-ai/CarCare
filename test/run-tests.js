@@ -1148,6 +1148,10 @@ runTest(
             reply,
             /Odaktaki arac|Vehicle in focus/i
         );
+        assert.match(
+            reply,
+            /Oncelikli sirali aksiyonlar|Ranked next actions/i
+        );
         assert.doesNotMatch(
             reply,
             /en riskli arac|riskiest vehicle/i
@@ -1273,6 +1277,79 @@ runTest(
         assert.doesNotMatch(
             reply,
             /Astra GSI: acil ariza/i
+        );
+    }
+);
+
+runTest(
+    "local garage AI ranks fleet actions by score for roadmap questions",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 1,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }, {
+                    id: 2,
+                    brand: "BMW",
+                    model: "320i",
+                    nickname: "BMW",
+                    current_mileage: 80000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    vehicle_id: 1,
+                    name: "Brake service",
+                    status: "overdue"
+                }, {
+                    vehicle_id: 2,
+                    name: "Oil service",
+                    status: "due_soon"
+                }],
+                serviceHistory: [],
+                issues: [{
+                    vehicle_id: 1,
+                    issue_title: "ABS light",
+                    risk_level: "red",
+                    status: "open"
+                }],
+                documents: [{
+                    vehicle_id: 2,
+                    title: "Insurance",
+                    renewal_status: "due_soon"
+                }],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Bana bir roadmap cikar",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Oncelikli sirali aksiyonlar|Ranked next actions/i
+        );
+        assert.match(
+            reply,
+            /1\. Astra GSI: skor|1\. Astra GSI: score/i
+        );
+        assert.match(
+            reply,
+            /2\. BMW: skor|2\. BMW: score/i
         );
     }
 );

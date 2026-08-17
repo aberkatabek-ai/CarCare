@@ -512,6 +512,9 @@ function createTranslator(lang) {
         focusVehicleLead: isTurkish
             ? "Odaktaki arac"
             : "Vehicle in focus",
+        rankedTitle: isTurkish
+            ? "Oncelikli sirali aksiyonlar"
+            : "Ranked next actions",
         nowTitle: isTurkish
             ? "Simdi odaklan"
             : "Focus now",
@@ -882,6 +885,208 @@ function buildMaintenanceKnowledgeLines(
     }
 
     return lines;
+}
+
+function buildRecommendationReasons(
+    vehicle,
+    lang
+) {
+    const reasons = [];
+    const isTurkish = lang === "tr";
+
+    if (
+        vehicle.mechanical
+            .urgentIssueCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.mechanical.urgentIssueCount} acil ariza`
+                : `${vehicle.mechanical.urgentIssueCount} urgent issue`
+        );
+    }
+
+    if (
+        vehicle.documents.expiredCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.documents.expiredCount} suresi dolmus belge`
+                : `${vehicle.documents.expiredCount} expired document`
+        );
+    }
+
+    if (
+        vehicle.maintenance
+            .overdueCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.maintenance.overdueCount} gecikmis bakim`
+                : `${vehicle.maintenance.overdueCount} overdue maintenance item`
+        );
+    }
+
+    if (
+        vehicle.mechanical
+            .monitorIssueCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.mechanical.monitorIssueCount} izlenen issue`
+                : `${vehicle.mechanical.monitorIssueCount} monitored issue`
+        );
+    }
+
+    if (
+        vehicle.documents.dueSoonCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.documents.dueSoonCount} yaklasan belge`
+                : `${vehicle.documents.dueSoonCount} document due soon`
+        );
+    }
+
+    if (
+        vehicle.maintenance
+            .dueSoonCount > 0
+    ) {
+        reasons.push(
+            isTurkish
+                ? `${vehicle.maintenance.dueSoonCount} yaklasan bakim`
+                : `${vehicle.maintenance.dueSoonCount} maintenance item due soon`
+        );
+    }
+
+    if (
+        vehicle.documents.trackedCount ===
+        0
+    ) {
+        reasons.push(
+            isTurkish
+                ? "belge kaydi eksik"
+                : "missing document records"
+        );
+    }
+
+    return reasons;
+}
+
+function buildPrimaryRecommendationAction(
+    vehicle,
+    lang
+) {
+    const isTurkish = lang === "tr";
+
+    if (
+        vehicle.mechanical
+            .urgentIssueCount > 0
+    ) {
+        return isTurkish
+            ? "once mekanik riski kapat"
+            : "clear the mechanical risk first";
+    }
+
+    if (
+        vehicle.documents.expiredCount > 0
+    ) {
+        return isTurkish
+            ? "suresi dolan belgeyi hemen yenile"
+            : "renew the expired document immediately";
+    }
+
+    if (
+        vehicle.maintenance
+            .overdueCount > 0
+    ) {
+        return isTurkish
+            ? "gecikmis bakimi randevuya cevir"
+            : "book the overdue maintenance";
+    }
+
+    if (
+        vehicle.documents.dueSoonCount > 0
+    ) {
+        return isTurkish
+            ? "yaklasan belge yenilemesini planla"
+            : "plan the upcoming document renewal";
+    }
+
+    if (
+        vehicle.maintenance
+            .dueSoonCount > 0
+    ) {
+        return isTurkish
+            ? "yaklasan bakimi planla"
+            : "plan the upcoming maintenance";
+    }
+
+    if (
+        vehicle.documents.trackedCount ===
+        0
+    ) {
+        return isTurkish
+            ? "temel belge kayitlarini ekle"
+            : "add the baseline document records";
+    }
+
+    if (
+        vehicle.maintenance.totalPlans ===
+        0
+    ) {
+        return isTurkish
+            ? "bakim baseline'ini kur"
+            : "create a maintenance baseline";
+    }
+
+    return isTurkish
+        ? "simdilik mevcut duzeni koru"
+        : "keep the current baseline steady";
+}
+
+function buildRankedRecommendationLines(
+    garageContext,
+    lang
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const isTurkish = lang === "tr";
+
+    return vehicles
+        .slice()
+        .sort(
+            (firstVehicle, secondVehicle) =>
+                getVehicleRiskScore(
+                    secondVehicle
+                ) -
+                getVehicleRiskScore(
+                    firstVehicle
+                )
+        )
+        .slice(0, 3)
+        .map((vehicle, index) => {
+            const score =
+                getVehicleRiskScore(vehicle);
+            const reasons =
+                buildRecommendationReasons(
+                    vehicle,
+                    lang
+                );
+            const action =
+                buildPrimaryRecommendationAction(
+                    vehicle,
+                    lang
+                );
+
+            if (isTurkish) {
+                return `${index + 1}. ${vehicle.name}: skor ${score}, aksiyon ${action}${reasons.length > 0 ? `; neden ${reasons.join(", ")}` : ""}.`;
+            }
+
+            return `${index + 1}. ${vehicle.name}: score ${score}, action ${action}${reasons.length > 0 ? `; reason ${reasons.join(", ")}` : ""}.`;
+        });
 }
 
 function buildMaintenanceLines(
@@ -1270,6 +1475,15 @@ function buildImprovedLocalGarageReply({
                 actionBuckets.later
             )
         );
+        sections.push(
+            prefixSection(
+                t.rankedTitle,
+                buildRankedRecommendationLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else if (intent === "cost") {
         sections.push(
             prefixSection(
@@ -1464,6 +1678,15 @@ function buildImprovedLocalGarageReply({
                     : actionBuckets.dataGaps
             )
         );
+        sections.push(
+            prefixSection(
+                t.rankedTitle,
+                buildRankedRecommendationLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else {
         sections.push(
             prefixSection(
@@ -1498,6 +1721,15 @@ function buildImprovedLocalGarageReply({
             prefixSection(
                 t.laterTitle,
                 actionBuckets.later
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.rankedTitle,
+                buildRankedRecommendationLines(
+                    scopedGarageContext,
+                    lang
+                )
             )
         );
     }
