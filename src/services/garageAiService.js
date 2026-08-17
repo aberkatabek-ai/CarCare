@@ -515,6 +515,9 @@ function createTranslator(lang) {
         rankedTitle: isTurkish
             ? "Oncelikli sirali aksiyonlar"
             : "Ranked next actions",
+        todoTitle: isTurkish
+            ? "Tek gorev kuyrugu"
+            : "Unified task queue",
         nowTitle: isTurkish
             ? "Simdi odaklan"
             : "Focus now",
@@ -1089,6 +1092,175 @@ function buildRankedRecommendationLines(
         });
 }
 
+function buildTodoEngineItems(
+    garageContext,
+    lang
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const isTurkish = lang === "tr";
+    const items = [];
+
+    vehicles.forEach((vehicle) => {
+        if (
+            vehicle.mechanical
+                .urgentIssueCount > 0
+        ) {
+            items.push({
+                score:
+                    100 +
+                    vehicle.mechanical
+                        .urgentIssueCount *
+                        12,
+                line: isTurkish
+                    ? `${vehicle.name}: mekanik risk once kapanmali; ufuk simdi; neden ${vehicle.mechanical.urgentIssueCount} acil ariza var.`
+                    : `${vehicle.name}: close the mechanical risk first; horizon now; reason ${vehicle.mechanical.urgentIssueCount} urgent issue exists.`
+            });
+        }
+
+        if (
+            vehicle.documents.expiredCount > 0
+        ) {
+            items.push({
+                score:
+                    92 +
+                    vehicle.documents
+                        .expiredCount *
+                        10,
+                line: isTurkish
+                    ? `${vehicle.name}: suresi dolan belgeyi yenile; ufuk simdi; neden ${vehicle.documents.expiredCount} belge expired durumda.`
+                    : `${vehicle.name}: renew the expired document; horizon now; reason ${vehicle.documents.expiredCount} document is expired.`
+            });
+        }
+
+        if (
+            vehicle.maintenance
+                .overdueCount > 0
+        ) {
+            items.push({
+                score:
+                    84 +
+                    vehicle.maintenance
+                        .overdueCount *
+                        8,
+                line: isTurkish
+                    ? `${vehicle.name}: gecikmis bakimi randevuya cevir; ufuk simdi; neden ${vehicle.maintenance.overdueCount} gecikmis bakim var.`
+                    : `${vehicle.name}: book the overdue maintenance; horizon now; reason ${vehicle.maintenance.overdueCount} overdue maintenance item exists.`
+            });
+        }
+
+        if (
+            vehicle.documents.dueSoonCount > 0
+        ) {
+            items.push({
+                score:
+                    60 +
+                    vehicle.documents
+                        .dueSoonCount *
+                        4,
+                line: isTurkish
+                    ? `${vehicle.name}: belge yenilemesini planla; ufuk bu ay; neden ${vehicle.documents.dueSoonCount} belge yaklasiyor.`
+                    : `${vehicle.name}: schedule the document renewal; horizon this month; reason ${vehicle.documents.dueSoonCount} document is approaching renewal.`
+            });
+        }
+
+        if (
+            vehicle.maintenance
+                .dueSoonCount > 0
+        ) {
+            items.push({
+                score:
+                    56 +
+                    vehicle.maintenance
+                        .dueSoonCount *
+                        4,
+                line: isTurkish
+                    ? `${vehicle.name}: yaklasan bakimi planla; ufuk bu ay; neden ${vehicle.maintenance.dueSoonCount} bakim kalemi yaklasiyor.`
+                    : `${vehicle.name}: schedule the upcoming maintenance; horizon this month; reason ${vehicle.maintenance.dueSoonCount} maintenance item is approaching.`
+            });
+        }
+
+        if (
+            vehicle.mechanical
+                .openIssueCount > 0 &&
+            vehicle.mechanical
+                .urgentIssueCount === 0
+        ) {
+            items.push({
+                score:
+                    48 +
+                    vehicle.mechanical
+                        .openIssueCount *
+                        3,
+                line: isTurkish
+                    ? `${vehicle.name}: acik issue notlarini netlestir; ufuk bu ay; neden ${vehicle.mechanical.openIssueCount} open issue izleniyor.`
+                    : `${vehicle.name}: clarify the open issue notes; horizon this month; reason ${vehicle.mechanical.openIssueCount} open issue is being monitored.`
+            });
+        }
+
+        if (
+            vehicle.documents.trackedCount ===
+            0
+        ) {
+            items.push({
+                score: 30,
+                line: isTurkish
+                    ? `${vehicle.name}: temel belge setini kur; ufuk sonra; neden belge takibi bos.`
+                    : `${vehicle.name}: create the baseline document set; horizon later; reason document tracking is empty.`
+            });
+        }
+
+        if (
+            vehicle.maintenance.totalPlans ===
+            0
+        ) {
+            items.push({
+                score: 26,
+                line: isTurkish
+                    ? `${vehicle.name}: bakim baseline'ini kur; ufuk sonra; neden plan kaydi yok.`
+                    : `${vehicle.name}: create the maintenance baseline; horizon later; reason no maintenance plan is recorded.`
+            });
+        }
+
+        if (!vehicle.recentService) {
+            items.push({
+                score: 18,
+                line: isTurkish
+                    ? `${vehicle.name}: servis gecmisini guclendir; ufuk sonra; neden kayitli tamamlanmis servis yok.`
+                    : `${vehicle.name}: strengthen the service history trail; horizon later; reason no completed service is recorded.`
+            });
+        }
+    });
+
+    return items
+        .sort(
+            (firstItem, secondItem) =>
+                secondItem.score -
+                firstItem.score
+        )
+        .slice(0, 6);
+}
+
+function buildTodoEngineLines(
+    garageContext,
+    lang
+) {
+    const isTurkish = lang === "tr";
+
+    return buildTodoEngineItems(
+        garageContext,
+        lang
+    ).map(
+        (item, index) =>
+            isTurkish
+                ? `${index + 1}. skor ${item.score}: ${item.line}`
+                : `${index + 1}. score ${item.score}: ${item.line}`
+    );
+}
+
 function buildMaintenanceLines(
     garageContext,
     lang
@@ -1484,6 +1656,15 @@ function buildImprovedLocalGarageReply({
                 )
             )
         );
+        sections.push(
+            prefixSection(
+                t.todoTitle,
+                buildTodoEngineLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else if (intent === "cost") {
         sections.push(
             prefixSection(
@@ -1687,6 +1868,15 @@ function buildImprovedLocalGarageReply({
                 )
             )
         );
+        sections.push(
+            prefixSection(
+                t.todoTitle,
+                buildTodoEngineLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else {
         sections.push(
             prefixSection(
@@ -1727,6 +1917,15 @@ function buildImprovedLocalGarageReply({
             prefixSection(
                 t.rankedTitle,
                 buildRankedRecommendationLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.todoTitle,
+                buildTodoEngineLines(
                     scopedGarageContext,
                     lang
                 )

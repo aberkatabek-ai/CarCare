@@ -1152,6 +1152,10 @@ runTest(
             reply,
             /Oncelikli sirali aksiyonlar|Ranked next actions/i
         );
+        assert.match(
+            reply,
+            /Tek gorev kuyrugu|Unified task queue/i
+        );
         assert.doesNotMatch(
             reply,
             /en riskli arac|riskiest vehicle/i
@@ -1345,11 +1349,19 @@ runTest(
         );
         assert.match(
             reply,
+            /Tek gorev kuyrugu|Unified task queue/i
+        );
+        assert.match(
+            reply,
             /1\. Astra GSI: skor|1\. Astra GSI: score/i
         );
         assert.match(
             reply,
             /2\. BMW: skor|2\. BMW: score/i
+        );
+        assert.match(
+            reply,
+            /ufuk simdi|horizon now|ufuk bu ay|horizon this month/i
         );
     }
 );
