@@ -1154,6 +1154,55 @@ runTest(
 );
 
 runTest(
+    "local garage AI keeps missing document questions on document topic",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 5,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    vehicle_id: 5,
+                    name: "Brake service",
+                    status: "overdue"
+                }],
+                serviceHistory: [],
+                issues: [],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Which documentations are missing?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Data gaps|Veri eksigi/i
+        );
+        assert.match(
+            reply,
+            /document|belge/i
+        );
+    }
+);
+
+runTest(
     "AI dataset row formatter keeps question, answer and feedback metadata",
     () => {
         const row = JSON.parse(

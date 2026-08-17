@@ -66,6 +66,38 @@ function matchesAnyKeyword(text, keywords) {
     );
 }
 
+function isDocumentQuestion(question) {
+    return matchesAnyKeyword(question, [
+        "document",
+        "documents",
+        "documentation",
+        "doc",
+        "paperwork",
+        "registration",
+        "insurance",
+        "inspection",
+        "muayene",
+        "sigorta",
+        "belge",
+        "evrak"
+    ]);
+}
+
+function isMissingDataQuestion(question) {
+    return matchesAnyKeyword(question, [
+        "missing",
+        "lack",
+        "what is missing",
+        "eksik",
+        "eksikler",
+        "eksigim",
+        "eksigim var",
+        "veri eksigi",
+        "data gap",
+        "data gaps"
+    ]);
+}
+
 function getVehicleSearchTerms(vehicle) {
     const terms = [];
 
@@ -859,14 +891,32 @@ function buildLocalGarageReply({
             )
         );
     } else if (
-        matchesAnyKeyword(question, [
-            "document",
-            "insurance",
-            "inspection",
-            "muayene",
-            "sigorta",
-            "belge"
-        ])
+        isDocumentQuestion(question) &&
+        isMissingDataQuestion(question)
+    ) {
+        sections.push(
+            prefixSection(
+                t.dataTitle,
+                actionBuckets.dataGaps.length > 0
+                    ? actionBuckets.dataGaps
+                    : [
+                        lang === "tr"
+                            ? "Belge tarafinda kayitli belirgin bir eksik görünmüyor."
+                            : "There is no obvious missing document record in the current data."
+                    ]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                buildDocumentLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (
+        isDocumentQuestion(question)
     ) {
         sections.push(
             prefixSection(
