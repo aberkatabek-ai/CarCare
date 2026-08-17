@@ -1038,6 +1038,122 @@ runTest(
 );
 
 runTest(
+    "local garage AI can focus on a named vehicle",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 1,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }, {
+                    id: 2,
+                    brand: "BMW",
+                    model: "320i",
+                    nickname: "BMW",
+                    current_mileage: 80000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    vehicle_id: 1,
+                    name: "Brake service",
+                    status: "overdue"
+                }, {
+                    vehicle_id: 2,
+                    name: "Oil service",
+                    status: "ok"
+                }],
+                serviceHistory: [],
+                issues: [{
+                    vehicle_id: 1,
+                    issue_title: "ABS light",
+                    risk_level: "red",
+                    status: "open"
+                }],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "BMW icin ne yapmaliyim?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /BMW/i
+        );
+        assert.doesNotMatch(
+            reply,
+            /Astra GSI: acil ariza/i
+        );
+    }
+);
+
+runTest(
+    "local garage AI can reuse helpful prior reply hints",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 7,
+                    brand: "BMW",
+                    model: "420",
+                    nickname: "Coupe",
+                    current_mileage: 68000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [],
+                serviceHistory: [],
+                issues: [],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Masraf durumum nasil?",
+                garageContext: context,
+                helpfulExamples: [{
+                    question:
+                        "Masraf durumum nasil?",
+                    reply:
+                        "Servis ve yakit dagilimini once kontrol et."
+                }]
+            });
+
+        assert.match(
+            reply,
+            /Useful note|Daha once/i
+        );
+        assert.match(
+            reply,
+            /Servis ve yakit dagilimini once kontrol et/i
+        );
+    }
+);
+
+runTest(
     "AI dataset row formatter keeps question, answer and feedback metadata",
     () => {
         const row = JSON.parse(

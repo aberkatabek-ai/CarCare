@@ -53,10 +53,33 @@ function normalizeQuestion(question) {
         .toLowerCase();
 }
 
+function tokenizeText(text) {
+    return normalizeQuestion(text)
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter((token) => token.length >= 3);
+}
+
 function matchesAnyKeyword(text, keywords) {
     return keywords.some((keyword) =>
         text.includes(keyword)
     );
+}
+
+function getVehicleSearchTerms(vehicle) {
+    const terms = [];
+
+    [
+        vehicle?.name,
+        vehicle?.brand,
+        vehicle?.model
+    ].forEach((value) => {
+        tokenizeText(value).forEach((token) =>
+            terms.push(token)
+        );
+    });
+
+    return Array.from(new Set(terms));
 }
 
 function isLikelyTurkishQuestion(
@@ -140,6 +163,179 @@ function getRiskiestVehicle(
                     firstVehicle
                 )
         )[0] || null;
+}
+
+function selectRelevantVehicles(
+    garageContext,
+    question
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+
+    const matchedVehicles = vehicles.filter(
+        (vehicle) =>
+            getVehicleSearchTerms(vehicle).some(
+                (term) =>
+                    term &&
+                    question.includes(term)
+            )
+    );
+
+    return matchedVehicles.length > 0
+        ? matchedVehicles
+        : vehicles;
+}
+
+function filterGarageContextToVehicles(
+    garageContext,
+    selectedVehicles
+) {
+    if (
+        !Array.isArray(selectedVehicles) ||
+        selectedVehicles.length === 0
+    ) {
+        return garageContext;
+    }
+
+    const selectedIds = new Set(
+        selectedVehicles.map((vehicle) =>
+            String(vehicle.id)
+        )
+    );
+
+    const filteredVehicles = (
+        garageContext.vehicles || []
+    ).filter((vehicle) =>
+        selectedIds.has(String(vehicle.id))
+    );
+
+    const urgentItems =
+        filteredVehicles.flatMap(
+            (vehicle) =>
+                Array.isArray(vehicle.topAlerts)
+                    ? vehicle.topAlerts.map(
+                        (alert) =>
+                            `${vehicle.name}: ${alert}`
+                    )
+                    : []
+        );
+
+    const overview =
+        filteredVehicles.reduce(
+            (summary, vehicle) => {
+                summary.activeVehicleCount += 1;
+                summary.overdueMaintenanceCount +=
+                    toNumber(
+                        vehicle.maintenance
+                            ?.overdueCount
+                    );
+                summary.openIssueCount +=
+                    toNumber(
+                        vehicle.mechanical
+                            ?.openIssueCount
+                    );
+                summary.expiredDocumentCount +=
+                    toNumber(
+                        vehicle.documents
+                            ?.expiredCount
+                    );
+                summary.totalOwnershipCost +=
+                    toNumber(
+                        vehicle.costs
+                            ?.ownershipTotal
+                    );
+                summary.totalServiceCost +=
+                    toNumber(
+                        vehicle.costs
+                            ?.serviceTotal
+                    );
+                summary.totalExpenseCost +=
+                    toNumber(
+                        vehicle.costs
+                            ?.expenseTotal
+                    );
+                summary.totalFuelCost +=
+                    toNumber(
+                        vehicle.costs?.fuelTotal
+                    );
+
+                return summary;
+            },
+            {
+                activeVehicleCount: 0,
+                overdueMaintenanceCount: 0,
+                openIssueCount: 0,
+                expiredDocumentCount: 0,
+                totalOwnershipCost: 0,
+                totalServiceCost: 0,
+                totalExpenseCost: 0,
+                totalFuelCost: 0
+            }
+        );
+
+    return {
+        ...garageContext,
+        overview,
+        urgentItems,
+        vehicles: filteredVehicles
+    };
+}
+
+function scoreHelpfulExample(
+    questionTokens,
+    example
+) {
+    const exampleTokens = new Set(
+        tokenizeText(example.question)
+    );
+
+    if (
+        questionTokens.length === 0 ||
+        exampleTokens.size === 0
+    ) {
+        return 0;
+    }
+
+    let overlap = 0;
+
+    questionTokens.forEach((token) => {
+        if (exampleTokens.has(token)) {
+            overlap += 1;
+        }
+    });
+
+    return overlap;
+}
+
+function selectHelpfulExamples({
+    question,
+    helpfulExamples
+}) {
+    if (!Array.isArray(helpfulExamples)) {
+        return [];
+    }
+
+    const questionTokens =
+        tokenizeText(question);
+
+    return helpfulExamples
+        .map((example) => ({
+            ...example,
+            score: scoreHelpfulExample(
+                questionTokens,
+                example
+            )
+        }))
+        .filter((example) => example.score > 0)
+        .sort(
+            (firstExample, secondExample) =>
+                secondExample.score -
+                firstExample.score
+        )
+        .slice(0, 2);
 }
 
 function createTranslator(lang) {
@@ -537,10 +733,21 @@ function buildOverviewLines(
 
 function buildLocalGarageReply({
     message,
-    garageContext
+    garageContext,
+    helpfulExamples = []
 }) {
     const question =
         normalizeQuestion(message);
+    const relevantVehicles =
+        selectRelevantVehicles(
+            garageContext,
+            question
+        );
+    const scopedGarageContext =
+        filterGarageContextToVehicles(
+            garageContext,
+            relevantVehicles
+        );
     const lang = isLikelyTurkishQuestion(
         question
     )
@@ -550,11 +757,18 @@ function buildLocalGarageReply({
     const sections = [];
     const actionBuckets =
         buildActionBuckets(
-            garageContext,
+            scopedGarageContext,
             lang
         );
     const riskiestVehicle =
-        getRiskiestVehicle(garageContext);
+        getRiskiestVehicle(
+            scopedGarageContext
+        );
+    const matchedHelpfulExamples =
+        selectHelpfulExamples({
+            question,
+            helpfulExamples
+        });
 
     if (riskiestVehicle) {
         sections.push(
@@ -609,7 +823,7 @@ function buildLocalGarageReply({
             prefixSection(
                 t.costTitle,
                 buildLocalizedCostLines(
-                    garageContext,
+                    scopedGarageContext,
                     lang
                 )
             )
@@ -639,7 +853,7 @@ function buildLocalGarageReply({
             prefixSection(
                 t.monthTitle,
                 buildMaintenanceLines(
-                    garageContext,
+                    scopedGarageContext,
                     lang
                 )
             )
@@ -670,7 +884,7 @@ function buildLocalGarageReply({
             prefixSection(
                 t.monthTitle,
                 buildDocumentLines(
-                    garageContext,
+                    scopedGarageContext,
                     lang
                 )
             )
@@ -709,7 +923,7 @@ function buildLocalGarageReply({
             prefixSection(
                 t.monthTitle,
                 buildIssueLines(
-                    garageContext,
+                    scopedGarageContext,
                     lang
                 )
             )
@@ -754,7 +968,7 @@ function buildLocalGarageReply({
                     0
                     ? actionBuckets.thisMonth
                     : buildOverviewLines(
-                        garageContext,
+                        scopedGarageContext,
                         lang
                     )
             )
@@ -763,7 +977,7 @@ function buildLocalGarageReply({
             prefixSection(
                 t.costTitle,
                 buildLocalizedCostLines(
-                    garageContext,
+                    scopedGarageContext,
                     lang
                 ).slice(0, 3)
             )
@@ -783,6 +997,22 @@ function buildLocalGarageReply({
         )
     );
 
+    if (matchedHelpfulExamples.length > 0) {
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Daha once ise yarayan cevaplardan not"
+                    : "Useful note from previous helpful replies",
+                matchedHelpfulExamples.map(
+                    (example) =>
+                        example.reply
+                            .split("\n")[0]
+                            .slice(0, 220)
+                )
+            )
+        );
+    }
+
     const filteredSections =
         sections.filter(Boolean);
 
@@ -795,13 +1025,15 @@ function buildLocalGarageReply({
 
 async function requestGarageAiReply({
     message,
-    garageContext
+    garageContext,
+    helpfulExamples = []
 }) {
     if (!hasAiConfiguration()) {
         return {
             reply: buildLocalGarageReply({
                 message,
-                garageContext
+                garageContext,
+                helpfulExamples
             }),
             model: LOCAL_AI_MODEL
         };
@@ -855,7 +1087,8 @@ async function requestGarageAiReply({
                 payload?.output_text ||
                 buildLocalGarageReply({
                     message,
-                    garageContext
+                    garageContext,
+                    helpfulExamples
                 }),
             model: payload?.model || null
         };
@@ -863,7 +1096,8 @@ async function requestGarageAiReply({
         return {
             reply: buildLocalGarageReply({
                 message,
-                garageContext
+                garageContext,
+                helpfulExamples
             }),
             model: LOCAL_AI_MODEL
         };

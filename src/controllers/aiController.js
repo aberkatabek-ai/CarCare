@@ -11,6 +11,7 @@ const {
     recordAiConversation,
     updateAiConversationFeedback,
     getAiConversationHistory,
+    getHelpfulAiExamples,
     formatConversationDatasetRow,
     getAiConversationExportRows
 } = require("../services/aiTrainingService");
@@ -310,6 +311,10 @@ async function chatWithGarageAi(
         );
         const garageContext =
             buildGarageAiContext(garageData);
+        const helpfulExamples =
+            await getHelpfulAiExamples(
+                req.session.userId
+            );
 
         if (garageContext.overview.activeVehicleCount === 0) {
             return res.json({
@@ -329,7 +334,8 @@ async function chatWithGarageAi(
         const result =
             await requestGarageAiReply({
                 message: question,
-                garageContext
+                garageContext,
+                helpfulExamples
             });
 
         const conversation =

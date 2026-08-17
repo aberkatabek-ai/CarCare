@@ -161,6 +161,37 @@ async function getAiConversationHistory(userId) {
     return result.rows;
 }
 
+async function getHelpfulAiExamples(
+    userId,
+    limit = 12
+) {
+    await ensureAiConversationTable();
+
+    const safeLimit = Math.max(
+        1,
+        Math.min(Number(limit) || 12, 30)
+    );
+
+    const result = await db.query(
+        `SELECT
+            id,
+            question,
+            reply,
+            feedback_note,
+            helpfulness_score,
+            created_at
+         FROM ai_conversations
+         WHERE user_id = $1
+           AND feedback_status = 'helpful'
+         ORDER BY feedback_updated_at DESC NULLS LAST,
+                  created_at DESC
+         LIMIT $2`,
+        [userId, safeLimit]
+    );
+
+    return result.rows;
+}
+
 function formatConversationDatasetRow(row) {
     return JSON.stringify({
         messages: [{
@@ -236,6 +267,7 @@ module.exports = {
     recordAiConversation,
     updateAiConversationFeedback,
     getAiConversationHistory,
+    getHelpfulAiExamples,
     formatConversationDatasetRow,
     getAiConversationExportRows
 };
