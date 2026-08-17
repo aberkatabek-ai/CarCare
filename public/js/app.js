@@ -382,6 +382,32 @@ function createAiFeedbackButton(
     return button;
 }
 
+function createAiActionButton({
+    label,
+    onClick,
+    href
+}) {
+    const button =
+        document.createElement(
+            href ? "a" : "button"
+        );
+
+    if (href) {
+        button.href = href;
+    } else {
+        button.type = "button";
+        button.addEventListener(
+            "click",
+            onClick
+        );
+    }
+
+    button.className = "ai-inline-action";
+    button.textContent = label;
+
+    return button;
+}
+
 function parseAiReplySections(text) {
     return String(text || "")
         .split(/\n\s*\n/)
@@ -650,6 +676,83 @@ function appendAiMessage(
         message.append(feedbackRow);
     }
 
+    if (
+        role === "assistant" &&
+        Array.isArray(
+            options.recommendedActions
+        ) &&
+        options.recommendedActions.length > 0
+    ) {
+        const actionRow =
+            document.createElement("div");
+
+        actionRow.className =
+            "ai-inline-action-row";
+
+        options.recommendedActions.forEach(
+            (action) => {
+                actionRow.append(
+                    createAiActionButton({
+                        label: action.label,
+                        href: action.href,
+                        onClick: async () => {
+                            if (
+                                action.question
+                            ) {
+                                await askGarageAi(
+                                    action.question
+                                );
+                            }
+                        }
+                    })
+                );
+            }
+        );
+
+        message.append(actionRow);
+    }
+
+    if (
+        role === "assistant" &&
+        Array.isArray(
+            options.suggestedQuestions
+        ) &&
+        options.suggestedQuestions
+            .length > 0
+    ) {
+        const suggestionLabel =
+            createTextElement(
+                "span",
+                "ai-suggestion-label",
+                "Suggested follow-ups"
+            );
+        const suggestionRow =
+            document.createElement("div");
+
+        suggestionRow.className =
+            "ai-suggestion-row";
+
+        options.suggestedQuestions.forEach(
+            (question) => {
+                suggestionRow.append(
+                    createAiActionButton({
+                        label: question,
+                        onClick: async () => {
+                            await askGarageAi(
+                                question
+                            );
+                        }
+                    })
+                );
+            }
+        );
+
+        message.append(
+            suggestionLabel,
+            suggestionRow
+        );
+    }
+
     aiChatThread.append(message);
     aiChatThread.scrollTop =
         aiChatThread.scrollHeight;
@@ -722,7 +825,11 @@ async function askGarageAi(question) {
                     data.conversation?.id,
                 feedbackStatus:
                     data.conversation
-                        ?.feedback_status
+                        ?.feedback_status,
+                suggestedQuestions:
+                    data.suggestedQuestions,
+                recommendedActions:
+                    data.recommendedActions
             }
         );
 
@@ -734,7 +841,8 @@ async function askGarageAi(question) {
 
         setAiStatus(
             aiConfigured
-                ? getAiReadyStatus()
+                ? data.coachMessage ||
+                    getAiReadyStatus()
                 : "AI is not configured on the server yet."
         );
     } catch (error) {

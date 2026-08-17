@@ -768,6 +768,42 @@
     margin-top: 12px;
 }
 
+.ai-inline-action-row,
+.ai-suggestion-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.ai-suggestion-label {
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ai-inline-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 11px;
+    color: var(--primary);
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.ai-inline-action:hover {
+    border-color: rgba(47, 108, 83, 0.35);
+    background: rgba(248, 244, 237, 0.96);
+}
+
 .ai-feedback-button {
     padding: 8px 11px;
     color: var(--primary);

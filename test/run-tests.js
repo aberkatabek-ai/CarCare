@@ -47,6 +47,7 @@ const {
     getSmtpAuth
 } = require("../src/utils/mailer");
 const {
+    deriveAiChatEnhancements,
     buildLocalGarageReply,
     buildGarageAiContext
 } = require("../src/services/garageAiService");
@@ -1501,6 +1502,55 @@ runTest(
         assert.equal(
             row.metadata.helpfulnessScore,
             1
+        );
+    }
+);
+
+runTest(
+    "AI chat enhancements provide suggestions and actions",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 5,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [],
+                serviceHistory: [],
+                issues: [],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const enhancements =
+            deriveAiChatEnhancements({
+                question:
+                    "Hangi belgelerim eksik?",
+                garageContext: context
+            });
+
+        assert.ok(
+            enhancements.suggestedQuestions
+                .length >= 2
+        );
+        assert.ok(
+            enhancements.recommendedActions
+                .length >= 2
+        );
+        assert.match(
+            enhancements.coachMessage,
+            /follow-up|soru|aksiyon/i
         );
     }
 );

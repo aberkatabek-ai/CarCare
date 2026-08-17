@@ -4,6 +4,7 @@ const {
 } = require("../middleware/rateLimitMiddleware");
 const {
     buildGarageAiContext,
+    deriveAiChatEnhancements,
     hasAiConfiguration,
     requestGarageAiReply
 } = require("../services/garageAiService");
@@ -351,6 +352,11 @@ async function chatWithGarageAi(
                 garageContext,
                 model: result.model
             });
+        const enhancements =
+            deriveAiChatEnhancements({
+                question,
+                garageContext
+            });
 
         res.json({
             success: true,
@@ -363,7 +369,13 @@ async function chatWithGarageAi(
             model: result.model,
             garageContext,
             reply: result.reply,
-            conversation
+            conversation,
+            suggestedQuestions:
+                enhancements.suggestedQuestions,
+            recommendedActions:
+                enhancements.recommendedActions,
+            coachMessage:
+                enhancements.coachMessage
         });
     } catch (error) {
         next(error);

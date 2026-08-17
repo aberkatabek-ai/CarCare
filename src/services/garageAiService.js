@@ -1528,6 +1528,200 @@ function inferQuestionIntent(question) {
     return "overview";
 }
 
+function buildSuggestedQuestions({
+    question,
+    garageContext,
+    lang
+}) {
+    const normalizedQuestion =
+        normalizeQuestion(question);
+    const isTurkish = lang === "tr";
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const primaryVehicle =
+        vehicles[0]?.name || "";
+
+    if (
+        isDocumentQuestion(normalizedQuestion)
+    ) {
+        return isTurkish
+            ? [
+                "Belge tarafinda once neyi tamamlamaliyim?",
+                `${primaryVehicle || "Bu arac"} icin belge riskini ozetle`,
+                "Eksik kayitlari kapatirsam ne degisir?"
+            ]
+            : [
+                "What document should I fix first?",
+                `Summarize the document risk for ${primaryVehicle || "this vehicle"}`,
+                "What changes if I close the missing records?"
+            ];
+    }
+
+    if (
+        matchesAnyKeyword(normalizedQuestion, [
+            "cost",
+            "spend",
+            "budget",
+            "expense",
+            "fuel",
+            "money",
+            "masraf",
+            "maliyet"
+        ])
+    ) {
+        return isTurkish
+            ? [
+                "Hangi masraf kalemi bana en yakin gorunuyor?",
+                "Bu ay neyi ertelersem risk artar?",
+                "Arac bazli masraf baskisini sirala"
+            ]
+            : [
+                "Which cost pressure is most likely to hit next?",
+                "What becomes riskier if I delay it this month?",
+                "Rank the vehicles by upcoming cost pressure"
+            ];
+    }
+
+    if (
+        matchesAnyKeyword(normalizedQuestion, [
+            "plan",
+            "roadmap",
+            "sirala",
+            "adim",
+            "what next",
+            "sonra ne"
+        ])
+    ) {
+        return isTurkish
+            ? [
+                "Sadece bu aya odaklan",
+                "Sadece en riskli araci detaylandir",
+                "Eksik verileri tamamlamak icin bana liste ver"
+            ]
+            : [
+                "Focus only on this month",
+                "Detail only the riskiest vehicle",
+                "Give me a list to close the missing data"
+            ];
+    }
+
+    return isTurkish
+        ? [
+            "Neye hemen oncelik vermeliyim?",
+            "Bana bir roadmap cikar",
+            "Hangi veriler eksik?"
+        ]
+        : [
+            "What should I prioritize right now?",
+            "Build me a roadmap",
+            "Which records are missing?"
+        ];
+}
+
+function buildRecommendedActions({
+    garageContext,
+    lang
+}) {
+    const isTurkish = lang === "tr";
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const actions = [];
+
+    if (
+        vehicles.some(
+            (vehicle) =>
+                vehicle.documents
+                    .trackedCount === 0
+        )
+    ) {
+        actions.push({
+            label: isTurkish
+                ? "Belgeleri duzenle"
+                : "Manage documents",
+            href: "/documents.html",
+            kind: "link"
+        });
+    }
+
+    if (
+        vehicles.some(
+            (vehicle) =>
+                vehicle.maintenance
+                    .totalPlans === 0 ||
+                vehicle.maintenance
+                    .overdueCount > 0
+        )
+    ) {
+        actions.push({
+            label: isTurkish
+                ? "Bakim planlarini ac"
+                : "Open maintenance",
+            href: "/maintenance.html",
+            kind: "link"
+        });
+    }
+
+    if (vehicles.length > 0) {
+        actions.push({
+            label: isTurkish
+                ? "Araclari incele"
+                : "Review vehicles",
+            href: "/index.html",
+            kind: "link"
+        });
+    }
+
+    actions.push({
+        label: isTurkish
+            ? "Eksik verileri sor"
+            : "Ask about missing data",
+        question: isTurkish
+            ? "Hangi veriler eksik?"
+            : "Which records are missing?",
+        kind: "question"
+    });
+
+    return actions.slice(0, 4);
+}
+
+function deriveAiChatEnhancements({
+    question,
+    garageContext
+}) {
+    const normalizedQuestion =
+        normalizeQuestion(question);
+    const lang = isLikelyTurkishQuestion(
+        normalizedQuestion
+    )
+        ? "tr"
+        : "en";
+
+    return {
+        suggestedQuestions:
+            buildSuggestedQuestions({
+                question:
+                    normalizedQuestion,
+                garageContext,
+                lang
+            }),
+        recommendedActions:
+            buildRecommendedActions({
+                garageContext,
+                lang
+            }),
+        coachMessage:
+            lang === "tr"
+                ? "Cevabi daha iyi hale getirmek icin follow-up sorulari veya hizli aksiyonlari kullanabilirsin."
+                : "Use a follow-up question or a quick action to sharpen the next reply."
+    };
+}
+
 function buildRelevantHistoryLines({
     question,
     recentConversations,
@@ -2373,6 +2567,7 @@ async function requestGarageAiReply({
 }
 
 module.exports = {
+    deriveAiChatEnhancements,
     buildLocalGarageReply:
         buildImprovedLocalGarageReply,
     buildGarageAiContext,
