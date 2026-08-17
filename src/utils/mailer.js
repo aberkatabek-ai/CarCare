@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
 
 let transporterPromise = null;
 let lastSentMail = null;
@@ -77,12 +78,23 @@ function getTransportOptions(
             }
             : {}),
         host,
+        name: host,
         port,
         secure,
+        family: 4,
         connectionTimeout: 15000,
         greetingTimeout: 15000,
         socketTimeout: 20000,
         requireTLS: !secure && port === 587,
+        lookup(lookupHost, _options, callback) {
+            dns.lookup(
+                lookupHost,
+                {
+                    family: 4
+                },
+                callback
+            );
+        },
         tls: {
             servername: host,
             minVersion: "TLSv1.2"
