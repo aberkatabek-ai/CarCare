@@ -3,6 +3,7 @@ const dns = require("dns");
 
 let transporterPromise = null;
 let lastSentMail = null;
+let gmailAccessTokenPromise = null;
 
 function getEnvValue(name) {
     const rawValue = process.env[name];
@@ -32,6 +33,13 @@ function getMailProviderPreference() {
         getEnvValue("EMAIL_PROVIDER") ||
         "auto"
     ).toLowerCase();
+}
+
+function normalizeProviderName(name) {
+    return String(name || "")
+        .trim()
+        .toLowerCase()
+        .replaceAll("-", "_");
 }
 
 function isGmailHost(host) {
@@ -116,9 +124,34 @@ function hasResendConfiguration() {
     );
 }
 
+function hasGmailApiConfiguration() {
+    return Boolean(
+        getEnvValue("GMAIL_API_CLIENT_ID") &&
+        getEnvValue("GMAIL_API_CLIENT_SECRET") &&
+        getEnvValue("GMAIL_API_REFRESH_TOKEN") &&
+        getGmailApiSenderEmail()
+    );
+}
+
+function getGmailApiSenderEmail() {
+    return (
+        getEnvValue(
+            "GMAIL_API_SENDER_EMAIL"
+        ) ||
+        getEnvValue("SMTP_USER")
+    );
+}
+
 function getConfiguredMailProvider() {
-    const preference =
-        getMailProviderPreference();
+    const preference = normalizeProviderName(
+        getMailProviderPreference()
+    );
+
+    if (preference === "gmail_api") {
+        return hasGmailApiConfiguration()
+            ? "gmail_api"
+            : null;
+    }
 
     if (preference === "resend") {
         return hasResendConfiguration()
@@ -130,6 +163,10 @@ function getConfiguredMailProvider() {
         return hasSmtpConfiguration()
             ? "smtp"
             : null;
+    }
+
+    if (hasGmailApiConfiguration()) {
+        return "gmail_api";
     }
 
     if (hasResendConfiguration()) {
@@ -188,6 +225,9 @@ function canSendRealMail() {
 function getFromAddress() {
     return (
         getEnvValue("EMAIL_FROM") ||
+        getEnvValue(
+            "GMAIL_API_SENDER_EMAIL"
+        ) ||
         getEnvValue("SMTP_FROM") ||
         getEnvValue("SMTP_USER") ||
         "no-reply@carcare.local"
@@ -204,11 +244,18 @@ function getMailConfigurationErrorMessage(
         return `Resend is not configured for production ${mailType} delivery.`;
     }
 
+    if (
+        normalizeProviderName(preference) ===
+        "gmail_api"
+    ) {
+        return `Gmail API is not configured for production ${mailType} delivery.`;
+    }
+
     if (preference === "smtp") {
         return `SMTP is not configured for production ${mailType} delivery.`;
     }
 
-    return `No email provider is configured for production ${mailType} delivery. Add RESEND_API_KEY or SMTP_* variables.`;
+    return `No email provider is configured for production ${mailType} delivery. Add Gmail API, RESEND_API_KEY, or SMTP_* variables.`;
 }
 
 function isGmailSmtpFallbackCandidate(
@@ -341,9 +388,170 @@ async function sendMailWithResend(
     };
 }
 
+async function getGmailApiAccessToken() {
+    if (!hasGmailApiConfiguration()) {
+        throw new Error(
+            "Gmail API credentials are incomplete."
+        );
+    }
+
+    if (!gmailAccessTokenPromise) {
+        gmailAccessTokenPromise = fetch(
+            "https://oauth2.googleapis.com/token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+                    "User-Agent":
+                        "CarCare/1.0"
+                },
+                body: new URLSearchParams({
+                    client_id:
+                        getEnvValue(
+                            "GMAIL_API_CLIENT_ID"
+                        ),
+                    client_secret:
+                        getEnvValue(
+                            "GMAIL_API_CLIENT_SECRET"
+                        ),
+                    refresh_token:
+                        getEnvValue(
+                            "GMAIL_API_REFRESH_TOKEN"
+                        ),
+                    grant_type:
+                        "refresh_token"
+                }).toString()
+            }
+        )
+            .then(async (response) => {
+                const payload =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        payload?.error_description ||
+                            payload?.error ||
+                            `OAuth token request returned ${response.status}.`
+                    );
+                }
+
+                return payload.access_token;
+            })
+            .catch((error) => {
+                gmailAccessTokenPromise = null;
+                throw error;
+            });
+    }
+
+    return gmailAccessTokenPromise;
+}
+
+function createBoundary() {
+    return `carcare_${Date.now()}_${Math.random()
+        .toString(16)
+        .slice(2)}`;
+}
+
+function encodeHeaderValue(value) {
+    return String(value || "")
+        .replaceAll("\r", "")
+        .replaceAll("\n", " ");
+}
+
+function createRawMimeMessage(message) {
+    const boundary = createBoundary();
+    const lines = [
+        `From: ${encodeHeaderValue(
+            message.from
+        )}`,
+        `To: ${encodeHeaderValue(
+            message.to
+        )}`,
+        `Subject: ${encodeHeaderValue(
+            message.subject
+        )}`,
+        "MIME-Version: 1.0",
+        `Content-Type: multipart/alternative; boundary="${boundary}"`,
+        "",
+        `--${boundary}`,
+        'Content-Type: text/plain; charset="UTF-8"',
+        "Content-Transfer-Encoding: 7bit",
+        "",
+        message.text || "",
+        "",
+        `--${boundary}`,
+        'Content-Type: text/html; charset="UTF-8"',
+        "Content-Transfer-Encoding: 7bit",
+        "",
+        message.html || "",
+        "",
+        `--${boundary}--`
+    ];
+
+    return Buffer.from(
+        lines.join("\r\n"),
+        "utf8"
+    )
+        .toString("base64")
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replace(/=+$/u, "");
+}
+
+async function sendMailWithGmailApi(
+    message
+) {
+    const accessToken =
+        await getGmailApiAccessToken();
+    const response = await fetch(
+        "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type":
+                    "application/json",
+                "User-Agent":
+                    "CarCare/1.0"
+            },
+            body: JSON.stringify({
+                raw: createRawMimeMessage({
+                    ...message,
+                    from:
+                        message.from ||
+                        getGmailApiSenderEmail()
+                })
+            })
+        }
+    );
+
+    const payload =
+        await response.json();
+
+    if (!response.ok) {
+        gmailAccessTokenPromise = null;
+        throw new Error(
+            payload?.error?.message ||
+                `Gmail API returned ${response.status}.`
+        );
+    }
+
+    return {
+        provider: "gmail_api",
+        id: payload?.id || null
+    };
+}
+
 async function sendMail(message) {
     const provider =
         getConfiguredMailProvider();
+
+    if (provider === "gmail_api") {
+        return sendMailWithGmailApi(
+            message
+        );
+    }
 
     if (provider === "resend") {
         return sendMailWithResend(
@@ -610,7 +818,9 @@ function getLastSentMail() {
 module.exports = {
     canSendRealMail,
     getConfiguredMailProvider,
+    getGmailApiSenderEmail,
     getSmtpAuth,
+    hasGmailApiConfiguration,
     hasSmtpConfiguration,
     hasResendConfiguration,
     sendPasswordResetCode,

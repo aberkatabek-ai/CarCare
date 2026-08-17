@@ -46,6 +46,7 @@ const {
 } = require("../src/utils/passwordResetDelivery");
 const {
     getConfiguredMailProvider,
+    getGmailApiSenderEmail,
     getSmtpAuth
 } = require("../src/utils/mailer");
 
@@ -443,6 +444,33 @@ runTest(
 );
 
 runTest(
+    "mail provider uses gmail api when configured",
+    () => {
+        withEnv(
+            {
+                EMAIL_PROVIDER: "gmail_api",
+                EMAIL_FROM:
+                    "user@example.com",
+                GMAIL_API_CLIENT_ID:
+                    "client-id",
+                GMAIL_API_CLIENT_SECRET:
+                    "client-secret",
+                GMAIL_API_REFRESH_TOKEN:
+                    "refresh-token",
+                GMAIL_API_SENDER_EMAIL:
+                    "user@example.com"
+            },
+            () => {
+                assert.equal(
+                    getConfiguredMailProvider(),
+                    "gmail_api"
+                );
+            }
+        );
+    }
+);
+
+runTest(
     "mail provider auto mode prefers resend when configured",
     () => {
         withEnv(
@@ -467,12 +495,48 @@ runTest(
 );
 
 runTest(
+    "mail provider auto mode prefers gmail api before smtp",
+    () => {
+        withEnv(
+            {
+                EMAIL_PROVIDER: "auto",
+                EMAIL_FROM:
+                    "user@example.com",
+                GMAIL_API_CLIENT_ID:
+                    "client-id",
+                GMAIL_API_CLIENT_SECRET:
+                    "client-secret",
+                GMAIL_API_REFRESH_TOKEN:
+                    "refresh-token",
+                GMAIL_API_SENDER_EMAIL:
+                    "user@example.com",
+                RESEND_API_KEY: null,
+                SMTP_HOST: "smtp.gmail.com",
+                SMTP_PORT: "587",
+                SMTP_USER: "user@example.com",
+                SMTP_PASS: "secret"
+            },
+            () => {
+                assert.equal(
+                    getConfiguredMailProvider(),
+                    "gmail_api"
+                );
+            }
+        );
+    }
+);
+
+runTest(
     "mail provider falls back to smtp when resend is absent",
     () => {
         withEnv(
             {
                 EMAIL_PROVIDER: "auto",
                 EMAIL_FROM: null,
+                GMAIL_API_CLIENT_ID: null,
+                GMAIL_API_CLIENT_SECRET: null,
+                GMAIL_API_REFRESH_TOKEN: null,
+                GMAIL_API_SENDER_EMAIL: null,
                 RESEND_API_KEY: null,
                 SMTP_HOST: "smtp.gmail.com",
                 SMTP_PORT: "587",
@@ -483,6 +547,24 @@ runTest(
                 assert.equal(
                     getConfiguredMailProvider(),
                     "smtp"
+                );
+            }
+        );
+    }
+);
+
+runTest(
+    "gmail api sender email falls back to smtp user",
+    () => {
+        withEnv(
+            {
+                GMAIL_API_SENDER_EMAIL: null,
+                SMTP_USER: "user@example.com"
+            },
+            () => {
+                assert.equal(
+                    getGmailApiSenderEmail(),
+                    "user@example.com"
                 );
             }
         );

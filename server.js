@@ -14,6 +14,15 @@ if (!process.env.SESSION_SECRET) {
 
 if (
     !(
+        (
+            process.env.GMAIL_API_CLIENT_ID &&
+            process.env.GMAIL_API_CLIENT_SECRET &&
+            process.env.GMAIL_API_REFRESH_TOKEN &&
+            (
+                process.env.GMAIL_API_SENDER_EMAIL ||
+                process.env.EMAIL_FROM
+            )
+        ) ||
         process.env.RESEND_API_KEY ||
         (
             process.env.SMTP_HOST &&
@@ -24,7 +33,7 @@ if (
     )
 ) {
     console.warn(
-        "[mail] No email provider is configured. Add RESEND_API_KEY or SMTP_* variables if forgot-password emails should reach real inboxes."
+        "[mail] No email provider is configured. Add Gmail API, RESEND_API_KEY, or SMTP_* variables if forgot-password emails should reach real inboxes."
     );
 }
 
