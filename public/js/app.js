@@ -382,6 +382,128 @@ function createAiFeedbackButton(
     return button;
 }
 
+function parseAiReplySections(text) {
+    return String(text || "")
+        .split(/\n\s*\n/)
+        .map((block) => block.trim())
+        .filter(Boolean)
+        .map((block) => {
+            const lines = block
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean);
+
+            if (lines.length === 0) {
+                return null;
+            }
+
+            const [firstLine, ...restLines] =
+                lines;
+            const bulletLines = restLines
+                .filter((line) =>
+                    line.startsWith("- ")
+                )
+                .map((line) =>
+                    line.replace(/^- /, "")
+                );
+
+            if (
+                bulletLines.length > 0 &&
+                restLines.length ===
+                    bulletLines.length
+            ) {
+                return {
+                    title: firstLine,
+                    bullets: bulletLines,
+                    summary: ""
+                };
+            }
+
+            return {
+                title: "",
+                bullets: [],
+                summary: block
+            };
+        })
+        .filter(Boolean);
+}
+
+function createAiMessageBody(text) {
+    const sections =
+        parseAiReplySections(text);
+    const container =
+        document.createElement("div");
+
+    container.className =
+        "ai-message-body";
+
+    if (
+        sections.length === 0 ||
+        sections.every(
+            (section) =>
+                !section.title ||
+                section.bullets.length === 0
+        )
+    ) {
+        container.append(
+            createTextElement("p", "", text)
+        );
+        return container;
+    }
+
+    sections.forEach((section) => {
+        if (section.title && section.bullets.length) {
+            const sectionElement =
+                document.createElement(
+                    "section"
+                );
+
+            sectionElement.className =
+                "ai-reply-section";
+
+            sectionElement.append(
+                createTextElement(
+                    "h4",
+                    "ai-reply-section-title",
+                    section.title
+                )
+            );
+
+            const list =
+                document.createElement("ul");
+
+            list.className =
+                "ai-reply-list";
+
+            section.bullets.forEach(
+                (bullet) => {
+                    list.append(
+                        createTextElement(
+                            "li",
+                            "",
+                            bullet
+                        )
+                    );
+                }
+            );
+
+            sectionElement.append(list);
+            container.append(sectionElement);
+            return;
+        }
+
+        container.append(
+            createTextElement(
+                "p",
+                "",
+                section.summary || text
+            )
+        );
+    });
+
+    return container;
+}
+
 async function saveAiFeedback(
     conversationId,
     feedbackStatus,
@@ -453,19 +575,27 @@ function appendAiMessage(
             String(options.conversationId);
     }
 
-    message.append(
+    const messageLabel =
         createTextElement(
             "strong",
             "",
             role === "user"
                 ? "You"
                 : "CarCare AI"
-        ),
-        createTextElement(
-            "p",
-            "",
-            text
-        )
+        );
+
+    const messageBody =
+        role === "assistant"
+            ? createAiMessageBody(text)
+            : createTextElement(
+                "p",
+                "",
+                text
+            );
+
+    message.append(
+        messageLabel,
+        messageBody
     );
 
     if (
@@ -3283,6 +3413,23 @@ if (aiChatForm) {
                 aiChatInput.value.trim();
 
             await askGarageAi(question);
+        }
+    );
+}
+
+if (aiChatInput) {
+    aiChatInput.addEventListener(
+        "keydown",
+        async (event) => {
+            if (
+                event.key === "Enter" &&
+                (event.ctrlKey || event.metaKey)
+            ) {
+                event.preventDefault();
+                await askGarageAi(
+                    aiChatInput.value.trim()
+                );
+            }
         }
     );
 }

@@ -680,6 +680,38 @@
     line-height: 1.6;
 }
 
+.ai-message-body {
+    display: grid;
+    gap: 12px;
+}
+
+.ai-reply-section {
+    padding: 12px 13px;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(47, 108, 83, 0.12);
+    border-radius: 14px;
+}
+
+.ai-reply-section-title {
+    margin: 0 0 8px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.ai-reply-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text);
+    display: grid;
+    gap: 8px;
+}
+
+.ai-reply-list li {
+    line-height: 1.55;
+}
+
 .ai-message.assistant {
     background: rgba(252, 248, 242, 0.95);
 }
@@ -720,6 +752,13 @@
     color: var(--muted);
     font-size: 13px;
     line-height: 1.5;
+}
+
+.ai-chat-shortcut {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
 }
 
 .ai-message-feedback {
@@ -831,6 +870,10 @@
     .ai-chat-actions {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .ai-reply-section {
+        padding: 11px 12px;
     }
 
     .overview-status,
