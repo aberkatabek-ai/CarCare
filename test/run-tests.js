@@ -44,6 +44,10 @@ const {
 const {
     shouldExposePasswordResetCode
 } = require("../src/utils/passwordResetDelivery");
+const {
+    getConfiguredMailProvider,
+    getSmtpAuth
+} = require("../src/utils/mailer");
 
 function runTest(name, testFn) {
     try {
@@ -53,6 +57,38 @@ function runTest(name, testFn) {
         console.error(`FAIL ${name}`);
         console.error(error);
         process.exitCode = 1;
+    }
+}
+
+function withEnv(overrides, testFn) {
+    const keys = Object.keys(overrides);
+    const previousValues = {};
+
+    keys.forEach((key) => {
+        previousValues[key] = process.env[key];
+
+        if (overrides[key] === null) {
+            delete process.env[key];
+            return;
+        }
+
+        process.env[key] = overrides[key];
+    });
+
+    try {
+        testFn();
+    } finally {
+        keys.forEach((key) => {
+            if (
+                previousValues[key] === undefined
+            ) {
+                delete process.env[key];
+                return;
+            }
+
+            process.env[key] =
+                previousValues[key];
+        });
     }
 }
 
@@ -402,6 +438,76 @@ runTest(
                 deliveryFailed: true
             }),
             true
+        );
+    }
+);
+
+runTest(
+    "mail provider auto mode prefers resend when configured",
+    () => {
+        withEnv(
+            {
+                EMAIL_PROVIDER: "auto",
+                EMAIL_FROM:
+                    "CarCare <noreply@example.com>",
+                RESEND_API_KEY: "re_test",
+                SMTP_HOST: "smtp.gmail.com",
+                SMTP_PORT: "587",
+                SMTP_USER: "user@example.com",
+                SMTP_PASS: "secret"
+            },
+            () => {
+                assert.equal(
+                    getConfiguredMailProvider(),
+                    "resend"
+                );
+            }
+        );
+    }
+);
+
+runTest(
+    "mail provider falls back to smtp when resend is absent",
+    () => {
+        withEnv(
+            {
+                EMAIL_PROVIDER: "auto",
+                EMAIL_FROM: null,
+                RESEND_API_KEY: null,
+                SMTP_HOST: "smtp.gmail.com",
+                SMTP_PORT: "587",
+                SMTP_USER: "user@example.com",
+                SMTP_PASS: "secret"
+            },
+            () => {
+                assert.equal(
+                    getConfiguredMailProvider(),
+                    "smtp"
+                );
+            }
+        );
+    }
+);
+
+runTest(
+    "gmail app password is normalized for smtp auth",
+    () => {
+        withEnv(
+            {
+                SMTP_HOST: "smtp.gmail.com",
+                SMTP_USER: "user@example.com",
+                SMTP_PASS:
+                    "\"abcd efgh ijkl mnop\""
+            },
+            () => {
+                assert.deepEqual(
+                    getSmtpAuth(),
+                    {
+                        user: "user@example.com",
+                        pass: "abcdefghijklmnop"
+                    }
+                );
+            }
         );
     }
 );

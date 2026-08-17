@@ -39,6 +39,9 @@ function loadEnv() {
     delete process.env.SMTP_USER;
     delete process.env.SMTP_PASS;
     delete process.env.SMTP_FROM;
+    delete process.env.EMAIL_PROVIDER;
+    delete process.env.EMAIL_FROM;
+    delete process.env.RESEND_API_KEY;
 
     require("dotenv").config({
         path: dotenvPath,
@@ -63,14 +66,17 @@ async function startServer() {
 
     if (
         !(
-            process.env.SMTP_HOST &&
-            process.env.SMTP_PORT &&
-            process.env.SMTP_USER &&
-            process.env.SMTP_PASS
+            process.env.RESEND_API_KEY ||
+            (
+                process.env.SMTP_HOST &&
+                process.env.SMTP_PORT &&
+                process.env.SMTP_USER &&
+                process.env.SMTP_PASS
+            )
         )
     ) {
         console.warn(
-            "[mail] SMTP is not configured. Forgot-password emails will not reach real inboxes until SMTP_* variables are added to .env."
+            "[mail] No email provider is configured. Add RESEND_API_KEY or SMTP_* variables if forgot-password emails should reach real inboxes."
         );
     }
 

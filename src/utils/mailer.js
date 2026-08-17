@@ -1,221 +1,139 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns");
-const net = require("net");
-const tls = require("tls");
 
 let transporterPromise = null;
 let lastSentMail = null;
 
-function openSmtpSocket(host, port, secure) {
-    return new Promise((resolve, reject) => {
-        function connectWithAddresses(addresses) {
-            const ipv4Addresses = Array.isArray(addresses)
-                ? addresses.filter(Boolean)
-                : [];
+function getEnvValue(name) {
+    const rawValue = process.env[name];
 
-            if (ipv4Addresses.length === 0) {
-                reject(
-                    new Error(
-                        `No IPv4 SMTP addresses were found for ${host}.`
-                    )
-                );
-                return;
-            }
+    if (rawValue === undefined || rawValue === null) {
+        return "";
+    }
 
-            let currentIndex = 0;
+    const trimmedValue =
+        String(rawValue).trim();
 
-            function tryNextAddress(lastError) {
-                if (
-                    currentIndex >=
-                    ipv4Addresses.length
-                ) {
-                    reject(
-                        lastError ||
-                            new Error(
-                                `Could not connect to any IPv4 SMTP address for ${host}.`
-                            )
-                    );
-                    return;
-                }
+    if (
+        trimmedValue.length >= 2 &&
+        ((trimmedValue.startsWith('"') &&
+            trimmedValue.endsWith('"')) ||
+            (trimmedValue.startsWith("'") &&
+                trimmedValue.endsWith("'")))
+    ) {
+        return trimmedValue.slice(1, -1);
+    }
 
-                const address =
-                    ipv4Addresses[currentIndex];
-
-                currentIndex += 1;
-
-                const socket = secure
-                    ? tls.connect({
-                        host: address,
-                        port,
-                        family: 4,
-                        servername: host
-                    })
-                    : net.connect({
-                        host: address,
-                        port,
-                        family: 4
-                    });
-
-                const timeoutMs = 15000;
-
-                socket.setTimeout(timeoutMs);
-
-                const handleFailure = (error) => {
-                    socket.destroy();
-                    tryNextAddress(error);
-                };
-
-                socket.once(
-                    "error",
-                    handleFailure
-                );
-
-                socket.once("timeout", () => {
-                    handleFailure(
-                        new Error(
-                            `SMTP connection timed out after ${timeoutMs} ms.`
-                        )
-                    );
-                });
-
-                if (secure) {
-                    socket.once(
-                        "secureConnect",
-                        () => {
-                            socket.removeListener(
-                                "error",
-                                handleFailure
-                            );
-                            socket.setTimeout(0);
-                            resolve(socket);
-                        }
-                    );
-                } else {
-                    socket.once("connect", () => {
-                        socket.removeListener(
-                            "error",
-                            handleFailure
-                        );
-                        socket.setTimeout(0);
-                        resolve(socket);
-                    });
-                }
-            }
-
-            tryNextAddress();
-        }
-
-        dns.resolve4(host, (dnsError, addresses) => {
-            if (
-                !dnsError &&
-                Array.isArray(addresses) &&
-                addresses.length > 0
-            ) {
-                connectWithAddresses(addresses);
-                return;
-            }
-
-            dns.lookup(
-                host,
-                {
-                    family: 4,
-                    all: true
-                },
-                (lookupError, records) => {
-                    if (lookupError) {
-                        reject(
-                            dnsError || lookupError
-                        );
-                        return;
-                    }
-
-                    const lookupAddresses =
-                        Array.isArray(records)
-                            ? records.map(
-                                (record) =>
-                                    record.address
-                            )
-                            : [];
-
-                    if (
-                        lookupAddresses.length === 0
-                    ) {
-                        reject(
-                            dnsError ||
-                                new Error(
-                                    `No IPv4 SMTP addresses were found for ${host}.`
-                                )
-                        );
-                        return;
-                    }
-
-                    connectWithAddresses(
-                        lookupAddresses
-                    );
-                }
-            );
-        });
-    });
+    return trimmedValue;
 }
 
-function getSmtpSocket(options, callback) {
-    openSmtpSocket(
-        options.host,
-        Number(options.port),
-        options.secure
-    )
-        .then((connection) =>
-            callback(null, {
-                connection,
-                secured: Boolean(
-                    options.secure
-                )
-            })
-        )
-        .catch((error) => callback(error));
+function getMailProviderPreference() {
+    return (
+        getEnvValue("EMAIL_PROVIDER") ||
+        "auto"
+    ).toLowerCase();
+}
+
+function isGmailHost(host) {
+    return host === "smtp.gmail.com";
+}
+
+function getSmtpAuth() {
+    const user = getEnvValue("SMTP_USER");
+    let pass = getEnvValue("SMTP_PASS");
+    const host = getEnvValue("SMTP_HOST");
+
+    if (isGmailHost(host)) {
+        pass = pass.replace(/\s+/g, "");
+    }
+
+    return {
+        user,
+        pass
+    };
 }
 
 function getTransportOptions(
     overrides = {}
 ) {
+    const host =
+        overrides.host ||
+        getEnvValue("SMTP_HOST");
+    const port =
+        Number(
+            overrides.port ??
+                getEnvValue("SMTP_PORT")
+        ) || 587;
+    const secure =
+        overrides.secure ??
+        (getEnvValue(
+            "SMTP_SECURE"
+        ).toLowerCase() === "true");
+    const auth = getSmtpAuth();
+
     return {
-        host:
-            overrides.host ||
-            process.env.SMTP_HOST,
-        port:
-            Number(
-                overrides.port ??
-                    process.env.SMTP_PORT
-            ) || 587,
-        secure:
-            overrides.secure ??
-            (String(
-                process.env.SMTP_SECURE || ""
-            ).toLowerCase() === "true"),
+        ...(isGmailHost(host)
+            ? {
+                service: "gmail"
+            }
+            : {}),
+        host,
+        port,
+        secure,
         connectionTimeout: 15000,
         greetingTimeout: 15000,
         socketTimeout: 20000,
-        dnsTimeout: 10000,
+        requireTLS: !secure && port === 587,
         tls: {
-            servername:
-                overrides.host ||
-                process.env.SMTP_HOST
+            servername: host,
+            minVersion: "TLSv1.2"
         },
-        getSocket: getSmtpSocket,
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
+        auth
     };
 }
 
 function hasSmtpConfiguration() {
+    const auth = getSmtpAuth();
+
     return Boolean(
-        process.env.SMTP_HOST &&
-        process.env.SMTP_PORT &&
-        process.env.SMTP_USER &&
-        process.env.SMTP_PASS
+        getEnvValue("SMTP_HOST") &&
+        getEnvValue("SMTP_PORT") &&
+        auth.user &&
+        auth.pass
     );
+}
+
+function hasResendConfiguration() {
+    return Boolean(
+        getEnvValue("RESEND_API_KEY") &&
+        getFromAddress()
+    );
+}
+
+function getConfiguredMailProvider() {
+    const preference =
+        getMailProviderPreference();
+
+    if (preference === "resend") {
+        return hasResendConfiguration()
+            ? "resend"
+            : null;
+    }
+
+    if (preference === "smtp") {
+        return hasSmtpConfiguration()
+            ? "smtp"
+            : null;
+    }
+
+    if (hasResendConfiguration()) {
+        return "resend";
+    }
+
+    if (hasSmtpConfiguration()) {
+        return "smtp";
+    }
+
+    return null;
 }
 
 async function getTransporter() {
@@ -224,11 +142,19 @@ async function getTransporter() {
     }
 
     if (!transporterPromise) {
-        transporterPromise = Promise.resolve(
+        const transporter =
             nodemailer.createTransport(
                 getTransportOptions()
-            )
-        );
+            );
+
+        transporterPromise =
+            transporter
+                .verify()
+                .then(() => transporter)
+                .catch((error) => {
+                    transporterPromise = null;
+                    throw error;
+                });
     }
 
     return transporterPromise;
@@ -247,37 +173,57 @@ function isProduction() {
 }
 
 function canSendRealMail() {
-    return hasSmtpConfiguration();
+    return Boolean(
+        getConfiguredMailProvider()
+    );
 }
 
 function getFromAddress() {
     return (
-        process.env.SMTP_FROM ||
-        process.env.SMTP_USER ||
+        getEnvValue("EMAIL_FROM") ||
+        getEnvValue("SMTP_FROM") ||
+        getEnvValue("SMTP_USER") ||
         "no-reply@carcare.local"
     );
+}
+
+function getMailConfigurationErrorMessage(
+    mailType
+) {
+    const preference =
+        getMailProviderPreference();
+
+    if (preference === "resend") {
+        return `Resend is not configured for production ${mailType} delivery.`;
+    }
+
+    if (preference === "smtp") {
+        return `SMTP is not configured for production ${mailType} delivery.`;
+    }
+
+    return `No email provider is configured for production ${mailType} delivery. Add RESEND_API_KEY or SMTP_* variables.`;
 }
 
 function isGmailSmtpFallbackCandidate(
     error
 ) {
     if (
-        process.env.SMTP_HOST !==
+        getEnvValue("SMTP_HOST") !==
         "smtp.gmail.com"
     ) {
         return false;
     }
 
     if (
-        Number(process.env.SMTP_PORT) !==
+        Number(getEnvValue("SMTP_PORT")) !==
         587
     ) {
         return false;
     }
 
     if (
-        String(
-            process.env.SMTP_SECURE || ""
+        getEnvValue(
+            "SMTP_SECURE"
         ).toLowerCase() === "true"
     ) {
         return false;
@@ -330,10 +276,83 @@ async function sendMailWithFallback(
                 secure: true
             });
 
+        await fallbackTransporter.verify();
+
         return fallbackTransporter.sendMail(
             message
         );
     }
+}
+
+async function sendMailWithResend(
+    message
+) {
+    const response = await fetch(
+        "https://api.resend.com/emails",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${getEnvValue("RESEND_API_KEY")}`,
+                "Content-Type":
+                    "application/json",
+                "User-Agent":
+                    "CarCare/1.0"
+            },
+            body: JSON.stringify({
+                from: message.from,
+                to: [message.to],
+                subject: message.subject,
+                html: message.html,
+                text: message.text
+            })
+        }
+    );
+
+    const rawBody =
+        await response.text();
+    let payload = null;
+
+    try {
+        payload = rawBody
+            ? JSON.parse(rawBody)
+            : null;
+    } catch (_error) {
+        payload = null;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            payload?.message ||
+                payload?.error ||
+                `Resend API returned ${response.status}.`
+        );
+    }
+
+    return {
+        provider: "resend",
+        id: payload?.id || null
+    };
+}
+
+async function sendMail(message) {
+    const provider =
+        getConfiguredMailProvider();
+
+    if (provider === "resend") {
+        return sendMailWithResend(
+            message
+        );
+    }
+
+    if (provider === "smtp") {
+        return sendMailWithFallback(
+            message
+        );
+    }
+
+    throw new Error(
+        "No configured email provider is available."
+    );
 }
 
 async function sendPasswordResetCode({
@@ -369,7 +388,9 @@ async function sendPasswordResetCode({
         if (!canSendRealMail()) {
             if (isProduction()) {
                 throw new Error(
-                    "SMTP is not configured for production password reset delivery."
+                    getMailConfigurationErrorMessage(
+                        "password reset"
+                    )
                 );
             }
 
@@ -384,14 +405,18 @@ async function sendPasswordResetCode({
             };
         }
 
-        await sendMailWithFallback(
-            message
-        );
+        const deliveryResult =
+            await sendMail(message);
 
         return {
             delivered: true,
             fallback: false,
-            mode: "smtp"
+            mode:
+                getConfiguredMailProvider() ||
+                "unknown",
+            provider:
+                deliveryResult?.provider ||
+                getConfiguredMailProvider()
         };
     } catch (error) {
         if (isProduction()) {
@@ -539,7 +564,9 @@ async function sendReminderDigestEmail({
     if (!canSendRealMail()) {
         if (isProduction()) {
             throw new Error(
-                "SMTP is not configured for production reminder delivery."
+                getMailConfigurationErrorMessage(
+                    "reminder"
+                )
             );
         }
 
@@ -554,12 +581,18 @@ async function sendReminderDigestEmail({
         };
     }
 
-    await sendMailWithFallback(message);
+    const deliveryResult =
+        await sendMail(message);
 
     return {
         delivered: true,
         fallback: false,
-        mode: "smtp"
+        mode:
+            getConfiguredMailProvider() ||
+            "unknown",
+        provider:
+            deliveryResult?.provider ||
+            getConfiguredMailProvider()
     };
 }
 
@@ -568,7 +601,11 @@ function getLastSentMail() {
 }
 
 module.exports = {
+    canSendRealMail,
+    getConfiguredMailProvider,
+    getSmtpAuth,
     hasSmtpConfiguration,
+    hasResendConfiguration,
     sendPasswordResetCode,
     sendReminderDigestEmail,
     getLastSentMail
