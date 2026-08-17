@@ -98,6 +98,38 @@ function isMissingDataQuestion(question) {
     ]);
 }
 
+function isFollowUpQuestion(question) {
+    return matchesAnyKeyword(question, [
+        "this car",
+        "that car",
+        "this vehicle",
+        "that vehicle",
+        "it",
+        "its",
+        "bunda",
+        "bunu",
+        "bu arac",
+        "bu araba",
+        "onda",
+        "onun",
+        "ona gore",
+        "devam"
+    ]);
+}
+
+function mentionsWholeGarage(question) {
+    return matchesAnyKeyword(question, [
+        "all vehicles",
+        "whole garage",
+        "entire garage",
+        "tum arac",
+        "tum araba",
+        "genel",
+        "hepsi",
+        "garage"
+    ]);
+}
+
 function getVehicleSearchTerms(vehicle) {
     const terms = [];
 
@@ -112,6 +144,19 @@ function getVehicleSearchTerms(vehicle) {
     });
 
     return Array.from(new Set(terms));
+}
+
+function getVehicleMatchScore(
+    question,
+    vehicle
+) {
+    return getVehicleSearchTerms(vehicle).reduce(
+        (score, term) =>
+            question.includes(term)
+                ? score + Math.max(term.length, 1)
+                : score,
+        0
+    );
 }
 
 function isLikelyTurkishQuestion(
@@ -197,9 +242,58 @@ function getRiskiestVehicle(
         )[0] || null;
 }
 
+function findVehicleFromRecentConversations({
+    vehicles,
+    recentConversations
+}) {
+    if (
+        !Array.isArray(recentConversations) ||
+        recentConversations.length === 0
+    ) {
+        return null;
+    }
+
+    const recentText = recentConversations
+        .slice(0, 4)
+        .flatMap((conversation) => [
+            conversation?.question,
+            conversation?.reply
+        ])
+        .map((value) =>
+            normalizeQuestion(value)
+        )
+        .join(" ");
+
+    if (!recentText) {
+        return null;
+    }
+
+    return vehicles
+        .map((vehicle) => ({
+            vehicle,
+            score: getVehicleMatchScore(
+                recentText,
+                vehicle
+            )
+        }))
+        .filter(
+            (vehicleMatch) =>
+                vehicleMatch.score > 0
+        )
+        .sort(
+            (
+                firstVehicleMatch,
+                secondVehicleMatch
+            ) =>
+                secondVehicleMatch.score -
+                firstVehicleMatch.score
+        )[0]?.vehicle || null;
+}
+
 function selectRelevantVehicles(
     garageContext,
-    question
+    question,
+    recentConversations = []
 ) {
     const vehicles = Array.isArray(
         garageContext.vehicles
@@ -207,18 +301,59 @@ function selectRelevantVehicles(
         ? garageContext.vehicles
         : [];
 
-    const matchedVehicles = vehicles.filter(
-        (vehicle) =>
-            getVehicleSearchTerms(vehicle).some(
-                (term) =>
-                    term &&
-                    question.includes(term)
-            )
-    );
+    if (
+        vehicles.length <= 1 &&
+        vehicles.length > 0
+    ) {
+        return vehicles;
+    }
 
-    return matchedVehicles.length > 0
-        ? matchedVehicles
-        : vehicles;
+    if (mentionsWholeGarage(question)) {
+        return vehicles;
+    }
+
+    const matchedVehicles = vehicles
+        .map((vehicle) => ({
+            vehicle,
+            score: getVehicleMatchScore(
+                question,
+                vehicle
+            )
+        }))
+        .filter(
+            (vehicleMatch) =>
+                vehicleMatch.score > 0
+        )
+        .sort(
+            (
+                firstVehicleMatch,
+                secondVehicleMatch
+            ) =>
+                secondVehicleMatch.score -
+                firstVehicleMatch.score
+        )
+        .map(
+            (vehicleMatch) =>
+                vehicleMatch.vehicle
+        );
+
+    if (matchedVehicles.length > 0) {
+        return matchedVehicles;
+    }
+
+    if (isFollowUpQuestion(question)) {
+        const historyVehicle =
+            findVehicleFromRecentConversations({
+                vehicles,
+                recentConversations
+            });
+
+        if (historyVehicle) {
+            return [historyVehicle];
+        }
+    }
+
+    return vehicles;
 }
 
 function filterGarageContextToVehicles(
@@ -374,6 +509,9 @@ function createTranslator(lang) {
     const isTurkish = lang === "tr";
 
     return {
+        focusVehicleLead: isTurkish
+            ? "Odaktaki arac"
+            : "Vehicle in focus",
         nowTitle: isTurkish
             ? "Simdi odaklan"
             : "Focus now",
@@ -389,6 +527,9 @@ function createTranslator(lang) {
         dataTitle: isTurkish
             ? "Veri eksigi"
             : "Data gaps",
+        missingDocsTitle: isTurkish
+            ? "Eksik belge tarafi"
+            : "Missing document side",
         riskiestLead: isTurkish
             ? "Su an en riskli arac"
             : "The riskiest vehicle right now is",
@@ -595,6 +736,49 @@ function buildLocalizedCostLines(
     ];
 }
 
+function buildMissingDocumentLines(
+    garageContext,
+    lang
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const isTurkish = lang === "tr";
+
+    return vehicles.map((vehicle) => {
+        if (
+            vehicle.documents.trackedCount ===
+            0
+        ) {
+            return isTurkish
+                ? `${vehicle.name}: hic belge kaydi yok. En az sigorta, muayene ve ruhsatla ilgili temel kayitlari ekle.`
+                : `${vehicle.name}: there are no tracked documents yet. Start with insurance, inspection, and registration-related records.`;
+        }
+
+        if (
+            vehicle.documents.expiredCount > 0
+        ) {
+            return isTurkish
+                ? `${vehicle.name}: eksik taraf daha cok guncellikte; suresi dolmus belge var.`
+                : `${vehicle.name}: the gap is freshness rather than coverage because at least one document is expired.`;
+        }
+
+        if (
+            vehicle.documents.dueSoonCount > 0
+        ) {
+            return isTurkish
+                ? `${vehicle.name}: belge seti var ama yakinda yenileme isteyen kayitlar bulunuyor.`
+                : `${vehicle.name}: document coverage exists, but some records are nearing renewal.`;
+        }
+
+        return isTurkish
+            ? `${vehicle.name}: belirgin belge eksigi gorunmuyor.`
+            : `${vehicle.name}: there is no obvious document gap in the recorded data.`;
+    });
+}
+
 function buildMaintenanceLines(
     garageContext,
     lang
@@ -761,6 +945,467 @@ function buildOverviewLines(
     }
 
     return lines;
+}
+
+function inferQuestionIntent(question) {
+    if (
+        matchesAnyKeyword(question, [
+            "oncelik",
+            "Ã¶ncelik",
+            "first",
+            "priorit",
+            "now",
+            "simdi",
+            "ÅŸimdi"
+        ])
+    ) {
+        return "priority";
+    }
+
+    if (
+        matchesAnyKeyword(question, [
+            "cost",
+            "spend",
+            "budget",
+            "expense",
+            "fuel",
+            "money",
+            "masraf",
+            "maliyet"
+        ])
+    ) {
+        return "cost";
+    }
+
+    if (
+        matchesAnyKeyword(question, [
+            "maint",
+            "service",
+            "oil",
+            "bak",
+            "periy"
+        ])
+    ) {
+        return "maintenance";
+    }
+
+    if (
+        isDocumentQuestion(question) &&
+        isMissingDataQuestion(question)
+    ) {
+        return "missing_documents";
+    }
+
+    if (isDocumentQuestion(question)) {
+        return "documents";
+    }
+
+    if (
+        matchesAnyKeyword(question, [
+            "issue",
+            "problem",
+            "repair",
+            "risk",
+            "ariza",
+            "arÄ±za",
+            "sorun",
+            "tamir"
+        ])
+    ) {
+        return "issues";
+    }
+
+    if (
+        matchesAnyKeyword(question, [
+            "hangi arac",
+            "hangi araÃ§",
+            "which vehicle",
+            "riskiest",
+            "riskli arac",
+            "riskli araÃ§"
+        ])
+    ) {
+        return "riskiest_vehicle";
+    }
+
+    if (
+        matchesAnyKeyword(question, [
+            "plan",
+            "roadmap",
+            "sirala",
+            "siralay",
+            "adim",
+            "step",
+            "what next",
+            "sonra ne"
+        ])
+    ) {
+        return "plan";
+    }
+
+    return "overview";
+}
+
+function buildRelevantHistoryLines({
+    question,
+    recentConversations,
+    lang
+}) {
+    if (!Array.isArray(recentConversations)) {
+        return [];
+    }
+
+    const selectedExamples =
+        selectHelpfulExamples({
+            question,
+            helpfulExamples:
+                recentConversations.map(
+                    (conversation) => ({
+                        question:
+                            conversation.question,
+                        reply: conversation.reply
+                    })
+                )
+        });
+
+    return selectedExamples
+        .slice(0, 2)
+        .map((example) => {
+            const line = example.reply
+                .split("\n")[0]
+                .trim()
+                .slice(0, 220);
+
+            return lang === "tr"
+                ? `Onceki baglam: ${line}`
+                : `Previous context: ${line}`;
+        });
+}
+
+function buildImprovedLocalGarageReply({
+    message,
+    garageContext,
+    helpfulExamples = [],
+    recentConversations = []
+}) {
+    const question =
+        normalizeQuestion(message);
+    const intent =
+        inferQuestionIntent(question);
+    const relevantVehicles =
+        selectRelevantVehicles(
+            garageContext,
+            question,
+            recentConversations
+        );
+    const scopedGarageContext =
+        filterGarageContextToVehicles(
+            garageContext,
+            relevantVehicles
+        );
+    const lang = isLikelyTurkishQuestion(
+        question
+    )
+        ? "tr"
+        : "en";
+    const t = createTranslator(lang);
+    const sections = [];
+    const actionBuckets =
+        buildActionBuckets(
+            scopedGarageContext,
+            lang
+        );
+    const riskiestVehicle =
+        getRiskiestVehicle(
+            scopedGarageContext
+        );
+    const matchedHelpfulExamples =
+        selectHelpfulExamples({
+            question,
+            helpfulExamples
+        });
+    const relevantHistoryLines =
+        buildRelevantHistoryLines({
+            question,
+            recentConversations,
+            lang
+        });
+
+    if (
+        scopedGarageContext.vehicles
+            ?.length === 1
+    ) {
+        sections.push(
+            `${t.focusVehicleLead} ${scopedGarageContext.vehicles[0].name}.`
+        );
+    } else if (riskiestVehicle) {
+        sections.push(
+            `${t.riskiestLead} ${riskiestVehicle.name}.`
+        );
+    }
+
+    if (intent === "priority") {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.length > 0
+                    ? actionBuckets.now
+                    : [t.noUrgentItems]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                actionBuckets.thisMonth
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.laterTitle,
+                actionBuckets.later
+            )
+        );
+    } else if (intent === "cost") {
+        sections.push(
+            prefixSection(
+                t.costTitle,
+                buildLocalizedCostLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (intent === "maintenance") {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.filter(
+                    (line) =>
+                        line.includes("bak") ||
+                        line.includes(
+                            "maintenance"
+                        )
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                buildMaintenanceLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (
+        intent === "missing_documents"
+    ) {
+        sections.push(
+            prefixSection(
+                t.missingDocsTitle,
+                buildMissingDocumentLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.dataTitle,
+                actionBuckets.dataGaps.length > 0
+                    ? actionBuckets.dataGaps
+                    : [
+                        lang === "tr"
+                            ? "Belge tarafinda kayitli belirgin bir eksik gorunmuyor."
+                            : "There is no obvious missing document record in the current data."
+                    ]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                buildDocumentLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (intent === "documents") {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.filter(
+                    (line) =>
+                        line.includes("belge") ||
+                        line.includes(
+                            "document"
+                        )
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                buildDocumentLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (intent === "issues") {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.filter(
+                    (line) =>
+                        line.includes("ariza") ||
+                        line.includes(
+                            "issue"
+                        ) ||
+                        line.includes(
+                            "workshop"
+                        ) ||
+                        line.includes(
+                            "mekanik"
+                        )
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                buildIssueLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+    } else if (
+        intent === "riskiest_vehicle"
+    ) {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.length > 0
+                    ? actionBuckets.now
+                    : [t.noUrgentItems]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                actionBuckets.thisMonth
+            )
+        );
+    } else if (intent === "plan") {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.length > 0
+                    ? actionBuckets.now
+                    : [t.noUrgentItems]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                actionBuckets.thisMonth.length >
+                    0
+                    ? actionBuckets.thisMonth
+                    : buildOverviewLines(
+                        scopedGarageContext,
+                        lang
+                    )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.laterTitle,
+                actionBuckets.later.length > 0
+                    ? actionBuckets.later
+                    : actionBuckets.dataGaps
+            )
+        );
+    } else {
+        sections.push(
+            prefixSection(
+                t.nowTitle,
+                actionBuckets.now.length > 0
+                    ? actionBuckets.now
+                    : [t.noUrgentItems]
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.monthTitle,
+                actionBuckets.thisMonth.length >
+                    0
+                    ? actionBuckets.thisMonth
+                    : buildOverviewLines(
+                        scopedGarageContext,
+                        lang
+                    )
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.costTitle,
+                buildLocalizedCostLines(
+                    scopedGarageContext,
+                    lang
+                ).slice(0, 3)
+            )
+        );
+        sections.push(
+            prefixSection(
+                t.laterTitle,
+                actionBuckets.later
+            )
+        );
+    }
+
+    if (relevantHistoryLines.length > 0) {
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Baglam"
+                    : "Context",
+                relevantHistoryLines
+            )
+        );
+    }
+
+    sections.push(
+        prefixSection(
+            t.dataTitle,
+            actionBuckets.dataGaps
+        )
+    );
+
+    if (matchedHelpfulExamples.length > 0) {
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Daha once ise yarayan cevaplardan not"
+                    : "Useful note from previous helpful replies",
+                matchedHelpfulExamples.map(
+                    (example) =>
+                        example.reply
+                            .split("\n")[0]
+                            .slice(0, 220)
+                )
+            )
+        );
+    }
+
+    const filteredSections =
+        sections.filter(Boolean);
+
+    if (filteredSections.length === 0) {
+        return t.needMoreData;
+    }
+
+    return filteredSections.join("\n\n");
 }
 
 function buildLocalGarageReply({
@@ -1076,14 +1721,16 @@ function buildLocalGarageReply({
 async function requestGarageAiReply({
     message,
     garageContext,
-    helpfulExamples = []
+    helpfulExamples = [],
+    recentConversations = []
 }) {
     if (!hasAiConfiguration()) {
         return {
-            reply: buildLocalGarageReply({
+            reply: buildImprovedLocalGarageReply({
                 message,
                 garageContext,
-                helpfulExamples
+                helpfulExamples,
+                recentConversations
             }),
             model: LOCAL_AI_MODEL
         };
@@ -1135,19 +1782,21 @@ async function requestGarageAiReply({
         return {
             reply:
                 payload?.output_text ||
-                buildLocalGarageReply({
+                buildImprovedLocalGarageReply({
                     message,
                     garageContext,
-                    helpfulExamples
+                    helpfulExamples,
+                    recentConversations
                 }),
             model: payload?.model || null
         };
     } catch (_error) {
         return {
-            reply: buildLocalGarageReply({
+            reply: buildImprovedLocalGarageReply({
                 message,
                 garageContext,
-                helpfulExamples
+                helpfulExamples,
+                recentConversations
             }),
             model: LOCAL_AI_MODEL
         };
@@ -1155,7 +1804,8 @@ async function requestGarageAiReply({
 }
 
 module.exports = {
-    buildLocalGarageReply,
+    buildLocalGarageReply:
+        buildImprovedLocalGarageReply,
     buildGarageAiContext,
     hasAiConfiguration,
     requestGarageAiReply

@@ -922,7 +922,7 @@ runTest(
         );
         assert.match(
             reply,
-            /riskiest vehicle/i
+            /Vehicle in focus/i
         );
     }
 );
@@ -1103,6 +1103,55 @@ runTest(
 );
 
 runTest(
+    "local garage AI uses single vehicle focus instead of fleet risk framing",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 9,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    vehicle_id: 9,
+                    name: "Brake service",
+                    status: "overdue"
+                }],
+                serviceHistory: [],
+                issues: [],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Genel olarak neye oncelik vereyim?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /Odaktaki arac|Vehicle in focus/i
+        );
+        assert.doesNotMatch(
+            reply,
+            /en riskli arac|riskiest vehicle/i
+        );
+    }
+);
+
+runTest(
     "local garage AI can reuse helpful prior reply hints",
     () => {
         const context =
@@ -1154,6 +1203,77 @@ runTest(
 );
 
 runTest(
+    "local garage AI uses prior conversation context for follow-up questions",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 1,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }, {
+                    id: 2,
+                    brand: "BMW",
+                    model: "320i",
+                    nickname: "BMW",
+                    current_mileage: 80000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [{
+                    vehicle_id: 1,
+                    name: "Brake service",
+                    status: "overdue"
+                }, {
+                    vehicle_id: 2,
+                    name: "Oil service",
+                    status: "ok"
+                }],
+                serviceHistory: [],
+                issues: [{
+                    vehicle_id: 1,
+                    issue_title: "ABS light",
+                    risk_level: "red",
+                    status: "open"
+                }],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Bu arabada sonra ne yapayim?",
+                garageContext: context,
+                recentConversations: [{
+                    question:
+                        "BMW icin ne yapmaliyim?",
+                    reply:
+                        "BMW icin yag servisi izlenebilir."
+                }]
+            });
+
+        assert.match(
+            reply,
+            /BMW/i
+        );
+        assert.doesNotMatch(
+            reply,
+            /Astra GSI: acil ariza/i
+        );
+    }
+);
+
+runTest(
     "local garage AI keeps missing document questions on document topic",
     () => {
         const context =
@@ -1198,6 +1318,47 @@ runTest(
         assert.match(
             reply,
             /document|belge/i
+        );
+    }
+);
+
+runTest(
+    "local garage AI explains missing document coverage with concrete document guidance",
+    () => {
+        const context =
+            buildGarageAiContext({
+                vehicles: [{
+                    id: 5,
+                    brand: "Opel",
+                    model: "Astra",
+                    nickname: "Astra GSI",
+                    current_mileage: 120000,
+                    ownership_status: "verified"
+                }],
+                maintenancePlans: [],
+                serviceHistory: [],
+                issues: [],
+                documents: [],
+                expenses: [],
+                fuelEntries: [],
+                costSummary: {
+                    totalFuelCost: 0,
+                    totalExpenseCost: 0,
+                    totalServiceCost: 0,
+                    totalOwnershipCost: 0
+                }
+            });
+
+        const reply =
+            buildLocalGarageReply({
+                message:
+                    "Hangi belgelerim eksik?",
+                garageContext: context
+            });
+
+        assert.match(
+            reply,
+            /sigorta|muayene|registration|inspection/i
         );
     }
 );

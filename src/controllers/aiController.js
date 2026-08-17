@@ -311,6 +311,10 @@ async function chatWithGarageAi(
         );
         const garageContext =
             buildGarageAiContext(garageData);
+        const recentConversations =
+            await getAiConversationHistory(
+                req.session.userId
+            );
         const helpfulExamples =
             await getHelpfulAiExamples(
                 req.session.userId
@@ -335,7 +339,8 @@ async function chatWithGarageAi(
             await requestGarageAiReply({
                 message: question,
                 garageContext,
-                helpfulExamples
+                helpfulExamples,
+                recentConversations
             });
 
         const conversation =
