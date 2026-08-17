@@ -1022,7 +1022,7 @@ runTest(
         const reply =
             buildLocalGarageReply({
                 message:
-                    "Su an neye oncelik vermeliyim?",
+                    "Bakim tarafinda ne durumdayim?",
                 garageContext: context
             });
 
@@ -1033,6 +1033,10 @@ runTest(
         assert.match(
             reply,
             /bakim/i
+        );
+        assert.match(
+            reply,
+            /Bakim bilgisi/i
         );
     }
 );
@@ -1359,6 +1363,10 @@ runTest(
         assert.match(
             reply,
             /sigorta|muayene|registration|inspection/i
+        );
+        assert.match(
+            reply,
+            /Belge bilgisi|Document knowledge/i
         );
     }
 );

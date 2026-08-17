@@ -779,6 +779,111 @@ function buildMissingDocumentLines(
     });
 }
 
+function buildDocumentKnowledgeLines(
+    garageContext,
+    lang
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const isTurkish = lang === "tr";
+    const hasTrackedDocuments =
+        vehicles.some(
+            (vehicle) =>
+                vehicle.documents
+                    .trackedCount > 0
+        );
+
+    if (isTurkish) {
+        const lines = [
+            "Temel belge setinde genelde sigorta, muayene ve ruhsat kayitlari bulunmali."
+        ];
+
+        if (!hasTrackedDocuments) {
+            lines.push(
+                "Sistemde hic belge yoksa once bu uc baslikla baslamak en temiz adim olur."
+            );
+        }
+
+        return lines;
+    }
+
+    const lines = [
+        "A practical baseline usually includes insurance, inspection, and registration records."
+    ];
+
+    if (!hasTrackedDocuments) {
+        lines.push(
+            "If no document is tracked yet, start with those three categories first."
+        );
+    }
+
+    return lines;
+}
+
+function buildMaintenanceKnowledgeLines(
+    garageContext,
+    lang
+) {
+    const vehicles = Array.isArray(
+        garageContext.vehicles
+    )
+        ? garageContext.vehicles
+        : [];
+    const isTurkish = lang === "tr";
+    const hasAnyPlans = vehicles.some(
+        (vehicle) =>
+            vehicle.maintenance.totalPlans > 0
+    );
+    const hasUrgentPressure = vehicles.some(
+        (vehicle) =>
+            vehicle.maintenance
+                .overdueCount > 0 ||
+            vehicle.mechanical
+                .urgentIssueCount > 0
+    );
+
+    if (isTurkish) {
+        const lines = [
+            "Bakim tarafinda en saglam baseline genelde yag servisi, frenler, lastikler ve agir kilometrede triger gibi kalemleri kapsar."
+        ];
+
+        if (!hasAnyPlans) {
+            lines.push(
+                "Plan yoksa once periyodik yag bakimini ve guvenlik kritik kalemleri tanimlamak gerekir."
+            );
+        }
+
+        if (hasUrgentPressure) {
+            lines.push(
+                "Acil ariza veya gecikmis bakim varsa yeni iyilestirme yerine once onlar kapatilmalı."
+            );
+        }
+
+        return lines;
+    }
+
+    const lines = [
+        "A strong maintenance baseline usually covers oil service, brakes, tires, and on higher-mileage cars timing-belt style items."
+    ];
+
+    if (!hasAnyPlans) {
+        lines.push(
+            "If no maintenance plan exists yet, start with periodic oil service and safety-critical items."
+        );
+    }
+
+    if (hasUrgentPressure) {
+        lines.push(
+            "If urgent issues or overdue maintenance exist, clear those before adding optimization work."
+        );
+    }
+
+    return lines;
+}
+
 function buildMaintenanceLines(
     garageContext,
     lang
@@ -1197,6 +1302,17 @@ function buildImprovedLocalGarageReply({
                 )
             )
         );
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Bakim bilgisi"
+                    : "Maintenance knowledge",
+                buildMaintenanceKnowledgeLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else if (
         intent === "missing_documents"
     ) {
@@ -1230,6 +1346,17 @@ function buildImprovedLocalGarageReply({
                 )
             )
         );
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Belge bilgisi"
+                    : "Document knowledge",
+                buildDocumentKnowledgeLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
     } else if (intent === "documents") {
         sections.push(
             prefixSection(
@@ -1247,6 +1374,17 @@ function buildImprovedLocalGarageReply({
             prefixSection(
                 t.monthTitle,
                 buildDocumentLines(
+                    scopedGarageContext,
+                    lang
+                )
+            )
+        );
+        sections.push(
+            prefixSection(
+                lang === "tr"
+                    ? "Belge bilgisi"
+                    : "Document knowledge",
+                buildDocumentKnowledgeLines(
                     scopedGarageContext,
                     lang
                 )
