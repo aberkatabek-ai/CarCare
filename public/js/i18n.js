@@ -7,6 +7,12 @@
         ru: "Русский",
         es: "Español"
     };
+    const localeFlags = {
+        tr: "🇹🇷",
+        en: "🇬🇧",
+        ru: "🇷🇺",
+        es: "🇪🇸"
+    };
     const intlLocaleMap = {
         tr: "tr-TR",
         en: "en-US",
@@ -1855,41 +1861,107 @@
                 z-index: 9999;
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
                 padding: 8px 10px;
                 border-radius: 999px;
                 background: rgba(255, 248, 236, 0.92);
                 border: 1px solid rgba(88, 72, 47, 0.18);
                 box-shadow: 0 10px 28px rgba(33, 28, 18, 0.08);
                 backdrop-filter: blur(8px);
+                overflow: visible;
             }
-            .language-switcher select {
+            .language-switcher-trigger {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 0;
                 border: none;
                 background: transparent;
                 color: #254f46;
                 font: 600 14px/1.2 "Segoe UI", sans-serif;
-                outline: none;
                 cursor: pointer;
             }
-            .language-switcher label {
+            .language-switcher-trigger:focus-visible,
+            .language-switcher-option:focus-visible {
+                outline: 2px solid rgba(37, 79, 70, 0.28);
+                outline-offset: 3px;
+            }
+            .language-switcher-label {
                 color: #5b5546;
                 font: 600 12px/1 "Segoe UI", sans-serif;
                 text-transform: uppercase;
                 letter-spacing: 0.08em;
             }
+            .language-switcher-flag {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                line-height: 1;
+            }
+            .language-switcher-text {
+                color: #254f46;
+                font: 600 14px/1.2 "Segoe UI", sans-serif;
+                white-space: nowrap;
+            }
+            .language-switcher-menu {
+                position: absolute;
+                top: calc(100% + 8px);
+                right: 0;
+                min-width: 170px;
+                display: none;
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px;
+                border-radius: 18px;
+                background: rgba(255, 248, 236, 0.98);
+                border: 1px solid rgba(88, 72, 47, 0.18);
+                box-shadow: 0 18px 34px rgba(33, 28, 18, 0.14);
+            }
+            .language-switcher.open .language-switcher-menu {
+                display: flex;
+            }
+            .language-switcher-option {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                padding: 10px 12px;
+                border: none;
+                border-radius: 14px;
+                background: transparent;
+                color: #254f46;
+                font: 600 14px/1.2 "Segoe UI", sans-serif;
+                text-align: left;
+                cursor: pointer;
+            }
+            .language-switcher-option:hover {
+                background: rgba(37, 79, 70, 0.08);
+            }
+            .language-switcher-option.is-active {
+                background: rgba(37, 79, 70, 0.12);
+            }
             @media (max-width: 768px) {
                 .language-switcher {
-                    top: auto;
-                    right: 12px;
-                    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
                     padding: 7px 9px;
-                    max-width: calc(100vw - 24px);
                 }
-                .language-switcher select {
-                    font-size: 13px;
+                .language-switcher.mobile-inline {
+                    position: static;
+                    top: auto;
+                    right: auto;
+                    bottom: auto;
+                    margin-left: auto;
+                    z-index: 5;
                 }
-                .language-switcher label {
-                    font-size: 11px;
+                .language-switcher.mobile-inline .language-switcher-label,
+                .language-switcher.mobile-inline .language-switcher-text {
+                    display: none;
+                }
+                .language-switcher.mobile-inline .language-switcher-trigger {
+                    gap: 0;
+                }
+                .language-switcher.mobile-inline .language-switcher-menu {
+                    right: 0;
+                    min-width: 148px;
                 }
             }
         `;
@@ -1898,29 +1970,135 @@
         const wrapper = document.createElement("div");
         wrapper.id = "language-switcher";
         wrapper.className = "language-switcher";
+        wrapper.setAttribute("aria-label", "Language switcher");
 
-        const label = document.createElement("label");
-        label.setAttribute("for", "locale-select");
-        label.textContent = "Lang";
+        const trigger = document.createElement("button");
+        trigger.type = "button";
+        trigger.className = "language-switcher-trigger";
+        trigger.setAttribute("aria-haspopup", "true");
+        trigger.setAttribute("aria-expanded", "false");
 
-        const select = document.createElement("select");
-        select.id = "locale-select";
+        const triggerLabel = document.createElement("span");
+        triggerLabel.className = "language-switcher-label";
+        triggerLabel.textContent = "Lang";
+
+        const triggerFlag = document.createElement("span");
+        triggerFlag.className = "language-switcher-flag";
+        triggerFlag.textContent =
+            localeFlags[window.currentLocale] ||
+            localeFlags.en;
+
+        const menu = document.createElement("div");
+        menu.className = "language-switcher-menu";
+        menu.setAttribute("role", "menu");
+
+        function closeMenu() {
+            wrapper.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+        }
+
+        function syncSelectorPlacement() {
+            const isMobile = window.innerWidth <= 720;
+            const headerContent = document.querySelector(
+                ".dashboard-header-content"
+            );
+            const navToggle =
+                headerContent?.querySelector(".nav-toggle");
+
+            wrapper.classList.toggle(
+                "mobile-inline",
+                Boolean(isMobile && headerContent)
+            );
+
+            if (isMobile && headerContent) {
+                if (navToggle) {
+                    headerContent.insertBefore(
+                        wrapper,
+                        navToggle
+                    );
+                } else {
+                    headerContent.appendChild(wrapper);
+                }
+            } else if (
+                wrapper.parentElement !== document.body
+            ) {
+                document.body.appendChild(wrapper);
+            }
+        }
 
         supportedLocales.forEach((locale) => {
-            const option = document.createElement("option");
-            option.value = locale;
-            option.textContent = localeLabels[locale];
-            option.selected = locale === window.currentLocale;
-            select.append(option);
+            const option = document.createElement("button");
+            option.type = "button";
+            option.className = "language-switcher-option";
+            option.setAttribute("role", "menuitem");
+
+            if (locale === window.currentLocale) {
+                option.classList.add("is-active");
+            }
+
+            const optionFlag = document.createElement("span");
+            optionFlag.className = "language-switcher-flag";
+            optionFlag.textContent = localeFlags[locale];
+
+            const optionText = document.createElement("span");
+            optionText.textContent = localeLabels[locale];
+
+            option.append(optionFlag, optionText);
+            option.addEventListener("click", () => {
+                window.localStorage.setItem(
+                    STORAGE_KEY,
+                    locale
+                );
+                window.location.reload();
+            });
+
+            menu.appendChild(option);
         });
 
-        select.addEventListener("change", (event) => {
-            window.localStorage.setItem(STORAGE_KEY, event.target.value);
-            window.location.reload();
+        trigger.append(
+            triggerLabel,
+            triggerFlag
+        );
+
+        trigger.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const isOpen =
+                !wrapper.classList.contains("open");
+
+            wrapper.classList.toggle("open", isOpen);
+            trigger.setAttribute(
+                "aria-expanded",
+                isOpen ? "true" : "false"
+            );
         });
 
-        wrapper.append(label, select);
-        document.body.append(wrapper);
+        window.document.addEventListener(
+            "click",
+            (event) => {
+                if (!wrapper.contains(event.target)) {
+                    closeMenu();
+                }
+            }
+        );
+
+        window.document.addEventListener(
+            "keydown",
+            (event) => {
+                if (event.key === "Escape") {
+                    closeMenu();
+                }
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            syncSelectorPlacement
+        );
+
+        wrapper.append(trigger, menu);
+        document.body.appendChild(wrapper);
+        syncSelectorPlacement();
+        window.setTimeout(syncSelectorPlacement, 150);
     }
 
     function observeTranslations() {
