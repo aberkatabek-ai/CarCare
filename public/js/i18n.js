@@ -1881,7 +1881,7 @@
                 .language-switcher {
                     top: auto;
                     right: 12px;
-                    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+                    bottom: calc(env(safe-area-inset-bottom, 0px) + 48px);
                     padding: 7px 9px;
                     max-width: calc(100vw - 24px);
                 }
