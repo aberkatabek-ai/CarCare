@@ -114,6 +114,15 @@
     gap: 0 18px;
 }
 
+.maintenance-form .form-group {
+    min-width: 0;
+}
+
+.maintenance-form input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .form-group select,
 .filter-control select {
     width: 100%;

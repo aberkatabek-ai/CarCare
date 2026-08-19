@@ -220,6 +220,11 @@
     min-width: 0;
 }
 
+.document-form input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .document-form label,
 .document-filters label {
     display: block;

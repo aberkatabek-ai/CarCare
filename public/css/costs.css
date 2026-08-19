@@ -304,6 +304,10 @@
     font-weight: 700;
 }
 
+.cost-panel .form-group {
+    min-width: 0;
+}
+
 .cost-panel input,
 .cost-panel select,
 .cost-panel textarea {
@@ -316,6 +320,11 @@
     border-radius: 12px;
     outline: none;
     font: inherit;
+}
+
+.cost-panel input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .cost-panel input,
