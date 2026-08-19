@@ -1658,7 +1658,8 @@ function renderExpenseIntelligence() {
             "Add fuel, service or expense records to understand the spending mix.";
     } else {
         expenseTopCategory.textContent =
-            topCategory[0];
+            topCategory[0].charAt(0).toUpperCase() +
+            topCategory[0].slice(1);
         expenseTopCategorySummary.textContent =
             `${formatCurrency(topCategory[1])} is your largest tracked cost bucket so far.`;
     }
