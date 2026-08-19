@@ -1,0 +1,1357 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-canvas text-ink antialiased;
+    }
+}
+
+@layer components {
+    .cc-shell {
+        @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    .cc-auth-body {
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(176,151,108,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(31,74,58,0.20),transparent_32%),linear-gradient(135deg,#efe9de,#ddd8cd)] px-5 py-8 sm:px-6;
+    }
+
+    .cc-auth-container {
+        @apply mx-auto flex min-h-screen w-full max-w-xl items-center justify-center;
+    }
+
+    .cc-auth-card {
+        @apply w-full rounded-[28px] border border-white/50 bg-[rgba(252,250,245,0.96)] p-7 shadow-panel backdrop-blur sm:p-10;
+    }
+
+    .cc-brand-lockup {
+        @apply flex items-center gap-3;
+    }
+
+    .cc-auth-heading {
+        @apply mb-7 mt-8;
+    }
+
+    .cc-auth-title {
+        @apply text-3xl font-semibold tracking-[-0.03em] text-ink;
+    }
+
+    .cc-auth-copy {
+        @apply mt-2 text-sm leading-6 text-[#666158];
+    }
+
+    .cc-field {
+        @apply mb-4;
+    }
+
+    .cc-label {
+        @apply mb-2 block text-sm font-semibold text-ink;
+    }
+
+    .cc-input {
+        @apply min-h-12 w-full rounded-xl border border-border bg-[#ebe4d8] px-4 text-ink outline-none transition placeholder:text-[#938b7d] focus:border-accent focus:bg-white;
+    }
+
+    .cc-helper-link {
+        @apply text-sm font-semibold text-[#7d6a44] transition hover:text-accent-strong hover:underline;
+    }
+
+    .cc-divider {
+        @apply my-6 h-px bg-gradient-to-r from-transparent via-border to-transparent;
+    }
+
+    .cc-header-shell {
+        @apply mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8;
+    }
+
+    .cc-nav-row {
+        @apply flex items-center gap-2 rounded-full border border-border bg-[#fff8ec]/90 p-2 shadow-panel backdrop-blur;
+    }
+
+    .cc-nav-link {
+        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#5f594d] transition hover:bg-[#efe4cf] hover:text-accent;
+    }
+
+    .cc-nav-link-active {
+        @apply bg-accent text-white hover:bg-accent-strong hover:text-white;
+    }
+
+    .cc-hero-card {
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,249,241,0.98),rgba(234,226,214,0.95))] p-6 shadow-panel sm:p-8;
+    }
+
+    .cc-kicker {
+        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#6d664f];
+    }
+
+    .cc-stat-card {
+        @apply relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(247,243,237,0.98),rgba(233,226,216,0.92))] p-5 shadow-[0_10px_30px_rgba(32,38,42,0.05)] transition hover:-translate-y-0.5 hover:shadow-panel;
+    }
+
+    .cc-stat-value {
+        @apply relative z-[1] block text-[2rem] font-semibold leading-none tracking-[-0.04em] text-ink;
+    }
+
+    .cc-page-hero {
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,249,241,0.98),rgba(234,226,214,0.95))] p-6 shadow-panel sm:p-8;
+    }
+
+    .cc-page-hero-title {
+        @apply text-[clamp(1.8rem,4vw,2.6rem)] font-semibold tracking-[-0.04em] text-ink;
+    }
+
+    .cc-badge {
+        @apply inline-flex items-center rounded-full border border-border bg-[#fff8ec] px-4 py-2 text-sm font-semibold text-accent shadow-[0_8px_20px_rgba(33,28,18,0.08)];
+    }
+
+    .cc-panel {
+        @apply rounded-[26px] border border-border bg-[rgba(252,250,245,0.96)] p-6 shadow-panel sm:p-7;
+    }
+
+    .cc-panel-heading h2 {
+        @apply text-[1.8rem] font-semibold tracking-[-0.03em] text-ink;
+    }
+
+    .cc-panel-copy {
+        @apply mt-2 text-sm leading-6 text-[#666158];
+    }
+
+    .cc-section-grid {
+        @apply grid gap-5 md:grid-cols-2;
+    }
+
+    .cc-four-grid {
+        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .cc-three-grid {
+        @apply grid gap-4 xl:grid-cols-3;
+    }
+
+    .cc-form-actions {
+        @apply mt-5 flex flex-wrap items-center gap-3;
+    }
+
+    .cc-warning {
+        @apply rounded-2xl border border-[#d9b37f] bg-[#fff5e8] p-4 text-sm leading-6 text-[#7d5b35];
+    }
+
+    .cc-card {
+        @apply rounded-panel border border-border bg-surface shadow-panel;
+    }
+
+    .cc-pill {
+        @apply inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-accent;
+    }
+
+    .cc-button-primary {
+        @apply inline-flex items-center justify-center rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong;
+    }
+
+    .cc-button-secondary {
+        @apply inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-3 text-sm font-semibold text-accent transition hover:bg-sand;
+    }
+
+    .page-heading-card,
+    .document-hero,
+    .cost-hero,
+    .settings-hero {
+        @apply cc-page-hero;
+    }
+
+    .page-heading-card h2,
+    .document-hero h2,
+    .cost-hero h2,
+    .settings-hero h2 {
+        @apply cc-page-hero-title;
+    }
+
+    .page-heading-card .eyebrow,
+    .document-eyebrow,
+    .cost-eyebrow,
+    .settings-hero .eyebrow {
+        @apply cc-kicker;
+    }
+
+    .page-heading-card .status-badge,
+    .document-account-badge,
+    .cost-account-badge,
+    .settings-account-badge {
+        @apply cc-badge;
+    }
+
+    .dashboard-section,
+    .document-panel,
+    .cost-panel,
+    .settings-panel {
+        @apply cc-panel;
+    }
+
+    .section-heading h2,
+    .document-section-heading h2,
+    .cost-section-heading h2,
+    .settings-panel-heading h2 {
+        @apply text-[1.6rem] font-semibold tracking-[-0.03em] text-ink;
+    }
+
+    .section-heading p:not(.eyebrow),
+    .document-section-heading p:not(.document-eyebrow),
+    .cost-section-heading p:not(.cost-eyebrow),
+    .settings-panel-heading p:not(.eyebrow) {
+        @apply cc-panel-copy;
+    }
+
+    .document-statistics,
+    .cost-summary-grid {
+        @apply cc-four-grid;
+    }
+
+    .cost-chart-grid,
+    .settings-grid {
+        @apply cc-three-grid;
+    }
+
+    .maintenance-form-grid,
+    .document-form-grid,
+    .settings-form-grid,
+    .cost-form-grid,
+    .cost-details-grid {
+        @apply cc-section-grid;
+    }
+
+    .document-form-section,
+    .settings-form-span,
+    .cost-full-width {
+        @apply md:col-span-2;
+    }
+
+    .maintenance-form .form-group label,
+    .document-form .form-group label,
+    #fuel-form .form-group label,
+    #expense-form .form-group label,
+    #profile-form .form-group label,
+    #password-form .form-group label,
+    #delete-account-form .form-group label {
+        @apply cc-label;
+    }
+
+    .maintenance-form .form-group input,
+    .maintenance-form .form-group select,
+    .maintenance-form .form-group textarea,
+    .document-form .form-group input,
+    .document-form .form-group select,
+    .document-form .form-group textarea,
+    #fuel-form .form-group input,
+    #fuel-form .form-group select,
+    #fuel-form .form-group textarea,
+    #expense-form .form-group input,
+    #expense-form .form-group select,
+    #expense-form .form-group textarea,
+    #profile-form .form-group input,
+    #password-form .form-group input,
+    #delete-account-form .form-group input {
+        @apply cc-input;
+    }
+
+    .maintenance-form .form-group,
+    .document-form .form-group,
+    #fuel-form .form-group,
+    #expense-form .form-group,
+    #profile-form .form-group,
+    #password-form .form-group,
+    #delete-account-form .form-group {
+        @apply cc-field;
+    }
+
+    .maintenance-form button[type="submit"],
+    .document-form button[type="submit"],
+    #fuel-form button[type="submit"],
+    #expense-form button[type="submit"],
+    #profile-form button[type="submit"],
+    #password-form button[type="submit"],
+    #reminder-settings-form button[type="submit"] {
+        @apply cc-button-primary;
+    }
+
+    #delete-account-form button[type="submit"] {
+        @apply rounded-full border border-[#c9877f] bg-[#fff0ee] px-5 py-3 text-sm font-semibold text-[#9f443d] transition hover:bg-[#f9ddda];
+    }
+
+    #no-vehicle-warning,
+    .document-warning,
+    .cost-warning {
+        @apply cc-warning;
+    }
+
+    .settings-form-actions,
+    .cost-panel .form-actions {
+        @apply cc-form-actions;
+    }
+
+    .vehicle-form-actions,
+    .document-form-actions {
+        @apply cc-form-actions;
+    }
+
+    .plans-toolbar,
+    .document-list-heading,
+    .document-section-heading,
+    .cost-history-heading,
+    .cost-list-heading {
+        @apply flex flex-wrap items-end justify-between gap-4;
+    }
+
+    .critical-control,
+    .cost-checkbox,
+    .settings-toggle-card,
+    .settings-danger-card,
+    .settings-danger-confirmation,
+    .issue-checkbox {
+        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4;
+    }
+
+    .critical-control label,
+    .cost-checkbox,
+    .settings-toggle-card,
+    .settings-danger-confirmation,
+    .issue-checkbox {
+        @apply flex cursor-pointer items-start gap-3;
+    }
+
+    .critical-control input,
+    .cost-checkbox input,
+    .settings-danger-confirmation input,
+    .issue-checkbox input {
+        @apply mt-1 h-4 w-4 shrink-0 accent-[rgb(37,79,70)];
+    }
+
+    .critical-control strong,
+    .cost-checkbox strong,
+    .settings-toggle-card strong,
+    .settings-danger-card strong,
+    .issue-checkbox strong {
+        @apply block text-sm font-semibold text-ink;
+    }
+
+    .critical-control small,
+    .cost-checkbox small,
+    .settings-toggle-card p,
+    .settings-danger-card p,
+    .settings-danger-confirmation span,
+    .issue-checkbox small {
+        @apply mt-1 block text-sm leading-6 text-[#666158];
+    }
+
+    .document-stat-card,
+    .cost-summary-card {
+        @apply cc-stat-card;
+    }
+
+    .document-stat-card strong,
+    .cost-summary-card strong {
+        @apply cc-stat-value;
+    }
+
+    .document-stat-card span,
+    .cost-summary-card span,
+    .cost-list-heading span,
+    .document-file-help,
+    .optional-text {
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .document-file-help {
+        @apply mt-2 block;
+    }
+
+    .document-autofill-button,
+    #cancel-document-edit,
+    .buyer-package-back-link {
+        @apply cc-button-secondary;
+    }
+
+    .document-filters {
+        @apply grid gap-4 sm:grid-cols-2;
+    }
+
+    .document-filters .form-group,
+    .cost-history-heading .form-group,
+    .plans-toolbar .filter-control {
+        @apply min-w-0;
+    }
+
+    .document-filters .form-group label,
+    .cost-history-heading .form-group label,
+    .plans-toolbar .filter-control label {
+        @apply cc-label;
+    }
+
+    .document-filters .form-group select,
+    .cost-history-heading .form-group select,
+    .plans-toolbar .filter-control select {
+        @apply cc-input;
+    }
+
+    .input-suffix {
+        @apply relative;
+    }
+
+    .input-suffix input {
+        @apply pr-20;
+    }
+
+    .input-suffix span {
+        @apply pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#6f6a5f];
+    }
+
+    .fuel-price-preview,
+    .loading-state,
+    .document-loading-state,
+    .cost-loading-state {
+        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4 text-sm leading-6 text-[#666158];
+    }
+
+    .cost-history-grid {
+        @apply grid gap-5 xl:grid-cols-2;
+    }
+
+    .cost-entry-list,
+    #maintenance-list,
+    #document-list,
+    #passport-list {
+        @apply grid gap-4;
+    }
+
+    .settings-toggle-card {
+        @apply items-center justify-between gap-6;
+    }
+
+    .settings-switch {
+        @apply relative inline-flex h-7 w-14 shrink-0 items-center;
+    }
+
+    .settings-switch input {
+        @apply sr-only;
+    }
+
+    .settings-switch-slider {
+        @apply relative h-7 w-14 rounded-full border border-border bg-[#e7dcc8] transition;
+    }
+
+    .settings-switch-slider::after {
+        content: "";
+        @apply absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition;
+    }
+
+    .settings-switch input:checked + .settings-switch-slider {
+        @apply border-[rgb(37,79,70)] bg-[rgb(37,79,70)];
+    }
+
+    .settings-switch input:checked + .settings-switch-slider::after {
+        transform: translateX(28px);
+    }
+
+    .settings-panel-danger {
+        @apply border-[#d9b1ac] bg-[#fff8f7];
+    }
+
+    .settings-danger-card,
+    .settings-danger-confirmation {
+        @apply border-[#e5c4c0] bg-[#fff3f1];
+    }
+
+    .settings-form-grid .input-hint {
+        @apply mt-2 text-xs leading-5 text-[#666158];
+    }
+
+    .health-hero,
+    .buyer-package-hero,
+    .share-hero {
+        @apply cc-page-hero;
+    }
+
+    .health-hero h1,
+    .buyer-package-hero h1,
+    .share-hero h1 {
+        @apply text-[clamp(1.9rem,4vw,2.7rem)] font-semibold tracking-[-0.04em] text-ink;
+    }
+
+    .health-eyebrow,
+    .buyer-package-eyebrow,
+    .share-eyebrow {
+        @apply cc-kicker;
+    }
+
+    .health-owner,
+    .share-hero-badge {
+        @apply cc-badge;
+    }
+
+    .health-statistics,
+    .share-stat-grid,
+    .buyer-package-stat-grid,
+    .buyer-package-summary-grid,
+    .history-summary-grid {
+        @apply cc-four-grid;
+    }
+
+    .health-stat-card,
+    .share-stat-card,
+    .buyer-package-stat-card,
+    .history-summary-card {
+        @apply cc-stat-card;
+    }
+
+    .health-stat-card strong,
+    .share-stat-card strong,
+    .buyer-package-stat-card strong,
+    .history-summary-card strong {
+        @apply cc-stat-value;
+    }
+
+    .health-section,
+    .buyer-package-panel,
+    .share-panel {
+        @apply cc-panel;
+    }
+
+    .health-section-heading h2,
+    .buyer-package-panel-heading h2,
+    .share-panel-heading h2,
+    .history-toolbar h2 {
+        @apply text-[1.6rem] font-semibold tracking-[-0.03em] text-ink;
+    }
+
+    .health-section-heading p:not(.eyebrow),
+    .buyer-package-section-text,
+    .buyer-package-hero p:not(.buyer-package-eyebrow),
+    .share-hero p:not(.share-eyebrow) {
+        @apply cc-panel-copy;
+    }
+
+    .health-warning,
+    .share-profile-error,
+    .buyer-package-error {
+        @apply cc-warning;
+    }
+
+    .health-container,
+    .settings-container,
+    .cost-container,
+    .document-container,
+    .share-profile-container,
+    .buyer-package-container,
+    .vehicle-page-container {
+        @apply cc-shell py-6 sm:py-8;
+    }
+
+    .issue-form-grid,
+    .share-grid,
+    .buyer-package-grid,
+    .buyer-package-meta,
+    .buyer-package-record-grid,
+    .share-detail-grid {
+        @apply cc-section-grid;
+    }
+
+    .issue-form .form-group,
+    .health-filters .form-group {
+        @apply cc-field;
+    }
+
+    .issue-form .form-group label,
+    .health-filters label,
+    .filter-control label {
+        @apply cc-label;
+    }
+
+    .issue-form .form-group input,
+    .issue-form .form-group select,
+    .issue-form .form-group textarea,
+    .health-filters select,
+    .filter-control select {
+        @apply cc-input;
+    }
+
+    .issue-form button[type="submit"],
+    .buyer-package-print-button,
+    .page-action-link {
+        @apply cc-button-primary;
+    }
+
+    .buyer-package-actions,
+    .history-toolbar {
+        @apply flex flex-wrap items-center justify-between gap-4;
+    }
+
+    .buyer-package-meta > div,
+    .buyer-package-detail-card,
+    .buyer-package-note-card,
+    .buyer-package-record,
+    .buyer-package-empty-state,
+    .share-readiness-summary,
+    .share-readiness-score {
+        @apply rounded-2xl border border-border bg-[#fff8ec] p-4;
+    }
+
+    .buyer-package-footer {
+        @apply cc-panel mt-5;
+    }
+
+    .share-profile-state,
+    .buyer-package-state,
+    .vehicle-page-state {
+        @apply cc-panel mx-auto max-w-3xl text-center;
+    }
+
+    .share-panel-emphasis,
+    .buyer-package-note-card {
+        @apply bg-[linear-gradient(145deg,rgba(247,243,237,0.98),rgba(233,226,216,0.92))];
+    }
+
+    .share-timeline-list,
+    .share-trust-list,
+    #buyer-package-service-list,
+    #buyer-package-document-list,
+    #buyer-package-issue-list,
+    #buyer-package-fuel-list,
+    #buyer-package-expense-list,
+    #buyer-package-mileage-list {
+        @apply grid gap-4;
+    }
+
+    .history-timeline,
+    .buyer-package-record-list {
+        @apply grid gap-4;
+    }
+
+    .history-summary-card,
+    .health-stat-card,
+    .share-stat-card,
+    .buyer-package-stat-card {
+        @apply bg-[rgba(252,250,245,0.96)] shadow-panel;
+    }
+
+    .health-hero,
+    .share-hero,
+    .buyer-package-hero,
+    .history-heading {
+        @apply relative overflow-hidden;
+    }
+
+    .health-owner,
+    .share-hero-badge {
+        @apply min-w-[210px] border border-white/20 bg-white/10 text-white shadow-none;
+    }
+
+    .health-owner span,
+    .share-hero-badge span {
+        @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8c79d];
+    }
+
+    .health-owner strong,
+    .share-hero-badge strong {
+        @apply mt-2 block text-[1.75rem] font-semibold text-white;
+    }
+
+    .history-heading,
+    .health-hero,
+    .share-hero,
+    .buyer-package-hero {
+        background-image:
+            radial-gradient(
+                circle at top right,
+                rgba(176, 151, 108, 0.28),
+                transparent 34%
+            ),
+            linear-gradient(135deg, #143126, #1f4a3a);
+    }
+
+    .history-heading .eyebrow,
+    .history-heading h2,
+    .history-heading p,
+    .health-hero .health-eyebrow,
+    .health-hero h1,
+    .health-hero p,
+    .share-hero .share-eyebrow,
+    .share-hero h1,
+    .share-hero p,
+    .buyer-package-hero .buyer-package-eyebrow,
+    .buyer-package-hero h1,
+    .buyer-package-hero p {
+        @apply text-white;
+    }
+
+    .health-hero .health-eyebrow,
+    .share-hero .share-eyebrow,
+    .buyer-package-hero .buyer-package-eyebrow,
+    .history-heading .eyebrow {
+        @apply text-[#d8c79d];
+    }
+
+    .health-hero > div:first-child > p:last-child,
+    .share-hero p:not(.share-eyebrow),
+    .buyer-package-hero p:not(.buyer-package-eyebrow),
+    .history-heading p:not(.eyebrow) {
+        @apply text-[#e3ddd1];
+    }
+
+    .history-record-content,
+    .buyer-package-record,
+    .share-detail-card,
+    .share-timeline-item {
+        @apply rounded-2xl border border-border bg-[rgba(252,250,245,0.96)] p-4 shadow-[0_8px_20px_rgba(33,28,18,0.06)];
+    }
+
+    .history-marker {
+        @apply border-4 border-[#d7efe8] bg-[#1f6f66] text-white;
+    }
+
+    .history-date-badge,
+    .buyer-package-record-badge {
+        @apply rounded-full bg-[#d7efe8] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#115e59];
+    }
+
+    .history-detail,
+    .buyer-package-detail-card,
+    .buyer-package-note-card,
+    .buyer-package-empty-state,
+    .share-readiness-summary,
+    .share-readiness-score {
+        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+    }
+
+    .history-details,
+    .buyer-package-summary-grid,
+    .share-detail-grid {
+        @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .buyer-package-summary-grid {
+        @apply xl:grid-cols-2;
+    }
+
+    .share-grid,
+    .buyer-package-grid {
+        @apply xl:grid-cols-2;
+    }
+
+    .share-readiness-row {
+        @apply grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)] lg:items-center;
+    }
+
+    .share-detail-card span,
+    .share-timeline-item span,
+    .buyer-package-detail-card span,
+    .buyer-package-meta span,
+    .history-detail-label,
+    .summary-label {
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .share-detail-card strong,
+    .share-timeline-item strong,
+    .buyer-package-detail-card strong,
+    .buyer-package-meta strong,
+    .history-detail strong {
+        @apply mt-1 block text-sm font-semibold text-ink;
+    }
+
+    .health-section,
+    .share-panel,
+    .buyer-package-panel,
+    .buyer-package-footer {
+        @apply backdrop-blur-sm;
+    }
+
+    .settings-body,
+    .share-profile-body,
+    .buyer-package-body,
+    .vehicle-passport-body {
+        background:
+            radial-gradient(
+                circle at top left,
+                rgba(198, 145, 63, 0.18),
+                transparent 28%
+            ),
+            linear-gradient(180deg, #e9e3d7 0%, #ddd8cd 42%);
+    }
+
+    .error-state {
+        @apply cc-panel mx-auto my-12 max-w-2xl text-center;
+    }
+
+    .state-icon {
+        @apply mx-auto grid h-[54px] w-[54px] place-items-center rounded-full bg-[#f7e6e1] text-2xl font-bold text-[#9f443d];
+    }
+
+    .passport-toolbar {
+        @apply mb-4 grid items-center gap-4 xl:grid-cols-[auto_1fr_auto];
+    }
+
+    .toolbar-back-link {
+        @apply cc-helper-link mb-0 inline-flex items-center;
+    }
+
+    .passport-ready-badge,
+    .vehicle-count-pill {
+        @apply inline-flex items-center justify-center rounded-full border border-[#b8d3c6] bg-[#ddebe2] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#2f6c53];
+    }
+
+    .passport-export-button {
+        @apply cc-button-secondary min-h-[43px] px-5;
+    }
+
+    .passport-print-button {
+        @apply cc-button-primary min-h-[43px] px-5;
+    }
+
+    .vehicle-hero {
+        @apply cc-page-hero relative flex flex-col gap-6 overflow-hidden lg:flex-row lg:items-center lg:justify-between;
+        background-image:
+            radial-gradient(
+                circle at top right,
+                rgba(176, 151, 108, 0.4),
+                transparent 34%
+            ),
+            linear-gradient(135deg, #143126, #1f4a3a);
+    }
+
+    .vehicle-hero-eyebrow {
+        @apply cc-kicker text-[#d8c79d];
+    }
+
+    .vehicle-hero h1 {
+        @apply text-[clamp(2.1rem,5vw,3.4rem)] font-semibold tracking-[-0.04em] text-white;
+    }
+
+    .vehicle-hero-content > p:not(.vehicle-hero-eyebrow) {
+        @apply mt-3 text-base leading-7 text-[#dbe4d8];
+    }
+
+    .vehicle-identity {
+        @apply mt-6 flex flex-wrap gap-2.5;
+    }
+
+    .vehicle-identity span {
+        @apply rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold text-[#f3eadc];
+    }
+
+    .hero-mileage {
+        @apply min-w-[270px] rounded-[20px] border border-white/20 bg-white/10 p-6 text-white backdrop-blur;
+    }
+
+    .hero-mileage span {
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#d8c79d];
+    }
+
+    .hero-mileage strong {
+        @apply my-2 block text-3xl font-semibold tracking-[-0.03em] text-white;
+    }
+
+    .hero-mileage small {
+        @apply text-sm leading-6 text-[#ddd6ca];
+    }
+
+    .passport-meta-bar {
+        @apply mt-4 grid overflow-hidden rounded-2xl border border-border bg-[rgba(252,250,245,0.96)] shadow-[0_8px_20px_rgba(33,28,18,0.06)] md:grid-cols-3;
+    }
+
+    .passport-meta-bar > div {
+        @apply min-w-0 p-4;
+    }
+
+    .passport-meta-bar > div + div {
+        @apply border-t border-border md:border-l md:border-t-0;
+    }
+
+    .passport-meta-bar span {
+        @apply mb-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .passport-meta-bar strong {
+        @apply block overflow-hidden text-sm font-semibold text-ink;
+    }
+
+    .vehicle-insights-section,
+    .vehicle-detail-section,
+    .vehicle-priority-panel {
+        @apply cc-panel;
+    }
+
+    .vehicle-section-heading {
+        @apply mb-5 flex flex-wrap items-start justify-between gap-4;
+    }
+
+    .vehicle-section-heading h2 {
+        @apply text-[1.6rem] font-semibold tracking-[-0.03em] text-ink;
+    }
+
+    .vehicle-signal-grid,
+    .forecast-summary-grid,
+    .vehicle-summary-grid {
+        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .vehicle-signal-card,
+    .forecast-card,
+    .vehicle-summary-card {
+        @apply rounded-2xl border border-border bg-[rgba(252,250,245,0.96)] p-4 shadow-[0_8px_20px_rgba(33,28,18,0.06)];
+    }
+
+    .signal-label,
+    .vehicle-summary-card .summary-label,
+    .forecast-card span {
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .signal-score-row {
+        @apply mt-3 flex items-center gap-3;
+    }
+
+    .signal-score {
+        @apply text-4xl font-semibold tracking-[-0.04em] text-ink;
+    }
+
+    .signal-tone {
+        @apply rounded-full bg-[#efe4cf] px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-accent;
+    }
+
+    .vehicle-signal-card p,
+    .forecast-card p,
+    .vehicle-summary-card p,
+    .muted-text {
+        @apply mt-3 text-sm leading-6 text-[#666158];
+    }
+
+    .priority-list,
+    #mileage-history-list,
+    #vehicle-maintenance-list {
+        @apply grid gap-4;
+    }
+
+    #ownership-verification-form .form-group {
+        @apply cc-field;
+    }
+
+    #ownership-verification-form .form-group label {
+        @apply cc-label;
+    }
+
+    #ownership-verification-form .form-group input {
+        @apply cc-input;
+    }
+
+    #ownership-verification-form button[type="submit"] {
+        @apply cc-button-primary;
+    }
+
+    .priority-item,
+    .issue-card,
+    .mileage-timeline-item,
+    .service-record-card,
+    .document-record-card,
+    .health-record-card {
+        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4 shadow-[0_8px_20px_rgba(33,28,18,0.05)];
+    }
+
+    .priority-item {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .priority-item-content span,
+    .issue-category,
+    .mileage-timeline-item span,
+    .service-record-card span,
+    .document-record-card span,
+    .health-record-card span {
+        @apply mb-1 block text-[11px] font-bold uppercase tracking-[0.08em] text-accent;
+    }
+
+    .priority-item-content strong,
+    .issue-card-heading h3,
+    .mileage-timeline-item strong,
+    .service-record-card strong,
+    .document-record-card strong,
+    .health-record-card strong,
+    .buyer-package-record-heading strong {
+        @apply text-sm font-semibold text-ink;
+    }
+
+    .priority-item-content p,
+    .issue-description,
+    .buyer-package-record-note {
+        @apply mt-2 text-sm leading-6 text-[#475569];
+    }
+
+    .priority-badge,
+    .issue-risk-badge {
+        @apply shrink-0 rounded-full px-3 py-2 text-[10px] font-bold uppercase tracking-[0.08em] whitespace-nowrap;
+    }
+
+    .priority-badge.critical,
+    .issue-risk-badge.red {
+        @apply bg-[#f5e7e3] text-[#8f2d28];
+    }
+
+    .priority-badge.warning,
+    .issue-risk-badge.orange {
+        @apply bg-[#efe2c4] text-[#7d6a44];
+    }
+
+    .priority-badge.info,
+    .issue-risk-badge.green {
+        @apply bg-[#ddebe2] text-[#2f6c53];
+    }
+
+    .issue-grid {
+        @apply grid gap-4 xl:grid-cols-2;
+    }
+
+    .issue-card {
+        @apply border-l-[5px];
+    }
+
+    .issue-card.risk-green {
+        @apply border-l-[#2f6c53];
+    }
+
+    .issue-card.risk-orange {
+        @apply border-l-[#8f7a52];
+    }
+
+    .issue-card.risk-red {
+        @apply border-l-[#9f443d];
+    }
+
+    .issue-card-heading {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .issue-card-heading p,
+    .risk-preview small,
+    .occurs-when,
+    .issue-information span {
+        @apply text-xs leading-5 text-[#666158];
+    }
+
+    .issue-information-grid,
+    .buyer-package-record-grid {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .issue-information,
+    .buyer-package-record-grid div {
+        @apply rounded-xl border border-border bg-white p-3;
+    }
+
+    .issue-information strong {
+        @apply text-xs font-semibold capitalize text-ink;
+    }
+
+    .issue-guidance,
+    .occurs-when,
+    .risk-preview {
+        @apply rounded-xl border p-3;
+    }
+
+    .risk-preview-heading {
+        @apply flex items-center gap-2;
+    }
+
+    .risk-dot {
+        @apply h-2.5 w-2.5 rounded-full bg-current;
+    }
+
+    .risk-preview.green,
+    .issue-guidance.green {
+        @apply border-[#b7d8c7] bg-[#edf6f0] text-[#2f6c53];
+    }
+
+    .risk-preview.orange,
+    .issue-guidance.orange {
+        @apply border-[#cfbe94] bg-[#f0e6d0] text-[#7d6a44];
+    }
+
+    .risk-preview.red,
+    .issue-guidance.red {
+        @apply border-[#e0b8b1] bg-[#f5e7e3] text-[#8f2d28];
+    }
+
+    .issue-form-actions {
+        @apply cc-form-actions justify-end;
+    }
+
+    .issue-submit {
+        @apply min-w-[190px] px-6;
+    }
+
+    .health-list-heading,
+    .passport-list-heading {
+        @apply flex flex-wrap items-end justify-between gap-4;
+    }
+
+    .health-filters {
+        @apply flex flex-wrap gap-3;
+    }
+
+    .health-filters select {
+        @apply cc-input min-h-[42px] px-3;
+    }
+
+    .buyer-package-record-heading {
+        @apply flex flex-wrap items-start justify-between gap-3;
+    }
+
+    .buyer-package-record-heading span {
+        @apply text-xs text-[#666158];
+    }
+
+    .buyer-package-footer-note {
+        @apply mt-3 font-semibold text-[#334155];
+    }
+
+    .buyer-package-signature-grid {
+        @apply grid gap-3;
+    }
+
+    .buyer-package-signature-card {
+        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+    }
+
+    .buyer-package-signature-card span {
+        @apply mb-5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .buyer-package-signature-line {
+        @apply h-[42px] border-b-2 border-[#c4b49c];
+    }
+
+    .share-readiness-score {
+        @apply bg-[rgba(31,74,58,0.08)] border-[rgba(31,74,58,0.12)];
+    }
+
+    .share-readiness-score span {
+        @apply text-xs font-bold uppercase tracking-[0.08em] text-[#666158];
+    }
+
+    .share-readiness-score strong {
+        @apply mt-2 block text-[2.1rem] font-semibold tracking-[-0.04em] text-ink;
+    }
+
+    .mileage-timeline,
+    .vehicle-plan-list,
+    .vehicle-service-grid,
+    .passport-record-list,
+    .passport-transaction-list {
+        @apply grid gap-3;
+    }
+
+    .mileage-timeline {
+        @apply relative;
+    }
+
+    .mileage-timeline::before {
+        content: "";
+        @apply absolute bottom-5 left-[18px] top-5 w-0.5 bg-[#d3c3ae];
+    }
+
+    .mileage-record {
+        @apply relative flex items-center gap-3;
+    }
+
+    .mileage-marker {
+        @apply relative z-[1] grid h-[38px] w-[38px] shrink-0 place-items-center rounded-full border-4 border-white bg-accent text-[11px] font-bold text-white;
+    }
+
+    .mileage-record-content,
+    .vehicle-plan-card,
+    .vehicle-service-record,
+    .passport-record-card,
+    .passport-transaction,
+    .document-notes,
+    .document-file-box,
+    .cost-entry-notes,
+    .consumption-box,
+    .issue-note-box,
+    .health-empty-state,
+    .document-empty-state,
+    .cost-empty-state,
+    .vehicle-empty-state {
+        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+    }
+
+    .mileage-record-heading,
+    .vehicle-plan-heading,
+    .vehicle-service-heading,
+    .passport-record-heading,
+    .cost-entry-actions,
+    .document-card-footer,
+    .issue-card-footer {
+        @apply flex flex-wrap items-start justify-between gap-3;
+    }
+
+    .mileage-record-heading strong,
+    .vehicle-plan-heading h3,
+    .vehicle-service-heading h3,
+    .passport-record-heading h3 {
+        @apply text-sm font-semibold text-ink;
+    }
+
+    .mileage-increase,
+    .vehicle-service-cost,
+    .transaction-cost,
+    .section-total {
+        @apply text-xs font-bold text-[#2f6c53];
+    }
+
+    .vehicle-plan-category,
+    .vehicle-service-heading p,
+    .mileage-record-content p,
+    .passport-transaction span,
+    .document-notes span,
+    .document-information span,
+    .cost-detail span,
+    .issue-note-box span,
+    .issue-date {
+        @apply text-xs leading-5 text-[#666158];
+    }
+
+    .vehicle-plan-category {
+        @apply font-bold uppercase tracking-[0.08em] text-accent;
+    }
+
+    .vehicle-information-grid,
+    .document-information-grid {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .vehicle-information-item,
+    .document-information,
+    .cost-detail {
+        @apply rounded-xl border border-border bg-white p-3;
+    }
+
+    .vehicle-information-item span,
+    .vehicle-information-item strong,
+    .document-information strong,
+    .cost-detail strong {
+        @apply block;
+    }
+
+    .vehicle-information-item span,
+    .document-information span,
+    .cost-detail span {
+        @apply mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+    }
+
+    .vehicle-information-item strong,
+    .document-information strong,
+    .cost-detail strong {
+        @apply overflow-hidden text-xs font-semibold text-ink;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .detail-status-overdue {
+        @apply bg-[#f5e7e3] text-[#8f2d28];
+    }
+
+    .detail-status-due-soon {
+        @apply bg-[#efe2c4] text-[#7d6a44];
+    }
+
+    .detail-status-ok {
+        @apply bg-[#ddebe2] text-[#2f6c53];
+    }
+
+    .detail-status-unscheduled {
+        @apply bg-[#e6e0d6] text-[#55606c];
+    }
+
+    .vehicle-detail-status {
+        @apply shrink-0 rounded-full px-3 py-2 text-[10px] font-bold uppercase tracking-[0.08em] whitespace-nowrap;
+    }
+
+    .document-file-link {
+        @apply font-semibold text-accent underline-offset-2 hover:underline;
+    }
+
+    .document-actions,
+    .issue-actions {
+        @apply flex flex-wrap justify-end gap-2;
+    }
+
+    .document-actions button,
+    .document-actions a {
+        @apply cc-button-secondary px-4 py-2 text-sm;
+    }
+
+    .cost-entry-actions {
+        @apply mt-4 border-t border-border pt-4 justify-end;
+    }
+
+    .consumption-box {
+        @apply mt-3 flex flex-col gap-1 bg-white text-[#64748b];
+    }
+
+    .consumption-box.calculated {
+        @apply border-[#b7d8c7] bg-[#edf6f0] text-[#2f6c53];
+    }
+
+    .consumption-box strong {
+        @apply text-[15px] font-semibold text-current;
+    }
+
+    .health-empty-state,
+    .document-empty-state,
+    .cost-empty-state,
+    .vehicle-empty-state {
+        @apply border-dashed text-center;
+    }
+
+    .health-empty-icon,
+    .document-empty-icon,
+    .cost-empty-icon,
+    .vehicle-empty-icon {
+        @apply mx-auto mb-4 grid h-12 w-12 place-items-center rounded-[14px] bg-[#d8d0bf] font-bold text-accent;
+    }
+
+    .health-empty-state h3,
+    .document-empty-state h3 {
+        @apply mb-2 text-lg font-semibold text-ink;
+    }
+
+    .health-empty-state p,
+    .document-empty-state p,
+    .cost-empty-state p,
+    .vehicle-empty-state p {
+        @apply mx-auto max-w-[32rem] text-sm leading-6 text-[#666158];
+    }
+
+    .passport-footer {
+        @apply cc-panel mt-5 flex flex-wrap items-center justify-between gap-6 bg-[#e6ddd1] text-[#55606c];
+    }
+
+    .passport-footer-brand {
+        @apply flex items-center gap-3;
+    }
+
+    .passport-footer-brand > span {
+        @apply grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[11px] bg-accent text-lg font-bold text-white;
+    }
+
+    .passport-footer-brand strong,
+    .passport-footer-brand small {
+        @apply block;
+    }
+
+    .passport-footer-brand strong {
+        @apply text-sm font-semibold text-ink;
+    }
+
+    .passport-footer-brand small {
+        @apply mt-1 text-[10px] text-[#666158];
+    }
+}

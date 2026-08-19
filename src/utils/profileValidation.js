@@ -10,6 +10,22 @@ function normalizeEmail(value) {
         : "";
 }
 
+const commonEmailDomainTypos = new Set([
+    "gmal.com",
+    "gmial.com",
+    "gmail.con",
+    "gmail.co",
+    "gnail.com",
+    "hotnail.com",
+    "hotmai.com",
+    "hotmial.com",
+    "outlok.com",
+    "otulook.com",
+    "yaho.com",
+    "yhoo.com",
+    "icloud.con"
+]);
+
 const blockedNameTerms = [
     "amcik",
     "ananisikim",
@@ -119,6 +135,52 @@ function getPasswordValidationError(
     return null;
 }
 
+function isValidEmailAddress(email) {
+    if (
+        !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i.test(
+            email
+        )
+    ) {
+        return false;
+    }
+
+    const [localPart, domain] = email.split("@");
+
+    if (
+        !localPart ||
+        localPart.length > 64 ||
+        !domain ||
+        domain.length > 253 ||
+        commonEmailDomainTypos.has(domain)
+    ) {
+        return false;
+    }
+
+    const domainLabels = domain.split(".");
+    const topLevelDomain =
+        domainLabels[domainLabels.length - 1];
+
+    if (
+        topLevelDomain.length < 2 ||
+        topLevelDomain.length > 24
+    ) {
+        return false;
+    }
+
+    return domainLabels.every((label) => {
+        if (
+            !label ||
+            label.length > 63 ||
+            label.startsWith("-") ||
+            label.endsWith("-")
+        ) {
+            return false;
+        }
+
+        return /^[a-z0-9-]+$/i.test(label);
+    });
+}
+
 function validateRegistration(data) {
     const fullName = normalizeName(
         data.fullName
@@ -135,7 +197,7 @@ function validateRegistration(data) {
         };
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmailAddress(email)) {
         return {
             error: "Please enter a valid email address."
         };
@@ -199,7 +261,7 @@ function validateProfileUpdate(data) {
         };
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmailAddress(email)) {
         return {
             error: "Please enter a valid email address."
         };
@@ -305,7 +367,7 @@ function validateForgotPasswordRequest(data) {
         };
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmailAddress(email)) {
         return {
             error: "Please enter a valid email address."
         };
@@ -336,7 +398,7 @@ function validatePasswordReset(data) {
         };
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmailAddress(email)) {
         return {
             error: "Please enter a valid email address."
         };
@@ -395,6 +457,7 @@ module.exports = {
     getNameValidationError,
     passwordRequirementsText,
     getPasswordValidationError,
+    isValidEmailAddress,
     normalizeEmail,
     normalizeName,
     validateRegistration,

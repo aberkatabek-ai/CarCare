@@ -15,6 +15,11 @@
         href="/css/style.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="/css/tailwind.css?v=20260819-tailwind1"
+    >
+
     <script
         src="/js/i18n.js?v=20260819-i18n1"
         defer
@@ -31,10 +36,10 @@
     ></script>
 </head>
 
-<body class="auth-body">
-    <main class="auth-container">
-        <section class="auth-card">
-            <div class="brand">
+<body class="auth-body cc-auth-body">
+    <main class="auth-container cc-auth-container">
+        <section class="auth-card cc-auth-card">
+            <div class="brand cc-brand-lockup">
                 <div class="brand-icon">CC</div>
 
                 <div>
@@ -43,19 +48,25 @@
                 </div>
             </div>
 
-            <div class="auth-heading">
-                <h2>Welcome back</h2>
-                <p>Log in to manage your vehicles and maintenance plans.</p>
+            <div class="auth-heading cc-auth-heading">
+                <h2 class="cc-auth-title">Welcome back</h2>
+                <p class="cc-auth-copy">Log in to manage your vehicles and maintenance plans.</p>
             </div>
 
             <form
                 id="login-form"
                 method="post"
             >
-                <div class="form-group">
-                    <label for="email">Email address</label>
+                <div class="form-group cc-field">
+                    <label
+                        class="cc-label"
+                        for="email"
+                    >
+                        Email address
+                    </label>
 
                     <input
+                        class="cc-input"
                         type="email"
                         id="email"
                         name="email"
@@ -64,11 +75,17 @@
                     >
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
+                <div class="form-group cc-field">
+                    <label
+                        class="cc-label"
+                        for="password"
+                    >
+                        Password
+                    </label>
 
-                    <div class="password-input-wrapper">
+                    <div class="password-input-wrapper relative">
                         <input
+                            class="cc-input pr-20"
                             type="password"
                             id="password"
                             name="password"
@@ -78,7 +95,7 @@
 
                         <button
                             type="button"
-                            class="password-toggle"
+                            class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-[#f6efe2] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent"
                             data-password-toggle
                             aria-label="Show password"
                             aria-pressed="false"
@@ -91,7 +108,7 @@
                 <p class="auth-helper-row">
                     <a
                         href="/forgot-password.html"
-                        class="auth-inline-link"
+                        class="auth-inline-link cc-helper-link"
                     >
                         Forgot password?
                     </a>
@@ -105,15 +122,20 @@
 
                 <button
                     type="submit"
-                    class="primary-button"
+                    class="primary-button cc-button-primary mt-3 w-full"
                 >
                     Log in
                 </button>
             </form>
 
-            <p class="auth-switch">
+            <p class="auth-switch mt-6 text-center text-sm text-[#666158]">
                 Do not have an account?
-                <a href="/register.html">Create an account</a>
+                <a
+                    class="font-semibold text-accent hover:text-accent-strong"
+                    href="/register.html"
+                >
+                    Create an account
+                </a>
             </p>
         </section>
     </main>

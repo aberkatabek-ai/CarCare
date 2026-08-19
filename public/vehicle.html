@@ -25,6 +25,11 @@
         href="/css/vehicle.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="/css/tailwind.css?v=20260819-tailwind1"
+    >
+
     <script
         src="/js/i18n.js?v=20260819-i18n1"
         defer
@@ -47,9 +52,9 @@
 </head>
 
 <body class="dashboard-body vehicle-passport-body">
-    <header class="dashboard-header screen-only">
-        <div class="dashboard-header-content">
-            <div class="brand compact">
+    <header class="dashboard-header screen-only border-b border-[rgba(200,190,177,0.65)] bg-[rgba(248,244,235,0.82)] backdrop-blur">
+        <div class="dashboard-header-content cc-header-shell">
+            <div class="brand compact cc-brand-lockup">
                 <div class="brand-icon">CC</div>
 
                 <div>
@@ -58,23 +63,23 @@
                 </div>
             </div>
 
-            <div class="header-actions">
+            <div class="header-actions cc-nav-row">
                 <a
-                    class="nav-link"
+                    class="nav-link cc-nav-link"
                     href="/index.html"
                 >
                     Dashboard
                 </a>
 
                 <a
-                    class="nav-link"
+                    class="nav-link cc-nav-link"
                     href="/maintenance.html"
                 >
                     Maintenance
                 </a>
 
                 <a
-                    class="nav-link"
+                    class="nav-link cc-nav-link"
                     href="/service-history.html"
                 >
                     Service history
@@ -82,7 +87,7 @@
 
                 <button
                     id="logout-button"
-                    class="secondary-button"
+                    class="secondary-button cc-button-secondary"
                     type="button"
                 >
                     Log out

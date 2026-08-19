@@ -30,6 +30,11 @@
         href="/css/dashboard-alerts.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="/css/tailwind.css?v=20260819-tailwind1"
+    >
+
     <script
         src="/js/i18n.js?v=20260819-i18n1"
         defer
@@ -57,9 +62,9 @@
 </head>
 
 <body class="dashboard-body">
-    <header class="dashboard-header">
-        <div class="dashboard-header-content">
-            <div class="brand compact">
+    <header class="dashboard-header border-b border-[rgba(200,190,177,0.65)] bg-[rgba(248,244,235,0.82)] backdrop-blur">
+        <div class="dashboard-header-content cc-header-shell">
+            <div class="brand compact cc-brand-lockup">
                 <div class="brand-icon">CC</div>
 
                 <div>
@@ -68,23 +73,23 @@
                 </div>
             </div>
 
-            <div class="header-actions">
+            <div class="header-actions cc-nav-row">
                 <a
-                    class="nav-link active"
+                    class="nav-link active cc-nav-link cc-nav-link-active"
                     href="/index.html"
                 >
                     Dashboard
                 </a>
 
                 <a
-                    class="nav-link"
+                    class="nav-link cc-nav-link"
                     href="/maintenance.html"
                 >
                     Maintenance
                 </a>
 
                 <a
-                    class="nav-link"
+                    class="nav-link cc-nav-link"
                     href="/settings.html"
                 >
                     Settings
@@ -92,7 +97,7 @@
 
                 <button
                     id="logout-button"
-                    class="secondary-button"
+                    class="secondary-button cc-button-secondary"
                     type="button"
                 >
                     Log out
@@ -102,11 +107,11 @@
     </header>
 
     <main class="dashboard-container">
-        <section class="welcome-card">
+        <section class="welcome-card cc-hero-card">
             <div>
-                <p class="eyebrow">Your dashboard</p>
+                <p class="eyebrow cc-kicker">Your dashboard</p>
 
-                <h2>
+                <h2 class="text-[clamp(2rem,5vw,2.75rem)] font-semibold tracking-[-0.04em] text-ink">
                     Welcome,
                     <span id="user-name">Driver</span>
                 </h2>
@@ -133,7 +138,7 @@
 
             <div class="welcome-actions">
                 <a
-                    class="secondary-button welcome-link-button"
+                    class="secondary-button welcome-link-button cc-button-secondary"
                     href="/documents.html"
                 >
                     Upload documents
@@ -151,8 +156,8 @@
         <section class="dashboard-overview">
             <div class="overview-heading">
                 <div>
-                    <p class="eyebrow">Garage intelligence</p>
-                    <h2>Vehicle overview</h2>
+                    <p class="eyebrow cc-kicker">Garage intelligence</p>
+                    <h2 class="text-[clamp(1.8rem,4vw,2.3rem)] font-semibold tracking-[-0.03em] text-ink">Vehicle overview</h2>
 
                     <p>
                         A live summary of your vehicles,
@@ -169,7 +174,7 @@
             </div>
 
             <div class="statistics-grid">
-                <article class="statistic-card">
+                <article class="statistic-card cc-stat-card">
                     <div class="statistic-card-top">
                         <span class="statistic-icon vehicle-icon">
                             V
@@ -182,7 +187,7 @@
 
                     <strong
                         id="stat-vehicle-count"
-                        class="statistic-value"
+                        class="statistic-value cc-stat-value"
                     >
                         —
                     </strong>
@@ -192,7 +197,7 @@
                     </p>
                 </article>
 
-                <article class="statistic-card">
+                <article class="statistic-card cc-stat-card">
                     <div class="statistic-card-top">
                         <span class="statistic-icon plan-icon">
                             P
@@ -205,7 +210,7 @@
 
                     <strong
                         id="stat-plan-count"
-                        class="statistic-value"
+                        class="statistic-value cc-stat-value"
                     >
                         —
                     </strong>
@@ -215,7 +220,7 @@
                     </p>
                 </article>
 
-                <article class="statistic-card attention-card">
+                <article class="statistic-card attention-card cc-stat-card">
                     <div class="statistic-card-top">
                         <span class="statistic-icon attention-icon">
                             !
@@ -228,7 +233,7 @@
 
                     <strong
                         id="stat-attention-count"
-                        class="statistic-value"
+                        class="statistic-value cc-stat-value"
                     >
                         —
                     </strong>
@@ -238,7 +243,7 @@
                     </p>
                 </article>
 
-                <article class="statistic-card">
+                <article class="statistic-card cc-stat-card">
                     <div class="statistic-card-top">
                         <span class="statistic-icon cost-icon">
                             ₺
@@ -251,7 +256,7 @@
 
                     <strong
                         id="stat-service-cost"
-                        class="statistic-value cost-value"
+                        class="statistic-value cost-value cc-stat-value text-[1.7rem]"
                     >
                         —
                     </strong>

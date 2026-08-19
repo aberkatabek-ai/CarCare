@@ -279,6 +279,22 @@ runTest(
 );
 
 runTest(
+    "registration rejects common mistyped email domains",
+    () => {
+        const result = validateRegistration({
+            fullName: "Berk Acar",
+            email: "berk@gmal.com",
+            password: "StrongPass1!"
+        });
+
+        assert.equal(
+            result.error,
+            "Please enter a valid email address."
+        );
+    }
+);
+
+runTest(
     "profile update rejects inappropriate preferred names",
     () => {
         const result = validateProfileUpdate({
@@ -352,6 +368,21 @@ runTest(
         assert.equal(
             result.value.email,
             "test@example.com"
+        );
+    }
+);
+
+runTest(
+    "forgot password rejects common mistyped email domains",
+    () => {
+        const result =
+            validateForgotPasswordRequest({
+                email: "berk@gmial.com"
+            });
+
+        assert.equal(
+            result.error,
+            "Please enter a valid email address."
         );
     }
 );
