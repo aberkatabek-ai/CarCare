@@ -573,7 +573,7 @@ function clearMessage(element) {
 function formatDate(value) {
     return new Date(value)
         .toLocaleDateString(
-            "en-GB",
+            window.getAppIntlLocale(),
             {
                 day: "2-digit",
                 month: "long",
@@ -585,7 +585,7 @@ function formatDate(value) {
 function formatMileage(value) {
     return (
         `${Number(value).toLocaleString(
-            "en-US"
+            window.getAppIntlLocale()
         )} km`
     );
 }

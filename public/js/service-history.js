@@ -63,7 +63,9 @@ function getRecordVehicleName(record) {
 
 function formatMileage(value) {
     return (
-        `${Number(value).toLocaleString("en-US")} km`
+        `${window.formatAppNumber(value, {
+            maximumFractionDigits: 0
+        })} km`
     );
 }
 
@@ -73,7 +75,7 @@ function formatDate(value) {
     }
 
     return new Date(value).toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "long",
@@ -87,11 +89,7 @@ function formatCost(value) {
         return "Not specified";
     }
 
-    return new Intl.NumberFormat("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
-    }).format(Number(value));
+    return window.formatAppCurrency(value);
 }
 
 function populateVehicleFilter() {

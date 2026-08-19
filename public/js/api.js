@@ -1,5 +1,10 @@
 let refreshPromise = null;
 
+const t = (value) =>
+    typeof window.translateAppText === "function"
+        ? window.translateAppText(value)
+        : value;
+
 function shouldAddJsonHeader(options) {
     return options.body !== undefined;
 }
@@ -18,8 +23,9 @@ function isRefreshableRequest(url) {
 async function parseApiResponse(response) {
     return response.json().catch(() => ({
         success: false,
-        message:
+        message: t(
             "The server returned an invalid response."
+        )
     }));
 }
 
@@ -42,7 +48,9 @@ async function refreshAuthSession() {
                     const error =
                         new Error(
                             data.message ||
-                                "Session refresh failed."
+                                t(
+                                    "Session refresh failed."
+                                )
                         );
 
                     error.status =
@@ -103,7 +111,7 @@ async function apiRequest(
             const error = new Error(
                 data.message ||
                     refreshError.message ||
-                    "Request failed."
+                    t("Request failed.")
             );
 
             error.status = 401;
@@ -116,7 +124,7 @@ async function apiRequest(
     if (!response.ok) {
         const error = new Error(
             data.message ||
-            "Request failed."
+            t("Request failed.")
         );
 
         error.status = response.status;
@@ -155,37 +163,37 @@ function handlePageLoadError(
 const navigationItems = [
     {
         href: "/index.html",
-        label: "Dashboard"
+        label: t("Dashboard")
     },
 
     {
         href: "/maintenance.html",
-        label: "Maintenance"
+        label: t("Maintenance")
     },
 
     {
         href: "/health.html",
-        label: "Health center"
+        label: t("Health center")
     },
 
     {
         href: "/service-history.html",
-        label: "Service history"
+        label: t("Service history")
     },
 
     {
         href: "/documents.html",
-        label: "Documents"
+        label: t("Documents")
     },
 
     {
         href: "/settings.html",
-        label: "Settings"
+        label: t("Settings")
     },
 
     {
         href: "/costs.html",
-        label: "Costs"
+        label: t("Costs")
     }
 ];
 

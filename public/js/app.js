@@ -951,21 +951,14 @@ function getOwnershipBadgeInfo(status) {
 
 function formatMileage(value) {
     return (
-        `${Number(value).toLocaleString(
-            "en-US"
-        )} km`
+        `${window.formatAppNumber(value, {
+            maximumFractionDigits: 0
+        })} km`
     );
 }
 
 function formatCurrency(value) {
-    return new Intl.NumberFormat(
-        "tr-TR",
-        {
-            style: "currency",
-            currency: "TRY",
-            maximumFractionDigits: 2
-        }
-    ).format(Number(value) || 0);
+    return window.formatAppCurrency(value);
 }
 
 function formatDashboardDate(value) {
@@ -975,7 +968,7 @@ function formatDashboardDate(value) {
 
     return new Date(value)
         .toLocaleDateString(
-            "en-GB",
+            window.getAppIntlLocale(),
             {
                 day: "2-digit",
                 month: "short",
@@ -1216,7 +1209,7 @@ function createOverviewEmptyState(
 
 function formatSignalScore(score) {
     return Number(score).toLocaleString(
-        "en-US",
+        window.getAppIntlLocale(),
         {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1

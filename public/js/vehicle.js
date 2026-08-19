@@ -305,22 +305,20 @@ function formatMileage(value) {
     }
 
     return (
-        `${Number(value).toLocaleString("en-US")} km`
+        `${window.formatAppNumber(value, {
+            maximumFractionDigits: 0
+        })} km`
     );
 }
 
 function formatCost(value) {
-    return new Intl.NumberFormat("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+    return window.formatAppCurrency(value);
 }
 
 function formatLiters(value) {
     return (
         `${Number(value || 0).toLocaleString(
-            "en-US",
+            window.getAppIntlLocale(),
             {
                 maximumFractionDigits: 2
             }
@@ -340,7 +338,7 @@ function formatDate(value) {
     }
 
     return date.toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "long",
@@ -351,7 +349,7 @@ function formatDate(value) {
 
 function formatDateTime(value) {
     return new Date(value).toLocaleString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "short",
@@ -610,7 +608,7 @@ function createEmptyState(icon, title, description) {
 
 function formatSignalScore(score) {
     return Number(score).toLocaleString(
-        "en-US",
+        window.getAppIntlLocale(),
         {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1
@@ -2404,7 +2402,7 @@ function formatTimelineDate(value) {
     }
 
     return new Date(value).toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "short",

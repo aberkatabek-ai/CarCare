@@ -71,7 +71,7 @@
 
         return (
             `${Number(value).toLocaleString(
-                "en-US"
+                window.getAppIntlLocale()
             )} km`
         );
     }
@@ -93,7 +93,7 @@
         }
 
         return date.toLocaleDateString(
-            "en-GB",
+            window.getAppIntlLocale(),
             {
                 day: "2-digit",
                 month: "short",

@@ -4,7 +4,9 @@ const {
     chromium
 } = require("playwright-core");
 
-const baseUrl = "http://localhost:3000";
+const baseUrl =
+    process.env.BASE_URL ||
+    "http://localhost:3000";
 const browserCandidates = [
     "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -50,6 +52,7 @@ async function main() {
     });
 
     const context = await browser.newContext({
+        locale: "en-US",
         viewport: {
             width: 1440,
             height: 960
@@ -177,6 +180,51 @@ async function main() {
                 message.includes("paused")
             );
         });
+
+        const localeChecks = [
+            {
+                value: "tr",
+                title: "Ayarlar | CarCare",
+                text: "Profil ve güvenlik ayarları"
+            },
+            {
+                value: "ru",
+                title: "Настройки | CarCare",
+                text: "Настройки профиля и безопасности"
+            },
+            {
+                value: "es",
+                title: "Configuración | CarCare",
+                text: "Configuración de perfil y seguridad"
+            },
+            {
+                value: "en",
+                title: "Settings | CarCare",
+                text: "Profile and security settings"
+            }
+        ];
+
+        for (const localeCheck of localeChecks) {
+            await page.selectOption(
+                "#locale-select",
+                localeCheck.value
+            );
+            await page.waitForLoadState(
+                "networkidle"
+            );
+            await page.waitForFunction(
+                (expectedState) =>
+                    document.title ===
+                        expectedState.title &&
+                    document.body.innerText.includes(
+                        expectedState.text
+                    ) &&
+                    window.localStorage.getItem(
+                        "carcare.locale"
+                    ) === expectedState.value,
+                localeCheck
+            );
+        }
 
         const pageChecks = [
             {

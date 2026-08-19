@@ -294,7 +294,9 @@ function formatMileage(value) {
     }
 
     return (
-        `${Number(value).toLocaleString("en-US")} km`
+        `${window.formatAppNumber(value, {
+            maximumFractionDigits: 0
+        })} km`
     );
 }
 
@@ -303,7 +305,9 @@ function formatDate(value) {
         return "Not scheduled";
     }
 
-    return new Date(value).toLocaleDateString("en-GB");
+    return new Date(value).toLocaleDateString(
+        window.getAppIntlLocale()
+    );
 }
 
 function formatDateForInput(value) {
@@ -321,11 +325,7 @@ function formatCost(value) {
         return "Not specified";
     }
 
-    return new Intl.NumberFormat("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
-    }).format(Number(value));
+    return window.formatAppCurrency(value);
 }
 
 function getStatusInformation(status) {

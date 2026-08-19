@@ -130,7 +130,7 @@ function formatDate(value) {
     }
 
     return new Date(value).toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "long",
@@ -145,7 +145,7 @@ function formatDateTime(value) {
     }
 
     return new Date(value).toLocaleString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "short",
@@ -161,7 +161,9 @@ function formatMileage(value) {
         return "Not recorded";
     }
 
-    return `${Number(value).toLocaleString("en-US")} km`;
+    return `${window.formatAppNumber(value, {
+        maximumFractionDigits: 0
+    })} km`;
 }
 
 function formatCost(value) {
@@ -169,14 +171,7 @@ function formatCost(value) {
         return "Not recorded";
     }
 
-    return new Intl.NumberFormat(
-        "tr-TR",
-        {
-            style: "currency",
-            currency: "TRY",
-            maximumFractionDigits: 2
-        }
-    ).format(Number(value));
+    return window.formatAppCurrency(value);
 }
 
 function formatLiters(value) {
@@ -184,7 +179,7 @@ function formatLiters(value) {
         return "Not recorded";
     }
 
-    return `${Number(value).toLocaleString("en-US", {
+    return `${Number(value).toLocaleString(window.getAppIntlLocale(), {
         maximumFractionDigits: 2
     })} L`;
 }

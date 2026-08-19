@@ -72,7 +72,7 @@ function formatDate(value) {
     }
 
     return new Date(value).toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "short",
@@ -83,16 +83,12 @@ function formatDate(value) {
 
 function formatMileage(value) {
     return `${Number(value || 0).toLocaleString(
-        "en-US"
+        window.getAppIntlLocale()
     )} km`;
 }
 
 function formatCost(value) {
-    return new Intl.NumberFormat("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+    return window.formatAppCurrency(value);
 }
 
 function showError(message) {

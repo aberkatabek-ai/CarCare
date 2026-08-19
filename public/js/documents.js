@@ -268,7 +268,7 @@ function formatDate(value) {
     }
 
     return date.toLocaleDateString(
-        "en-GB",
+        window.getAppIntlLocale(),
         {
             day: "2-digit",
             month: "long",
@@ -681,7 +681,9 @@ function renderPassports() {
                 "Mileage",
                 `${Number(
                     vehicle.current_mileage || 0
-                ).toLocaleString("en-US")} km`
+                ).toLocaleString(
+                    window.getAppIntlLocale()
+                )} km`
             ),
             createInformation(
                 "Nickname",

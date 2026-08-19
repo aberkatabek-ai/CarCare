@@ -83,15 +83,11 @@ function clearMessage(element) {
 }
 
 function formatCurrency(value) {
-    return new Intl.NumberFormat("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+    return window.formatAppCurrency(value);
 }
 
 function formatNumber(value, maximumFractionDigits = 2) {
-    return Number(value).toLocaleString("en-US", {
+    return Number(value).toLocaleString(window.getAppIntlLocale(), {
         maximumFractionDigits
     });
 }
@@ -112,7 +108,7 @@ function formatDate(value) {
     const normalizedValue = String(value).slice(0, 10);
     const date = new Date(`${normalizedValue}T00:00:00`);
 
-    return date.toLocaleDateString("en-GB", {
+    return date.toLocaleDateString(window.getAppIntlLocale(), {
         day: "2-digit",
         month: "short",
         year: "numeric"
@@ -188,7 +184,7 @@ function formatMonthKey(value) {
         `${year}-${month}-01T00:00:00`
     );
 
-    return date.toLocaleDateString("en-GB", {
+    return date.toLocaleDateString(window.getAppIntlLocale(), {
         month: "short",
         year: "2-digit"
     });
