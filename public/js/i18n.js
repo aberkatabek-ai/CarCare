@@ -1879,9 +1879,9 @@
             }
             @media (max-width: 768px) {
                 .language-switcher {
-                    top: calc(env(safe-area-inset-top, 0px) + 84px);
+                    top: auto;
                     right: 12px;
-                    bottom: auto;
+                    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
                     padding: 7px 9px;
                     max-width: calc(100vw - 24px);
                 }
