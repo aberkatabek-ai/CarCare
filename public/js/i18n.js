@@ -13,6 +13,40 @@
         ru: "🇷🇺",
         es: "🇪🇸"
     };
+    const localeFlagSvgs = {
+        tr: `
+            <svg viewBox="0 0 28 20" aria-hidden="true">
+                <rect width="28" height="20" rx="4" fill="#E30A17"></rect>
+                <circle cx="11" cy="10" r="4.6" fill="#fff"></circle>
+                <circle cx="12.3" cy="10" r="3.7" fill="#E30A17"></circle>
+                <path d="M16.9 10l3.3-1.1-2 2.7v-3.2l2 2.7z" fill="#fff"></path>
+            </svg>
+        `,
+        en: `
+            <svg viewBox="0 0 28 20" aria-hidden="true">
+                <rect width="28" height="20" rx="4" fill="#1F4AA8"></rect>
+                <path d="M0 2.3V0h3.2L28 15.3V20h-3.2L0 4.7V2.3zm24.8 0H28v2.4L3.2 20H0v-2.4L24.8 2.3z" fill="#fff"></path>
+                <path d="M0 3.3V1.6L8.6 7H6.1L0 3.3zm28 0V1.6L19.4 7h2.5L28 3.3zM0 18.4v-1.7l8.6-5.4H6.1L0 18.4zm28 0v-1.7l-8.6-5.4h2.5L28 18.4z" fill="#D81E34"></path>
+                <path d="M11.4 0h5.2v20h-5.2zM0 7.4h28v5.2H0z" fill="#fff"></path>
+                <path d="M12.5 0h3v20h-3zM0 8.5h28v3H0z" fill="#D81E34"></path>
+            </svg>
+        `,
+        ru: `
+            <svg viewBox="0 0 28 20" aria-hidden="true">
+                <rect width="28" height="20" rx="4" fill="#fff"></rect>
+                <path d="M0 6.67h28V20H0z" fill="#0C47B7"></path>
+                <path d="M0 13.33h28V20H0z" fill="#D72828"></path>
+            </svg>
+        `,
+        es: `
+            <svg viewBox="0 0 28 20" aria-hidden="true">
+                <rect width="28" height="20" rx="4" fill="#AA151B"></rect>
+                <rect y="5" width="28" height="10" fill="#F1BF00"></rect>
+                <rect x="6" y="7.2" width="2.2" height="5.6" rx="0.6" fill="#AA151B"></rect>
+                <rect x="8.4" y="8.2" width="1.1" height="3.6" rx="0.4" fill="#AA151B"></rect>
+            </svg>
+        `
+    };
     const intlLocaleMap = {
         tr: "tr-TR",
         en: "en-US",
@@ -1895,8 +1929,17 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 18px;
-                line-height: 1;
+                width: 24px;
+                height: 17px;
+                line-height: 0;
+                overflow: hidden;
+                border-radius: 4px;
+                box-shadow: 0 0 0 1px rgba(88, 72, 47, 0.12);
+            }
+            .language-switcher-flag svg {
+                display: block;
+                width: 100%;
+                height: 100%;
             }
             .language-switcher-text {
                 color: #254f46;
@@ -1982,15 +2025,22 @@
         triggerLabel.className = "language-switcher-label";
         triggerLabel.textContent = "Lang";
 
-        const triggerFlag = document.createElement("span");
-        triggerFlag.className = "language-switcher-flag";
-        triggerFlag.textContent =
-            localeFlags[window.currentLocale] ||
-            localeFlags.en;
+        const triggerFlag = createFlagElement(
+            window.currentLocale
+        );
 
         const menu = document.createElement("div");
         menu.className = "language-switcher-menu";
         menu.setAttribute("role", "menu");
+
+        function createFlagElement(locale) {
+            const flag = document.createElement("span");
+            flag.className = "language-switcher-flag";
+            flag.innerHTML =
+                localeFlagSvgs[locale] ||
+                localeFlagSvgs.en;
+            return flag;
+        }
 
         function closeMenu() {
             wrapper.classList.remove("open");
@@ -2036,9 +2086,8 @@
                 option.classList.add("is-active");
             }
 
-            const optionFlag = document.createElement("span");
-            optionFlag.className = "language-switcher-flag";
-            optionFlag.textContent = localeFlags[locale];
+            const optionFlag =
+                createFlagElement(locale);
 
             const optionText = document.createElement("span");
             optionText.textContent = localeLabels[locale];
