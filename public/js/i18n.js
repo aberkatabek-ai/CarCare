@@ -1913,6 +1913,7 @@
                 color: #254f46;
                 font: 600 14px/1.2 "Segoe UI", sans-serif;
                 cursor: pointer;
+                line-height: 1;
             }
             .language-switcher-trigger:focus-visible,
             .language-switcher-option:focus-visible {
@@ -1924,6 +1925,8 @@
                 font: 600 12px/1 "Segoe UI", sans-serif;
                 text-transform: uppercase;
                 letter-spacing: 0.08em;
+                display: inline-flex;
+                align-items: center;
             }
             .language-switcher-flag {
                 display: inline-flex;
@@ -1935,6 +1938,8 @@
                 overflow: hidden;
                 border-radius: 4px;
                 box-shadow: 0 0 0 1px rgba(88, 72, 47, 0.12);
+                flex: 0 0 auto;
+                vertical-align: middle;
             }
             .language-switcher-flag svg {
                 display: block;
