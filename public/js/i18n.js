@@ -1881,7 +1881,7 @@
                 .language-switcher {
                     top: auto;
                     right: 12px;
-                    bottom: 12px;
+                    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
                     padding: 7px 9px;
                 }
                 .language-switcher select {
