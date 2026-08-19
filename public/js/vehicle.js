@@ -6,6 +6,14 @@ const printPassportButton = document.querySelector(
     "#print-passport-button"
 );
 
+function t(text) {
+    if (typeof window.translateAppText === "function") {
+        return window.translateAppText(text);
+    }
+
+    return text;
+}
+
 const exportBuyerPackageButton = document.querySelector(
     "#export-buyer-package-button"
 );
@@ -807,20 +815,20 @@ function renderVehicleHeader() {
     vehicleSubtitle.textContent =
         vehicle.nickname
             ? `${vehicle.brand} ${vehicle.model}`
-            : "Registered vehicle profile";
+            : t("Registered vehicle profile");
 
     vehicleModelYear.textContent =
         vehicle.model_year
-            ? `Model year: ${vehicle.model_year}`
-            : "Model year not specified";
+            ? `${t("Model year:")} ${vehicle.model_year}`
+            : t("Model year not specified");
 
     vehicleLicensePlate.textContent =
         vehicle.license_plate
-            ? `License plate: ${vehicle.license_plate}`
-            : "License plate not specified";
+            ? `${t("License plate:")} ${vehicle.license_plate}`
+            : t("License plate not specified");
 
     vehiclePassportNumber.textContent =
-        `Passport #CC-${String(vehicle.id).padStart(
+        `${t("Passport #")}CC-${String(vehicle.id).padStart(
             6,
             "0"
         )}`;
@@ -831,19 +839,19 @@ function renderVehicleHeader() {
     if (vehicleMileageLabel) {
         vehicleMileageLabel.textContent =
             vehicle.vehicle_status === "sold"
-                ? "Sold mileage"
-                : "Current mileage";
+                ? t("Sold mileage")
+                : t("Current mileage");
     }
 
     if (vehicleMileageNote) {
         vehicleMileageNote.textContent =
             vehicle.vehicle_status === "sold"
-                ? "Mileage at the time this vehicle was marked as sold"
-                : "Odometer reductions are not permitted";
+                ? t("Mileage at the time this vehicle was marked as sold")
+                : t("Odometer reductions are not permitted");
     }
 
     passportOwnerName.textContent =
-        account?.full_name || "CarCare account owner";
+        account?.full_name || t("CarCare account owner");
 
     passportGeneratedAt.textContent =
         formatDateTime(new Date());
@@ -863,8 +871,8 @@ function renderVehicleHeader() {
     if (ownershipDocumentHelp) {
         ownershipDocumentHelp.textContent =
             vehicle.ownership_original_file_name
-                ? `Current registration image: ${vehicle.ownership_original_file_name}`
-                : "No file selected.";
+                ? `${t("Current registration image:")} ${vehicle.ownership_original_file_name}`
+                : t("No file selected.");
     }
 
     renderOwnershipVerificationState();
@@ -2237,7 +2245,7 @@ function printVehiclePassport() {
     const originalTitle = document.title;
 
     document.title =
-        `CarCare Vehicle Passport - ${getVehicleDisplayName()}`;
+        `${t("CarCare Vehicle Passport")} - ${getVehicleDisplayName()}`;
 
     window.print();
 
@@ -2284,7 +2292,7 @@ async function copyVehicleShareLink() {
 
     shareVehicleProfileButton.disabled = true;
     shareVehicleProfileButton.textContent =
-        "Preparing...";
+        t("Preparing...");
 
     try {
         const data = await window.apiRequest(
@@ -2296,15 +2304,15 @@ async function copyVehicleShareLink() {
         );
 
         shareVehicleProfileButton.textContent =
-            "Link copied";
+            t("Link copied");
 
         window.setTimeout(() => {
             shareVehicleProfileButton.textContent =
-                "Copy share link";
+                t("Copy share link");
         }, 1800);
     } catch (error) {
         shareVehicleProfileButton.textContent =
-            "Copy share link";
+            t("Copy share link");
         window.alert(error.message);
     } finally {
         shareVehicleProfileButton.disabled =
@@ -2324,8 +2332,8 @@ if (ownershipDocumentFileInput) {
             if (!selectedFile) {
                 ownershipDocumentHelp.textContent =
                     vehicle?.ownership_original_file_name
-                        ? `Current registration image: ${vehicle.ownership_original_file_name}`
-                        : "No file selected.";
+                        ? `${t("Current registration image:")} ${vehicle.ownership_original_file_name}`
+                        : t("No file selected.");
                 return;
             }
 
@@ -2391,14 +2399,14 @@ if (ownershipDocumentFileInput) {
             };
 
             ownershipDocumentHelp.textContent =
-                `${selectedFile.name} selected`;
+                `${selectedFile.name} ${t("selected")}`;
         }
     );
 }
 
 function formatTimelineDate(value) {
     if (!value) {
-        return "Unknown date";
+        return t("Unknown date");
     }
 
     return new Date(value).toLocaleDateString(
@@ -2426,7 +2434,7 @@ if (ownershipVerificationForm) {
             ownershipVerifyButton.disabled =
                 true;
             ownershipVerifyButton.textContent =
-                "Verifying...";
+                t("Verifying...");
 
             try {
                 const data =
@@ -2463,7 +2471,7 @@ if (ownershipVerificationForm) {
                 ownershipVerifyButton.disabled =
                     false;
                 ownershipVerifyButton.textContent =
-                    "Verify ownership";
+                    t("Verify ownership");
             }
         }
     );

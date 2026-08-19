@@ -102,6 +102,14 @@ const printButton = document.querySelector(
     "#buyer-package-print-button"
 );
 
+function t(text) {
+    if (typeof window.translateAppText === "function") {
+        return window.translateAppText(text);
+    }
+
+    return text;
+}
+
 function hasValue(value) {
     return (
         value !== undefined &&
@@ -126,7 +134,7 @@ function createElement(tag, className, text) {
 
 function formatDate(value) {
     if (!hasValue(value)) {
-        return "Not recorded";
+        return t("Not recorded");
     }
 
     return new Date(value).toLocaleDateString(
@@ -141,7 +149,7 @@ function formatDate(value) {
 
 function formatDateTime(value) {
     if (!hasValue(value)) {
-        return "Not recorded";
+        return t("Not recorded");
     }
 
     return new Date(value).toLocaleString(
@@ -158,7 +166,7 @@ function formatDateTime(value) {
 
 function formatMileage(value) {
     if (!hasValue(value)) {
-        return "Not recorded";
+        return t("Not recorded");
     }
 
     return `${window.formatAppNumber(value, {
@@ -168,7 +176,7 @@ function formatMileage(value) {
 
 function formatCost(value) {
     if (!hasValue(value)) {
-        return "Not recorded";
+        return t("Not recorded");
     }
 
     return window.formatAppCurrency(value);
@@ -186,7 +194,7 @@ function formatLiters(value) {
 
 function formatLabel(value, fallback = "Not specified") {
     if (!hasValue(value)) {
-        return fallback;
+        return t(fallback);
     }
 
     return String(value)
@@ -253,7 +261,7 @@ function createRecordGrid(details) {
 function createRecordList(records, createRecord) {
     if (records.length === 0) {
         return createEmptyState(
-            "No records available."
+            t("No records available.")
         );
     }
 
@@ -315,7 +323,7 @@ function createServiceRecord(record) {
             "buyer-package-record-badge",
             hasValue(record.actual_cost)
                 ? formatCost(record.actual_cost)
-                : "No cost"
+                : t("No cost")
         )
     );
 
@@ -324,15 +332,16 @@ function createServiceRecord(record) {
         createRecordGrid([
             {
                 label: "Mileage",
+                label: t("Mileage"),
                 value: formatMileage(
                     record.completed_at_mileage
                 )
             },
             {
-                label: "Provider",
+                label: t("Provider"),
                 value:
                     record.service_provider ||
-                    "Not specified"
+                    t("Not specified")
             }
         ])
     );
@@ -393,17 +402,18 @@ function createDocumentRecord(record) {
         createRecordGrid([
             {
                 label: "Provider",
+                label: t("Provider"),
                 value:
                     record.provider ||
-                    "Not specified"
+                    t("Not specified")
             },
             {
-                label: "Reminder",
+                label: t("Reminder"),
                 value: hasValue(
                     record.reminder_days
                 )
-                    ? `${record.reminder_days} days before`
-                    : "Not configured"
+                    ? `${record.reminder_days} ${t("days before")}`
+                    : t("Not configured")
             }
         ])
     );
@@ -463,14 +473,14 @@ function createIssueRecord(record) {
         heading,
         createRecordGrid([
             {
-                label: "Category",
+                label: t("Category"),
                 value: formatLabel(
                     record.category,
                     "Other"
                 )
             },
             {
-                label: "Risk",
+                label: t("Risk"),
                 value: formatLabel(
                     record.risk_level,
                     "Unknown"
@@ -494,7 +504,7 @@ function createIssueRecord(record) {
             createElement(
                 "p",
                 "buyer-package-record-note",
-                `Repair note: ${record.resolution_notes}`
+                `${t("Repair note:")} ${record.resolution_notes}`
             )
         );
     }
@@ -519,7 +529,7 @@ function createFuelRecord(record) {
         createElement(
             "strong",
             "",
-            record.station || "Fuel fill-up"
+            record.station || t("Fuel fill-up")
         ),
         createElement(
             "span",
@@ -541,13 +551,13 @@ function createFuelRecord(record) {
         heading,
         createRecordGrid([
             {
-                label: "Mileage",
+                label: t("Mileage"),
                 value: formatMileage(
                     record.odometer_km
                 )
             },
             {
-                label: "Fuel amount",
+                label: t("Fuel amount"),
                 value: formatLiters(
                     record.liters
                 )
@@ -607,17 +617,17 @@ function createExpenseRecord(record) {
         heading,
         createRecordGrid([
             {
-                label: "Type",
+                label: t("Type"),
                 value: formatLabel(
                     record.expense_type,
                     "Expense"
                 )
             },
             {
-                label: "Provider",
+                label: t("Provider"),
                 value:
                     record.provider ||
-                    "Not specified"
+                    t("Not specified")
             }
         ])
     );
@@ -729,19 +739,19 @@ function renderReport(reportPackage, vehicleId) {
         );
 
     document.title =
-        `${vehicleName} Buyer Handoff Report | CarCare`;
+        `${vehicleName} ${t("Buyer Handoff Report")} | CarCare`;
 
     titleElement.textContent = vehicleName;
     subtitleElement.textContent =
         vehicle.nickname
             ? `${vehicle.brand} ${vehicle.model}`
-            : "Buyer-ready vehicle summary";
+            : t("Buyer-ready vehicle summary");
 
     vehicleNameElement.textContent =
         vehicleName;
     plateElement.textContent =
         vehicle.license_plate ||
-        "Not specified";
+        t("Not specified");
     generatedAtElement.textContent =
         formatDateTime(
             reportPackage.exported_at
@@ -771,81 +781,81 @@ function renderReport(reportPackage, vehicleId) {
     summaryGrid.innerHTML = "";
     summaryGrid.append(
         createDetailCard(
-            "Brand",
-            vehicle.brand || "Not specified"
+            t("Brand"),
+            vehicle.brand || t("Not specified")
         ),
         createDetailCard(
-            "Model",
-            vehicle.model || "Not specified"
+            t("Model"),
+            vehicle.model || t("Not specified")
         ),
         createDetailCard(
-            "Model year",
+            t("Model year"),
             vehicle.model_year
                 ? String(vehicle.model_year)
-                : "Not specified"
+                : t("Not specified")
         ),
         createDetailCard(
             vehicle.vehicle_status === "sold"
-                ? "Sold mileage"
-                : "Current mileage",
+                ? t("Sold mileage")
+                : t("Current mileage"),
             formatMileage(
                 vehicle.current_mileage
             )
         ),
         createDetailCard(
-            "First recorded",
+            t("First recorded"),
             formatDate(vehicle.created_at)
         ),
         createDetailCard(
-            "Sold at",
+            t("Sold at"),
             vehicle.sold_at
                 ? formatDate(vehicle.sold_at)
-                : "Not marked as sold"
+                : t("Not marked as sold")
         )
     );
 
     handoverGrid.innerHTML = "";
     handoverGrid.append(
         createDetailCard(
-            "Report ID",
+            t("Report ID"),
             reportReference
         ),
         createDetailCard(
-            "Ownership check",
+            t("Ownership check"),
             formatLabel(
                 vehicle.ownership_status,
                 "Unknown"
             )
         ),
         createDetailCard(
-            "Open issues",
+            t("Open issues"),
             openIssueCount === 0
-                ? "No open issues"
-                : `${openIssueCount} open`
+                ? t("No open issues")
+                : `${openIssueCount} ${t("open")}`
         ),
         createDetailCard(
-            "Latest service",
+            t("Latest service"),
             latestService
                 ? formatDate(
                     latestService.completed_at
                 )
-                : "No service record"
+                : t("No service record")
         ),
         createDetailCard(
-            "Latest mileage update",
+            t("Latest mileage update"),
             latestMileageRecord
                 ? formatDateTime(
                     latestMileageRecord.recorded_at
                 )
-                : "No mileage record"
+                : t("No mileage record")
         ),
         createDetailCard(
-            "Vehicle state",
+            t("Vehicle state"),
             vehicle.vehicle_status === "sold"
-                ? `Sold on ${formatDate(
+                ? `${t("Sold on ")}${formatDate(
                     vehicle.sold_at
                 )}`
-                : "Active in owner account"
+                : t("Active in owner account")
         )
     );
 
@@ -864,9 +874,9 @@ function renderReport(reportPackage, vehicleId) {
             "",
             vehicle.ownership_status ===
                 "verified"
-                ? `Ownership was verified on ${formatDate(vehicle.ownership_verified_at)}.`
+                ? `${t("Ownership was verified on ")}${formatDate(vehicle.ownership_verified_at)}.`
                 : vehicle.ownership_failure_reason ||
-                    "Ownership has not been fully verified in CarCare."
+                    t("Ownership has not been fully verified in CarCare.")
         )
     );
 
@@ -942,7 +952,7 @@ async function loadBuyerPackageReport() {
         vehicleId <= 0
     ) {
         showError(
-            "A valid vehicle ID was not provided."
+            t("A valid vehicle ID was not provided.")
         );
         return;
     }
@@ -968,7 +978,7 @@ async function loadBuyerPackageReport() {
 
         showError(
             error.message ||
-                "The buyer handoff report could not be loaded."
+                t("The buyer handoff report could not be loaded.")
         );
     }
 }
