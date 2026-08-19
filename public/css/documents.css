@@ -221,8 +221,13 @@
 }
 
 .document-form input[type="date"] {
+    display: block;
     min-width: 0;
     max-width: 100%;
+    min-inline-size: 0;
+    inline-size: 100%;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .document-form label,
@@ -674,6 +679,15 @@
     .document-form-grid,
     .document-filters {
         grid-template-columns: 1fr;
+    }
+
+    .document-form-section {
+        grid-template-columns: 1fr;
+    }
+
+    .document-form-section-heading,
+    .document-notes-group {
+        grid-column: auto;
     }
 
     .document-notes-group {

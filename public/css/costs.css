@@ -323,8 +323,13 @@
 }
 
 .cost-panel input[type="date"] {
+    display: block;
     min-width: 0;
     max-width: 100%;
+    min-inline-size: 0;
+    inline-size: 100%;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .cost-panel input,
