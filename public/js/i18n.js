@@ -1879,10 +1879,11 @@
             }
             @media (max-width: 768px) {
                 .language-switcher {
-                    top: auto;
+                    top: calc(env(safe-area-inset-top, 0px) + 84px);
                     right: 12px;
-                    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+                    bottom: auto;
                     padding: 7px 9px;
+                    max-width: calc(100vw - 24px);
                 }
                 .language-switcher select {
                     font-size: 13px;

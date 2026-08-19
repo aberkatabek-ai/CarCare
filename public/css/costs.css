@@ -641,6 +641,15 @@
         flex-direction: column;
     }
 
+    .cost-form-grid,
+    .cost-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cost-full-width {
+        grid-column: auto;
+    }
+
     .cost-list-heading,
     .cost-entry-heading,
     .cost-entry-actions {
@@ -668,14 +677,8 @@
 }
 
 @media (max-width: 520px) {
-    .cost-summary-grid,
-    .cost-form-grid,
-    .cost-details-grid {
+    .cost-summary-grid {
         grid-template-columns: 1fr;
-    }
-
-    .cost-full-width {
-        grid-column: auto;
     }
 
     .cost-entry-heading {
