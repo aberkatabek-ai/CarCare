@@ -1,11 +1,6 @@
 const express = require("express");
 const path = require("path");
 const helmet = require("helmet");
-const session = require("express-session");
-
-const connectPgSimple = require(
-    "connect-pg-simple"
-);
 
 const db = require("./config/db");
 
@@ -66,9 +61,6 @@ const generalApiLimiter = createRateLimiter({
         "Too many requests. Please slow down and try again shortly."
 });
 
-const PgSession =
-    connectPgSimple(session);
-
 if (
     process.env.NODE_ENV ===
     "production"
@@ -96,42 +88,6 @@ app.use(
 );
 
 app.use("/api", generalApiLimiter);
-
-app.use(
-    session({
-        store: new PgSession({
-            pool: db,
-            tableName: "user_sessions",
-            createTableIfMissing: true
-        }),
-
-        name: "carcare.sid",
-
-        secret:
-            process.env.SESSION_SECRET,
-
-        resave: false,
-
-        saveUninitialized: false,
-
-        cookie: {
-            httpOnly: true,
-
-            secure:
-                process.env.NODE_ENV ===
-                "production",
-
-            sameSite: "lax",
-
-            maxAge:
-                7 *
-                24 *
-                60 *
-                60 *
-                1000
-        }
-    })
-);
 
 app.use(
     express.static(

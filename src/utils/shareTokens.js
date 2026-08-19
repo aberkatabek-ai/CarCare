@@ -2,7 +2,8 @@ const crypto = require("crypto");
 
 function getShareSecret() {
     return (
-        process.env.SESSION_SECRET ||
+        process.env.SHARE_TOKEN_SECRET ||
+        process.env.JWT_SECRET ||
         "carcare-local-share-secret"
     );
 }

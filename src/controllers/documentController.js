@@ -489,7 +489,7 @@ async function getDocuments(
                 d.expiry_date ASC,
                 d.created_at DESC`,
             [
-                req.session.userId,
+                req.auth.userId,
                 vehicleId
             ]
         );
@@ -526,7 +526,7 @@ async function getDocumentById(
         const document =
             await findOwnedDocument(
                 documentId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!document) {
@@ -597,7 +597,7 @@ async function createDocument(
                    AND user_id = $2`,
                 [
                     documentData.vehicleId,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -708,7 +708,7 @@ async function createDocument(
         const createdDocument =
             await findOwnedDocument(
                 insertResult.rows[0].id,
-                req.session.userId
+                req.auth.userId
             );
 
         res.status(201).json({
@@ -764,7 +764,7 @@ async function updateDocument(
         const currentDocument =
             await findOwnedDocument(
                 documentId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!currentDocument) {
@@ -882,7 +882,7 @@ async function updateDocument(
                    AND user_id = $2`,
                 [
                     documentData.vehicleId,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -1005,7 +1005,7 @@ async function updateDocument(
         const updatedDocument =
             await findOwnedDocument(
                 documentId,
-                req.session.userId
+                req.auth.userId
             );
 
         res.json({
@@ -1059,7 +1059,7 @@ async function deleteDocument(
         const ownedDocument =
             await findOwnedDocument(
                 documentId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!ownedDocument) {
@@ -1081,7 +1081,7 @@ async function deleteDocument(
              RETURNING d.id`,
             [
                 documentId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1122,7 +1122,7 @@ async function downloadDocumentFile(
         const document =
             await findOwnedDocument(
                 documentId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!document) {
@@ -1248,3 +1248,4 @@ module.exports = {
     downloadDocumentFile,
     extractDocumentDetails
 };
+

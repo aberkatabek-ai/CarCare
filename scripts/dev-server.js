@@ -32,7 +32,9 @@ function loadEnv() {
     delete process.env.PORT;
     delete process.env.NODE_ENV;
     delete process.env.DATABASE_URL;
-    delete process.env.SESSION_SECRET;
+    delete process.env.JWT_SECRET;
+    delete process.env.JWT_REFRESH_SECRET;
+    delete process.env.SHARE_TOKEN_SECRET;
     delete process.env.SMTP_HOST;
     delete process.env.SMTP_PORT;
     delete process.env.SMTP_SECURE;
@@ -62,9 +64,15 @@ async function startServer() {
         );
     }
 
-    if (!process.env.SESSION_SECRET) {
+    if (!process.env.JWT_SECRET) {
         throw new Error(
-            "SESSION_SECRET was not loaded from .env"
+            "JWT_SECRET was not loaded from .env"
+        );
+    }
+
+    if (!process.env.JWT_REFRESH_SECRET) {
+        throw new Error(
+            "JWT_REFRESH_SECRET was not loaded from .env"
         );
     }
 
@@ -94,7 +102,12 @@ async function startServer() {
     }
 
     const app = require("../src/app");
+    const {
+        ensureAuthTables
+    } = require("../src/services/authSessionService");
     const port = process.env.PORT || 3000;
+
+    await ensureAuthTables();
 
     return new Promise((resolve, reject) => {
         const instance = app.listen(

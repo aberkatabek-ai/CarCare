@@ -1,32 +1,117 @@
+let refreshPromise = null;
+
+function shouldAddJsonHeader(options) {
+    return options.body !== undefined;
+}
+
+function isRefreshableRequest(url) {
+    return ![
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/auth/refresh",
+        "/api/auth/logout",
+        "/api/auth/forgot-password",
+        "/api/auth/reset-password"
+    ].includes(url);
+}
+
+async function parseApiResponse(response) {
+    return response.json().catch(() => ({
+        success: false,
+        message:
+            "The server returned an invalid response."
+    }));
+}
+
+async function refreshAuthSession() {
+    if (!refreshPromise) {
+        refreshPromise = fetch(
+            "/api/auth/refresh",
+            {
+                method: "POST",
+                credentials: "same-origin"
+            }
+        )
+            .then(async (response) => {
+                const data =
+                    await parseApiResponse(
+                        response
+                    );
+
+                if (!response.ok) {
+                    const error =
+                        new Error(
+                            data.message ||
+                                "Session refresh failed."
+                        );
+
+                    error.status =
+                        response.status;
+                    throw error;
+                }
+            })
+            .finally(() => {
+                refreshPromise = null;
+            });
+    }
+
+    return refreshPromise;
+}
+
 async function apiRequest(
     url,
     options = {}
 ) {
-    const response = await fetch(
-        url,
-        {
-            ...options,
+    const {
+        retryOnUnauthorized = true,
+        headers,
+        ...fetchOptions
+    } = options;
 
-            credentials:
-                "same-origin",
-
-            headers: {
+    const requestHeaders = {
+        ...(shouldAddJsonHeader(options)
+            ? {
                 "Content-Type":
-                    "application/json",
-
-                ...(options.headers || {})
+                    "application/json"
             }
+            : {}),
+        ...(headers || {})
+    };
+
+    const response = await fetch(url, {
+        ...fetchOptions,
+        credentials: "same-origin",
+        headers: requestHeaders
+    });
+
+    const data =
+        await parseApiResponse(response);
+
+    if (
+        response.status === 401 &&
+        retryOnUnauthorized &&
+        isRefreshableRequest(url)
+    ) {
+        try {
+            await refreshAuthSession();
+
+            return apiRequest(url, {
+                ...options,
+                retryOnUnauthorized: false
+            });
+        } catch (refreshError) {
+            const error = new Error(
+                data.message ||
+                    refreshError.message ||
+                    "Request failed."
+            );
+
+            error.status = 401;
+            error.payload = data;
+
+            throw error;
         }
-    );
-
-    const data = await response
-        .json()
-        .catch(() => ({
-            success: false,
-
-            message:
-                "The server returned an invalid response."
-        }));
+    }
 
     if (!response.ok) {
         const error = new Error(

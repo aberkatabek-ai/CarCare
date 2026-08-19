@@ -8,8 +8,14 @@ if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL was not loaded from .env");
 }
 
-if (!process.env.SESSION_SECRET) {
-    throw new Error("SESSION_SECRET was not loaded from .env");
+if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET was not loaded from .env");
+}
+
+if (!process.env.JWT_REFRESH_SECRET) {
+    throw new Error(
+        "JWT_REFRESH_SECRET was not loaded from .env"
+    );
 }
 
 if (
@@ -41,10 +47,23 @@ const app = require("./src/app");
 const {
     scheduleReminderLoop
 } = require("./src/services/reminderService");
+const {
+    ensureAuthTables
+} = require("./src/services/authSessionService");
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`CarCare server is running at http://localhost:${PORT}`);
-    scheduleReminderLoop();
+(async () => {
+    await ensureAuthTables();
+
+    app.listen(PORT, () => {
+        console.log(`CarCare server is running at http://localhost:${PORT}`);
+        scheduleReminderLoop();
+    });
+})().catch((error) => {
+    console.error(
+        "Server bootstrap failed:",
+        error
+    );
+    process.exit(1);
 });

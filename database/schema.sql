@@ -4,6 +4,9 @@ ADD COLUMN IF NOT EXISTS preferred_name VARCHAR(60);
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS reminders_enabled BOOLEAN NOT NULL DEFAULT TRUE;
 
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS auth_token_version INTEGER NOT NULL DEFAULT 0;
+
 ALTER TABLE vehicle_documents
 ADD COLUMN IF NOT EXISTS stored_file_name TEXT;
 
@@ -29,6 +32,23 @@ CREATE TABLE IF NOT EXISTS password_reset_codes (
 CREATE INDEX IF NOT EXISTS idx_password_reset_codes_active
 ON password_reset_codes(user_id, email, expires_at)
 WHERE consumed_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS auth_refresh_tokens (
+    id BIGSERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_id UUID NOT NULL UNIQUE,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked_at TIMESTAMPTZ,
+    last_used_at TIMESTAMPTZ,
+    user_agent TEXT,
+    ip_address TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_refresh_tokens_user_active
+ON auth_refresh_tokens(user_id, expires_at DESC)
+WHERE revoked_at IS NULL;
 
 ALTER TABLE vehicles
 ADD COLUMN IF NOT EXISTS vehicle_status VARCHAR(20) NOT NULL DEFAULT 'active';

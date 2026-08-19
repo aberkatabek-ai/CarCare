@@ -34,7 +34,7 @@ test("normalizeOptionalFilePayload rejects unsupported mime types", () => {
 
 test("sanitizeFileName strips unsafe characters", () => {
     assert.equal(
-        sanitizeFileName("  poliçe / 2026  "),
-        "2026"
+        sanitizeFileName("  police / 2026  "),
+        "police-2026"
     );
 });

@@ -10,10 +10,31 @@ function assert(condition, message) {
 
 class SessionClient {
     constructor() {
-        this.cookie = "";
+        this.cookies = new Map();
+    }
+
+    clone() {
+        const cloned = new SessionClient();
+        cloned.cookies = new Map(
+            this.cookies
+        );
+        return cloned;
+    }
+
+    getCookie(name) {
+        return this.cookies.get(name) || "";
     }
 
     async request(path, options = {}) {
+        const cookieHeader =
+            Array.from(
+                this.cookies.entries()
+            )
+                .map(
+                    ([name, value]) =>
+                        `${name}=${value}`
+                )
+                .join("; ");
         const response = await fetch(
             `${baseUrl}${path}`,
             {
@@ -21,9 +42,9 @@ class SessionClient {
                 headers: {
                     "Content-Type":
                         "application/json",
-                    ...(this.cookie
+                    ...(cookieHeader
                         ? {
-                            Cookie: this.cookie
+                            Cookie: cookieHeader
                         }
                         : {}),
                     ...(options.headers || {})
@@ -31,20 +52,44 @@ class SessionClient {
             }
         );
 
-        const setCookie =
-            response.headers.get("set-cookie");
+        const setCookies =
+            typeof response.headers
+                .getSetCookie === "function"
+                ? response.headers.getSetCookie()
+                : [];
 
-        if (setCookie) {
-            this.cookie = setCookie
-                .split(",")
-                .map((cookiePart) =>
-                    cookiePart.split(";")[0]
-                )
-                .find((cookiePart) =>
-                    cookiePart.startsWith(
-                        "carcare.sid="
-                    )
-                ) || this.cookie;
+        for (const cookieValue of setCookies) {
+            const [cookiePair] =
+                cookieValue.split(";");
+
+            if (!cookiePair) {
+                continue;
+            }
+
+            const separatorIndex =
+                cookiePair.indexOf("=");
+
+            if (separatorIndex === -1) {
+                continue;
+            }
+
+            const name = cookiePair.slice(
+                0,
+                separatorIndex
+            );
+            const value = cookiePair.slice(
+                separatorIndex + 1
+            );
+
+            if (!name.startsWith("carcare.")) {
+                continue;
+            }
+
+            if (value) {
+                this.cookies.set(name, value);
+            } else {
+                this.cookies.delete(name);
+            }
         }
 
         const text = await response.text();
@@ -71,7 +116,65 @@ async function main() {
     const email =
         `codex-e2e-${Date.now()}@example.com`;
     const initialPassword = "StrongPass1!";
+    const changedPassword = "ChangedPass3#";
     const resetPasswordValue = "ResetPass2@";
+    const samplePdfBase64 = Buffer.from(
+        "%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF",
+        "utf8"
+    ).toString("base64");
+
+    const health = await client.request(
+        "/api/health"
+    );
+
+    assert(
+        health.status === 200,
+        `Health failed: ${JSON.stringify(health.data)}`
+    );
+
+    const docsPage = await client.request(
+        "/api/docs"
+    );
+
+    assert(
+        docsPage.status === 200,
+        "Swagger docs redirect failed."
+    );
+
+    const swaggerPage =
+        await client.request(
+            "/swagger.html"
+        );
+
+    assert(
+        swaggerPage.status === 200 &&
+            typeof swaggerPage.data.raw ===
+                "string" &&
+            swaggerPage.data.raw.includes(
+                "SwaggerUIBundle"
+            ),
+        "Swagger HTML did not load."
+    );
+
+    const openApi = await client.request(
+        "/openapi.json"
+    );
+
+    assert(
+        openApi.status === 200 &&
+            openApi.data?.openapi === "3.0.3",
+        "OpenAPI document failed."
+    );
+
+    const unauthorizedMe =
+        await client.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        unauthorizedMe.status === 401,
+        "Unauthenticated /me should be rejected."
+    );
 
     const register = await client.request(
         "/api/auth/register",
@@ -99,6 +202,100 @@ async function main() {
         `Auth session failed: ${JSON.stringify(me.data)}`
     );
 
+    assert(
+        me.data.user.email === email,
+        "Current user email mismatch."
+    );
+
+    const updateProfile =
+        await client.request(
+            "/api/auth/profile",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    fullName:
+                        "Codex E2E Updated",
+                    preferredName: "Codex",
+                    email
+                })
+            }
+        );
+
+    assert(
+        updateProfile.status === 200,
+        `Profile update failed: ${JSON.stringify(updateProfile.data)}`
+    );
+
+    const reminderSettings =
+        await client.request(
+            "/api/auth/reminder-settings",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    remindersEnabled: false
+                })
+            }
+        );
+
+    assert(
+        reminderSettings.status === 200,
+        `Reminder settings failed: ${JSON.stringify(reminderSettings.data)}`
+    );
+
+    const emptyVehicles =
+        await client.request("/api/vehicles");
+
+    assert(
+        emptyVehicles.status === 200 &&
+            Array.isArray(
+                emptyVehicles.data.vehicles
+            ) &&
+            emptyVehicles.data.vehicles
+                .length === 0,
+        "Vehicles should start empty."
+    );
+
+    const refreshTokenBeforeRotation =
+        client.getCookie("carcare.rt");
+    const staleRefreshClient =
+        client.clone();
+
+    const refresh = await client.request(
+        "/api/auth/refresh",
+        {
+            method: "POST"
+        }
+    );
+
+    assert(
+        refresh.status === 200,
+        `Refresh failed: ${JSON.stringify(refresh.data)}`
+    );
+
+    const refreshTokenAfterRotation =
+        client.getCookie("carcare.rt");
+
+    assert(
+        refreshTokenBeforeRotation &&
+            refreshTokenAfterRotation &&
+            refreshTokenBeforeRotation !==
+                refreshTokenAfterRotation,
+        "Refresh token rotation failed."
+    );
+
+    const staleRefreshAttempt =
+        await staleRefreshClient.request(
+            "/api/auth/refresh",
+            {
+                method: "POST"
+            }
+        );
+
+    assert(
+        staleRefreshAttempt.status === 401,
+        `Stale refresh token was accepted: ${JSON.stringify(staleRefreshAttempt.data)}`
+    );
+
     const createVehicle =
         await client.request(
             "/api/vehicles",
@@ -122,6 +319,28 @@ async function main() {
 
     const vehicleId =
         createVehicle.data.vehicle.id;
+
+    const vehiclesList =
+        await client.request("/api/vehicles");
+
+    assert(
+        vehiclesList.status === 200 &&
+            vehiclesList.data.vehicles.length ===
+                1,
+        "Vehicle list did not return created vehicle."
+    );
+
+    const vehicleDetail =
+        await client.request(
+            `/api/vehicles/${vehicleId}`
+        );
+
+    assert(
+        vehicleDetail.status === 200 &&
+            vehicleDetail.data.vehicle.id ===
+                vehicleId,
+        "Vehicle detail failed."
+    );
 
     const patchVehicle =
         await client.request(
@@ -171,6 +390,56 @@ async function main() {
         `Vehicle mileage update failed: ${JSON.stringify(goodMileage.data)}`
     );
 
+    const mileageHistory =
+        await client.request(
+            `/api/vehicles/${vehicleId}/mileage-history`
+        );
+
+    assert(
+        mileageHistory.status === 200 &&
+            Array.isArray(
+                mileageHistory.data.mileageHistory
+            ) &&
+            mileageHistory.data
+                .mileageHistory.length >= 1,
+        "Mileage history failed."
+    );
+
+    const shareLink =
+        await client.request(
+            `/api/vehicles/${vehicleId}/share-link`
+        );
+
+    assert(
+        shareLink.status === 200 &&
+            typeof shareLink.data.token ===
+                "string",
+        "Vehicle share link failed."
+    );
+
+    const sharedProfile =
+        await client.request(
+            `/api/public/vehicle-share/${shareLink.data.token}`
+        );
+
+    assert(
+        sharedProfile.status === 200 &&
+            sharedProfile.data.profile
+                .vehicle.id === vehicleId,
+        "Shared vehicle profile failed."
+    );
+
+    const handoffPackage =
+        await client.request(
+            `/api/vehicles/${vehicleId}/handoff-package`
+        );
+
+    assert(
+        handoffPackage.status === 200 &&
+            handoffPackage.data.package,
+        "Buyer handoff package failed."
+    );
+
     const maintenance =
         await client.request(
             "/api/maintenance-plans",
@@ -198,6 +467,18 @@ async function main() {
     const maintenancePlanId =
         maintenance.data.maintenancePlan.id;
 
+    const maintenanceList =
+        await client.request(
+            `/api/maintenance-plans?vehicleId=${vehicleId}`
+        );
+
+    assert(
+        maintenanceList.status === 200 &&
+            maintenanceList.data
+                .maintenancePlans.length === 1,
+        "Maintenance list failed."
+    );
+
     const completeMaintenance =
         await client.request(
             `/api/service-history/complete/${maintenancePlanId}`,
@@ -216,6 +497,18 @@ async function main() {
     assert(
         completeMaintenance.status === 201,
         `Maintenance completion failed: ${JSON.stringify(completeMaintenance.data)}`
+    );
+
+    const serviceHistory =
+        await client.request(
+            `/api/service-history?vehicleId=${vehicleId}`
+        );
+
+    assert(
+        serviceHistory.status === 200 &&
+            serviceHistory.data
+                .serviceHistory.length >= 1,
+        "Service history failed."
     );
 
     const createIssue =
@@ -246,6 +539,26 @@ async function main() {
 
     const issueId =
         createIssue.data.issue.id;
+
+    const issuesList =
+        await client.request("/api/issues");
+
+    assert(
+        issuesList.status === 200 &&
+            issuesList.data.issues.length === 1,
+        "Issues list failed."
+    );
+
+    const issueDetail =
+        await client.request(
+            `/api/issues/${issueId}`
+        );
+
+    assert(
+        issueDetail.status === 200 &&
+            issueDetail.data.issue.id === issueId,
+        "Issue detail failed."
+    );
 
     const addDiagnosis =
         await client.request(
@@ -299,7 +612,13 @@ async function main() {
                     startDate: "2026-08-01",
                     expiryDate: "2027-08-01",
                     reminderDays: 30,
-                    notes: "Annual renewal test"
+                    notes: "Annual renewal test",
+                    file: {
+                        name: "insurance.pdf",
+                        type: "application/pdf",
+                        contentBase64:
+                            samplePdfBase64
+                    }
                 })
             }
         );
@@ -312,6 +631,58 @@ async function main() {
     const documentId =
         createDocument.data.document.id;
 
+    const documentsList =
+        await client.request(
+            `/api/documents?vehicleId=${vehicleId}`
+        );
+
+    assert(
+        documentsList.status === 200 &&
+            documentsList.data.documents.length ===
+                1,
+        "Document list failed."
+    );
+
+    const documentDetail =
+        await client.request(
+            `/api/documents/${documentId}`
+        );
+
+    assert(
+        documentDetail.status === 200 &&
+            documentDetail.data.document.id ===
+                documentId,
+        "Document detail failed."
+    );
+
+    const downloadDocument =
+        await client.request(
+            `/api/documents/${documentId}/file`
+        );
+
+    assert(
+        downloadDocument.status === 200,
+        "Document download failed."
+    );
+
+    const updateDocument =
+        await client.request(
+            `/api/documents/${documentId}`,
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    title:
+                        "Traffic insurance renewed",
+                    removeFile: true
+                })
+            }
+        );
+
+    assert(
+        updateDocument.status === 200,
+        `Document update failed: ${JSON.stringify(updateDocument.data)}`
+    );
+
     const downloadMissingFile =
         await client.request(
             `/api/documents/${documentId}/file`
@@ -319,7 +690,23 @@ async function main() {
 
     assert(
         downloadMissingFile.status === 404,
-        "Document missing-file guard failed."
+        "Document file removal guard failed."
+    );
+
+    const extractWithoutFile =
+        await client.request(
+            "/api/documents/extract-details",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    documentType: "insurance"
+                })
+            }
+        );
+
+    assert(
+        extractWithoutFile.status === 400,
+        "Document extract should require file."
     );
 
     const fuelEntry =
@@ -345,6 +732,18 @@ async function main() {
         `Fuel create failed: ${JSON.stringify(fuelEntry.data)}`
     );
 
+    const fuelList =
+        await client.request(
+            `/api/costs/fuel?vehicleId=${vehicleId}`
+        );
+
+    assert(
+        fuelList.status === 200 &&
+            fuelList.data.fuelEntries.length ===
+                1,
+        "Fuel list failed."
+    );
+
     const expense =
         await client.request(
             "/api/costs/expenses",
@@ -368,6 +767,18 @@ async function main() {
         `Expense create failed: ${JSON.stringify(expense.data)}`
     );
 
+    const expenseList =
+        await client.request(
+            `/api/costs/expenses?vehicleId=${vehicleId}`
+        );
+
+    assert(
+        expenseList.status === 200 &&
+            expenseList.data.expenses.length ===
+                1,
+        "Expense list failed."
+    );
+
     const summary =
         await client.request(
             "/api/costs/summary"
@@ -384,6 +795,77 @@ async function main() {
                 .totalOwnershipCost
         ) > 0,
         "Ownership summary did not accumulate."
+    );
+
+    const aiChat = await client.request(
+        "/api/ai/chat",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                message:
+                    "What should I prioritize for this car?"
+            })
+        }
+    );
+
+    assert(
+        aiChat.status === 200 &&
+            typeof aiChat.data.reply ===
+                "string" &&
+            aiChat.data.conversation?.id,
+        `AI chat failed: ${JSON.stringify(aiChat.data)}`
+    );
+
+    const aiHistory =
+        await client.request(
+            "/api/ai/history"
+        );
+
+    assert(
+        aiHistory.status === 200 &&
+            aiHistory.data.conversations.length >=
+                1,
+        "AI history failed."
+    );
+
+    const aiFeedback =
+        await client.request(
+            `/api/ai/conversations/${aiChat.data.conversation.id}/feedback`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    feedbackStatus: "helpful",
+                    feedbackNote:
+                        "Regression test feedback."
+                })
+            }
+        );
+
+    assert(
+        aiFeedback.status === 200,
+        `AI feedback failed: ${JSON.stringify(aiFeedback.data)}`
+    );
+
+    const aiDataset =
+        await client.request(
+            "/api/ai/dataset?feedbackStatus=helpful"
+        );
+
+    assert(
+        aiDataset.status === 200 &&
+            (
+                (
+                    typeof aiDataset.data.raw ===
+                        "string" &&
+                    aiDataset.data.raw.includes(
+                        '"feedbackStatus":"helpful"'
+                    )
+                ) ||
+                aiDataset.data?.metadata
+                    ?.feedbackStatus ===
+                    "helpful"
+            ),
+        "AI dataset export failed."
     );
 
     const deleteFuel =
@@ -438,6 +920,29 @@ async function main() {
         `Vehicle sell failed: ${JSON.stringify(sellVehicle.data)}`
     );
 
+    const activeVehiclesAfterSell =
+        await client.request("/api/vehicles");
+
+    assert(
+        activeVehiclesAfterSell.status ===
+            200 &&
+            activeVehiclesAfterSell.data
+                .vehicles.length === 0,
+        "Sold vehicle should leave active list."
+    );
+
+    const archiveVehicles =
+        await client.request(
+            "/api/vehicles/archive"
+        );
+
+    assert(
+        archiveVehicles.status === 200 &&
+            archiveVehicles.data.vehicles.length ===
+                1,
+        "Vehicle archive failed."
+    );
+
     const deleteVehicle =
         await client.request(
             `/api/vehicles/${vehicleId}`,
@@ -451,17 +956,100 @@ async function main() {
         `Vehicle delete failed: ${JSON.stringify(deleteVehicle.data)}`
     );
 
-    const logout = await client.request(
-        "/api/auth/logout",
-        {
-            method: "POST"
-        }
-    );
+    const staleAccessBeforePasswordChange =
+        client.clone();
+
+    const updatePassword =
+        await client.request(
+            "/api/auth/password",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    currentPassword:
+                        initialPassword,
+                    newPassword:
+                        changedPassword
+                })
+            }
+        );
 
     assert(
-        logout.status === 200,
-        `Logout failed: ${JSON.stringify(logout.data)}`
+        updatePassword.status === 200,
+        `Password change failed: ${JSON.stringify(updatePassword.data)}`
     );
+
+    const meAfterPasswordChange =
+        await client.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        meAfterPasswordChange.status === 401,
+        `Current session survived password change: ${JSON.stringify(meAfterPasswordChange.data)}`
+    );
+
+    const staleAccessAfterPasswordChange =
+        await staleAccessBeforePasswordChange.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        staleAccessAfterPasswordChange.status ===
+            401,
+        `Old access token survived password change: ${JSON.stringify(staleAccessAfterPasswordChange.data)}`
+    );
+
+    const staleRefreshAfterPasswordChange =
+        await staleAccessBeforePasswordChange.request(
+            "/api/auth/refresh",
+            {
+                method: "POST"
+            }
+        );
+
+    assert(
+        staleRefreshAfterPasswordChange.status ===
+            401,
+        `Old refresh token survived password change: ${JSON.stringify(staleRefreshAfterPasswordChange.data)}`
+    );
+
+    const loginWithOldPassword =
+        await client.request(
+            "/api/auth/login",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email,
+                    password: initialPassword
+                })
+            }
+        );
+
+    assert(
+        loginWithOldPassword.status === 401,
+        `Old password still worked after password change: ${JSON.stringify(loginWithOldPassword.data)}`
+    );
+
+    const loginWithChangedPassword =
+        await client.request(
+            "/api/auth/login",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email,
+                    password: changedPassword
+                })
+            }
+        );
+
+    assert(
+        loginWithChangedPassword.status ===
+            200,
+        `Login with changed password failed: ${JSON.stringify(loginWithChangedPassword.data)}`
+    );
+
+    const staleAccessBeforeReset =
+        client.clone();
 
     const forgotPassword =
         await client.request(
@@ -494,7 +1082,8 @@ async function main() {
                 body: JSON.stringify({
                     email,
                     code: forgotPassword.data.debugCode,
-                    newPassword: resetPasswordValue
+                    newPassword:
+                        resetPasswordValue
                 })
             }
         );
@@ -504,6 +1093,29 @@ async function main() {
         `Password reset failed: ${JSON.stringify(resetPassword.data)}`
     );
 
+    const staleAccessAfterReset =
+        await staleAccessBeforeReset.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        staleAccessAfterReset.status === 401,
+        `Old access token survived password reset: ${JSON.stringify(staleAccessAfterReset.data)}`
+    );
+
+    const staleRefreshAfterReset =
+        await staleAccessBeforeReset.request(
+            "/api/auth/refresh",
+            {
+                method: "POST"
+            }
+        );
+
+    assert(
+        staleRefreshAfterReset.status === 401,
+        `Old refresh token survived password reset: ${JSON.stringify(staleRefreshAfterReset.data)}`
+    );
+
     const loginAfterReset =
         await client.request(
             "/api/auth/login",
@@ -511,7 +1123,8 @@ async function main() {
                 method: "POST",
                 body: JSON.stringify({
                     email,
-                    password: resetPasswordValue
+                    password:
+                        resetPasswordValue
                 })
             }
         );
@@ -520,6 +1133,52 @@ async function main() {
         loginAfterReset.status === 200,
         `Login after password reset failed: ${JSON.stringify(loginAfterReset.data)}`
     );
+
+    const logout = await client.request(
+        "/api/auth/logout",
+        {
+            method: "POST"
+        }
+    );
+
+    assert(
+        logout.status === 200,
+        `Logout failed: ${JSON.stringify(logout.data)}`
+    );
+
+    const refreshAfterLogout =
+        await client.request(
+            "/api/auth/refresh",
+            {
+                method: "POST"
+            }
+        );
+
+    assert(
+        refreshAfterLogout.status === 401,
+        `Refresh still worked after logout: ${JSON.stringify(refreshAfterLogout.data)}`
+    );
+
+    const loginBeforeDelete =
+        await client.request(
+            "/api/auth/login",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email,
+                    password:
+                        resetPasswordValue
+                })
+            }
+        );
+
+    assert(
+        loginBeforeDelete.status === 200,
+        `Login before account deletion failed: ${JSON.stringify(loginBeforeDelete.data)}`
+    );
+
+    const staleAccessBeforeDelete =
+        client.clone();
 
     const deleteAccount =
         await client.request(
@@ -536,6 +1195,16 @@ async function main() {
     assert(
         deleteAccount.status === 200,
         `Delete account failed: ${JSON.stringify(deleteAccount.data)}`
+    );
+
+    const staleAccessAfterDelete =
+        await staleAccessBeforeDelete.request(
+            "/api/auth/me"
+        );
+
+    assert(
+        staleAccessAfterDelete.status === 401,
+        `Old access token survived account deletion: ${JSON.stringify(staleAccessAfterDelete.data)}`
     );
 
     const meAfterDelete =

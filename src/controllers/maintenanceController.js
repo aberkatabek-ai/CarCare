@@ -157,7 +157,7 @@ async function getMaintenancePlans(req, res, next) {
             });
         }
 
-        const values = [req.session.userId];
+        const values = [req.auth.userId];
 
         let vehicleCondition = "";
 
@@ -353,7 +353,7 @@ async function createMaintenancePlan(req, res, next) {
                AND user_id = $2`,
             [
                 parsedVehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -471,7 +471,7 @@ async function deleteMaintenancePlan(req, res, next) {
              RETURNING mp.id`,
             [
                 planId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -498,3 +498,4 @@ module.exports = {
     createMaintenancePlan,
     deleteMaintenancePlan
 };
+

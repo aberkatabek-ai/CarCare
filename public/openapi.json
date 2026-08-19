@@ -3,7 +3,7 @@
   "info": {
     "title": "CarCare API",
     "version": "1.0.0",
-    "description": "Swagger setup for testing the CarCare backend. Authentication is session-cookie based: call /api/auth/login first, then use the protected endpoints from the same browser session."
+    "description": "Swagger setup for testing the CarCare backend. Authentication is JWT-cookie based: call /api/auth/login first, then use the protected endpoints from the same browser."
   },
   "servers": [
     {
@@ -45,7 +45,7 @@
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "carcare.sid"
+        "name": "carcare.at"
       }
     },
     "schemas": {
@@ -529,7 +529,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Log in and create a session cookie",
+        "summary": "Log in and issue JWT auth cookies",
         "requestBody": {
           "required": true,
           "content": {

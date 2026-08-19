@@ -23,6 +23,24 @@ const {
 const {
     shouldExposePasswordResetCode
 } = require("../utils/passwordResetDelivery");
+const {
+    createAccessToken,
+    createRefreshToken,
+    verifyRefreshToken,
+    getRefreshTokenFromRequest,
+    setAuthCookies,
+    clearAuthCookies,
+    getTokenExpiryDate
+} = require("../utils/authTokens");
+const {
+    getRequestMetadata,
+    storeRefreshToken,
+    consumeRefreshToken,
+    revokeRefreshToken,
+    revokeRefreshTokensForUser,
+    getUserAuthState,
+    bumpUserAuthTokenVersion
+} = require("../services/authSessionService");
 
 let preferredNameColumnState = null;
 let remindersEnabledColumnState = null;
@@ -122,36 +140,61 @@ async function getUserById(userId) {
     return result.rows[0] || null;
 }
 
-function createUserSession(req, userId) {
-    return new Promise((resolve, reject) => {
-        req.session.regenerate((error) => {
-            if (error) {
-                return reject(error);
-            }
+async function issueAuthSession(
+    req,
+    res,
+    userId,
+    authTokenVersion
+) {
+    const accessToken =
+        createAccessToken(
+            userId,
+            authTokenVersion
+        );
+    const refreshToken =
+        createRefreshToken(
+            userId,
+            authTokenVersion
+        );
+    const refreshPayload =
+        verifyRefreshToken(refreshToken);
+    const requestMetadata =
+        getRequestMetadata(req);
 
-            req.session.userId = userId;
+    await storeRefreshToken({
+        userId,
+        tokenId: refreshPayload.jti,
+        token: refreshToken,
+        expiresAt:
+            getTokenExpiryDate(
+                refreshPayload
+            ),
+        userAgent:
+            requestMetadata.userAgent,
+        ipAddress:
+            requestMetadata.ipAddress
+    });
 
-            req.session.save((saveError) => {
-                if (saveError) {
-                    return reject(saveError);
-                }
-
-                resolve();
-            });
-        });
+    setAuthCookies(res, {
+        accessToken,
+        refreshToken
     });
 }
 
-function destroyUserSession(req) {
-    return new Promise((resolve, reject) => {
-        req.session.destroy((error) => {
-            if (error) {
-                return reject(error);
-            }
+async function clearCurrentAuthSession(
+    req,
+    res
+) {
+    const refreshToken =
+        getRefreshTokenFromRequest(req);
 
-            resolve();
-        });
-    });
+    if (refreshToken) {
+        await revokeRefreshToken(
+            refreshToken
+        );
+    }
+
+    clearAuthCookies(res);
 }
 
 async function register(req, res, next) {
@@ -193,7 +236,12 @@ async function register(req, res, next) {
                 password_hash
             )
             VALUES ($1, $2, $3)
-            RETURNING id, full_name, email, created_at`,
+            RETURNING
+                id,
+                full_name,
+                email,
+                created_at,
+                auth_token_version`,
             [
                 registrationData.fullName,
                 registrationData.email,
@@ -203,12 +251,22 @@ async function register(req, res, next) {
 
         const user = result.rows[0];
 
-        await createUserSession(req, user.id);
+        await issueAuthSession(
+            req,
+            res,
+            user.id,
+            user.auth_token_version
+        );
 
         res.status(201).json({
             success: true,
             message: "Account created successfully.",
-            user
+            user: {
+                id: user.id,
+                full_name: user.full_name,
+                email: user.email,
+                created_at: user.created_at
+            }
         });
     } catch (error) {
         if (error.code === "23505") {
@@ -242,7 +300,8 @@ async function login(req, res, next) {
                 full_name,
                 email,
                 password_hash,
-                created_at
+                created_at,
+                auth_token_version
              FROM users
              WHERE email = $1`,
             [normalizedEmail]
@@ -269,7 +328,12 @@ async function login(req, res, next) {
             });
         }
 
-        await createUserSession(req, user.id);
+        await issueAuthSession(
+            req,
+            res,
+            user.id,
+            user.auth_token_version
+        );
 
         res.json({
             success: true,
@@ -288,17 +352,122 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
     try {
-        req.session.destroy((error) => {
-            if (error) {
-                return next(error);
+        await clearCurrentAuthSession(
+            req,
+            res
+        );
+
+        res.json({
+            success: true,
+            message: "Logout successful."
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function refreshSession(
+    req,
+    res,
+    next
+) {
+    try {
+        const refreshToken =
+            getRefreshTokenFromRequest(
+                req
+            );
+
+        if (!refreshToken) {
+            clearAuthCookies(res);
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Refresh token is missing."
+            });
+        }
+
+        let payload;
+
+        try {
+            payload =
+                verifyRefreshToken(
+                    refreshToken
+                );
+        } catch (error) {
+            await revokeRefreshToken(
+                refreshToken
+            );
+            clearAuthCookies(res);
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Refresh token is invalid or expired."
+            });
+        }
+
+        const storedToken =
+            await consumeRefreshToken({
+                token: refreshToken
+            });
+
+        if (
+            !storedToken ||
+            Number(payload.sub) !==
+                Number(storedToken.user_id)
+        ) {
+            if (
+                Number.isInteger(
+                    Number(payload.sub)
+                )
+            ) {
+                await revokeRefreshTokensForUser(
+                    Number(payload.sub)
+                );
             }
 
-            res.clearCookie("carcare.sid");
-
-            res.json({
-                success: true,
-                message: "Logout successful."
+            clearAuthCookies(res);
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Refresh token is not active."
             });
+        }
+
+        const authState =
+            await getUserAuthState(
+                Number(payload.sub)
+            );
+
+        if (
+            !authState ||
+            Number(
+                payload.authTokenVersion
+            ) !==
+                Number(
+                    authState.auth_token_version
+                )
+        ) {
+            clearAuthCookies(res);
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Refresh token is not active."
+            });
+        }
+
+        await issueAuthSession(
+            req,
+            res,
+            Number(payload.sub),
+            Number(
+                authState.auth_token_version
+            )
+        );
+
+        res.json({
+            success: true,
+            message:
+                "Session refreshed successfully."
         });
     } catch (error) {
         next(error);
@@ -308,7 +477,7 @@ async function logout(req, res, next) {
 async function getCurrentUser(req, res, next) {
     try {
         const user = await getUserById(
-            req.session.userId
+            req.auth.userId
         );
 
         if (!user) {
@@ -348,7 +517,7 @@ async function updateProfile(req, res, next) {
                AND id <> $2`,
             [
                 profileData.email,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -378,17 +547,17 @@ async function updateProfile(req, res, next) {
                     profileData.fullName,
                     profileData.preferredName,
                     profileData.email,
-                    req.session.userId
+                    req.auth.userId
                 ]
                 : [
                     profileData.fullName,
                     profileData.email,
-                    req.session.userId
+                    req.auth.userId
                 ]
         );
 
         const user = await getUserById(
-            req.session.userId
+            req.auth.userId
         );
 
         res.json({
@@ -428,7 +597,7 @@ async function updatePassword(req, res, next) {
             `SELECT id, password_hash
              FROM users
              WHERE id = $1`,
-            [req.session.userId]
+            [req.auth.userId]
         );
 
         if (result.rows.length === 0) {
@@ -466,14 +635,22 @@ async function updatePassword(req, res, next) {
              WHERE id = $2`,
             [
                 passwordHash,
-                req.session.userId
+                req.auth.userId
             ]
         );
+
+        await bumpUserAuthTokenVersion(
+            req.auth.userId
+        );
+        await revokeRefreshTokensForUser(
+            req.auth.userId
+        );
+        clearAuthCookies(res);
 
         res.json({
             success: true,
             message:
-                "Password updated successfully."
+                "Password updated successfully. Please log in again."
         });
     } catch (error) {
         next(error);
@@ -517,12 +694,12 @@ async function updateReminderSettings(
              WHERE id = $2`,
             [
                 remindersEnabled,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
         const user = await getUserById(
-            req.session.userId
+            req.auth.userId
         );
 
         res.json({
@@ -563,7 +740,7 @@ async function deleteAccount(req, res, next) {
             `SELECT id, password_hash
              FROM users
              WHERE id = $1`,
-            [req.session.userId]
+            [req.auth.userId]
         );
 
         if (userResult.rows.length === 0) {
@@ -616,7 +793,7 @@ async function deleteAccount(req, res, next) {
              FROM vehicles
              WHERE user_id = $1
                AND ownership_stored_file_name IS NOT NULL`,
-            [req.session.userId]
+            [req.auth.userId]
         );
 
         await client.query("BEGIN");
@@ -626,7 +803,7 @@ async function deleteAccount(req, res, next) {
             `DELETE FROM users
              WHERE id = $1
              RETURNING id`,
-            [req.session.userId]
+            [req.auth.userId]
         );
 
         if (deleteResult.rows.length === 0) {
@@ -645,8 +822,10 @@ async function deleteAccount(req, res, next) {
         shouldReleaseClient = false;
         client.release();
 
-        await destroyUserSession(req);
-        res.clearCookie("carcare.sid");
+        await revokeRefreshTokensForUser(
+            req.auth.userId
+        );
+        clearAuthCookies(res);
 
         for (const row of fileResult.rows) {
             await removeStoredDocument(
@@ -822,6 +1001,13 @@ async function resetPassword(
             ]
         );
 
+        await bumpUserAuthTokenVersion(
+            consumedCode.user_id
+        );
+        await revokeRefreshTokensForUser(
+            consumedCode.user_id
+        );
+
         res.json({
             success: true,
             message:
@@ -835,6 +1021,7 @@ async function resetPassword(
 module.exports = {
     register,
     login,
+    refreshSession,
     logout,
     getCurrentUser,
     updateProfile,
@@ -844,3 +1031,4 @@ module.exports = {
     requestPasswordReset,
     resetPassword
 };
+

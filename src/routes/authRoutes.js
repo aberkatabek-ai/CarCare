@@ -3,6 +3,7 @@ const express = require("express");
 const {
     register,
     login,
+    refreshSession,
     logout,
     getCurrentUser,
     updateProfile,
@@ -39,13 +40,14 @@ const forgotPasswordLimiter = createRateLimiter({
 
 router.post("/register", authWriteLimiter, register);
 router.post("/login", authWriteLimiter, login);
+router.post("/refresh", refreshSession);
 router.post(
     "/forgot-password",
     forgotPasswordLimiter,
     requestPasswordReset
 );
 router.post("/reset-password", authWriteLimiter, resetPassword);
-router.post("/logout", requireAuth, logout);
+router.post("/logout", logout);
 router.get("/me", requireAuth, getCurrentUser);
 router.patch("/profile", requireAuth, updateProfile);
 router.patch(

@@ -469,7 +469,7 @@ async function getIssues(
                     ELSE 4
                 END,
                 vi.created_at DESC`,
-            [req.session.userId]
+            [req.auth.userId]
         );
 
         res.json({
@@ -505,7 +505,7 @@ async function getIssueById(
 
         const issue = await findOwnedIssue(
             issueId,
-            req.session.userId
+            req.auth.userId
         );
 
         if (!issue) {
@@ -662,7 +662,7 @@ async function createIssue(
                    AND user_id = $2`,
                 [
                     parsedVehicleId,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -700,7 +700,7 @@ async function createIssue(
                    AND created_at >= NOW() - INTERVAL '14 days'
                  LIMIT 1`,
                 [
-                    req.session.userId,
+                    req.auth.userId,
                     parsedVehicleId,
                     category,
                     normalizeComparableText(
@@ -774,7 +774,7 @@ async function createIssue(
                  )
                  RETURNING id`,
                 [
-                    req.session.userId,
+                    req.auth.userId,
                     parsedVehicleId,
                     normalizedTitle,
                     category,
@@ -812,7 +812,7 @@ async function createIssue(
 
         const issue = await findOwnedIssue(
             insertResult.rows[0].id,
-            req.session.userId
+            req.auth.userId
         );
 
         res.status(201).json({
@@ -881,7 +881,7 @@ async function addDiagnosis(
             [
                 mechanicDiagnosis,
                 issueId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -895,7 +895,7 @@ async function addDiagnosis(
 
         const issue = await findOwnedIssue(
             issueId,
-            req.session.userId
+            req.auth.userId
         );
 
         res.json({
@@ -1026,7 +1026,7 @@ async function markIssueRepaired(
                  FOR UPDATE OF vi, v`,
                 [
                     issueId,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -1175,7 +1175,7 @@ async function markIssueRepaired(
                 normalizedResolutionNotes,
                 serviceRecord.id,
                 issueId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1184,7 +1184,7 @@ async function markIssueRepaired(
         const updatedIssue =
             await findOwnedIssue(
                 issueId,
-                req.session.userId
+                req.auth.userId
             );
 
         res.status(201).json({
@@ -1238,7 +1238,7 @@ async function deleteIssue(
                AND issue.user_id = $2`,
             [
                 issueId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1249,7 +1249,7 @@ async function deleteIssue(
              RETURNING id`,
             [
                 issueId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1311,7 +1311,7 @@ async function downloadIssueMedia(
                AND issue.user_id = $2`,
             [
                 mediaId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1350,3 +1350,4 @@ module.exports = {
     deleteIssue,
     downloadIssueMedia
 };
+

@@ -308,17 +308,17 @@ async function chatWithGarageAi(
         }
 
         const garageData = await loadGarageData(
-            req.session.userId
+            req.auth.userId
         );
         const garageContext =
             buildGarageAiContext(garageData);
         const recentConversations =
             await getAiConversationHistory(
-                req.session.userId
+                req.auth.userId
             );
         const helpfulExamples =
             await getHelpfulAiExamples(
-                req.session.userId
+                req.auth.userId
             );
 
         if (garageContext.overview.activeVehicleCount === 0) {
@@ -346,7 +346,7 @@ async function chatWithGarageAi(
 
         const conversation =
             await recordAiConversation({
-                userId: req.session.userId,
+                userId: req.auth.userId,
                 question,
                 reply: result.reply,
                 garageContext,
@@ -442,7 +442,7 @@ async function saveGarageAiFeedback(
         const feedback =
             await updateAiConversationFeedback({
                 conversationId,
-                userId: req.session.userId,
+                userId: req.auth.userId,
                 feedbackStatus,
                 feedbackNote:
                     normalizeOptionalFeedbackNote(
@@ -481,7 +481,7 @@ async function getGarageAiHistory(
             success: true,
             conversations:
                 await getAiConversationHistory(
-                    req.session.userId
+                    req.auth.userId
                 )
         });
     } catch (error) {
@@ -502,7 +502,7 @@ async function exportGarageAiDataset(
 
         const rows =
             await getAiConversationExportRows({
-                userId: req.session.userId,
+                userId: req.auth.userId,
                 feedbackStatus
             });
 
@@ -532,3 +532,4 @@ module.exports = {
     getGarageAiHistory,
     exportGarageAiDataset
 };
+

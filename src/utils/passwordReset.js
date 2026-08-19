@@ -41,7 +41,7 @@ function hashResetCode(email, code) {
     return crypto
         .createHash("sha256")
         .update(
-            `${email}:${code}:${process.env.SESSION_SECRET || "carcare"}`
+            `${email}:${code}:${process.env.SHARE_TOKEN_SECRET || process.env.JWT_SECRET || "carcare"}`
         )
         .digest("hex");
 }

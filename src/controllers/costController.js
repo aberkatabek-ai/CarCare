@@ -819,7 +819,7 @@ async function getFuelEntries(
 
         const fuelEntries =
             await getFuelRows(
-                req.session.userId,
+                req.auth.userId,
                 vehicleId
             );
 
@@ -886,7 +886,7 @@ async function createFuelEntry(
             await findOwnedVehicle(
                 client,
                 fuelData.vehicleId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!vehicle) {
@@ -1113,7 +1113,7 @@ async function createFuelEntry(
 
         const fuelEntries =
             await getFuelRows(
-                req.session.userId,
+                req.auth.userId,
                 fuelData.vehicleId
             );
 
@@ -1178,7 +1178,7 @@ async function deleteFuelEntry(
                AND v.user_id = $2`,
             [
                 fuelEntryId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1209,7 +1209,7 @@ async function deleteFuelEntry(
             await syncVehicleMileageFromRecords(
                 client,
                 result.rows[0].vehicle_id,
-                req.session.userId
+                req.auth.userId
             );
 
             await client.query("COMMIT");
@@ -1299,7 +1299,7 @@ async function getExpenses(
                 e.expense_date DESC,
                 e.id DESC`,
             [
-                req.session.userId,
+                req.auth.userId,
                 vehicleId
             ]
         );
@@ -1363,7 +1363,7 @@ async function createExpense(
             await findOwnedVehicle(
                 client,
                 expenseData.vehicleId,
-                req.session.userId
+                req.auth.userId
             );
 
         if (!vehicle) {
@@ -1568,7 +1568,7 @@ async function createExpense(
                    AND v.user_id = $2`,
                 [
                     result.rows[0].id,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -1634,7 +1634,7 @@ async function deleteExpense(
                AND v.user_id = $2`,
             [
                 expenseId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1665,7 +1665,7 @@ async function deleteExpense(
             await syncVehicleMileageFromRecords(
                 client,
                 result.rows[0].vehicle_id,
-                req.session.userId
+                req.auth.userId
             );
 
             await client.query("COMMIT");
@@ -1719,7 +1719,7 @@ async function getCostSummary(
 
                  WHERE v.user_id = $1`,
                 [
-                    req.session.userId
+                    req.auth.userId
                 ]
             ),
 
@@ -1739,7 +1739,7 @@ async function getCostSummary(
 
                  WHERE v.user_id = $1`,
                 [
-                    req.session.userId
+                    req.auth.userId
                 ]
             ),
 
@@ -1762,7 +1762,7 @@ async function getCostSummary(
 
                  WHERE v.user_id = $1`,
                 [
-                    req.session.userId
+                    req.auth.userId
                 ]
             )
         ]);
@@ -1848,3 +1848,4 @@ module.exports = {
     deleteExpense,
     getCostSummary
 };
+

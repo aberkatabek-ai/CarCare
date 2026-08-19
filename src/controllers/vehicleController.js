@@ -281,7 +281,7 @@ async function getVehicles(req, res, next) {
                AND vehicle_status = $2
              ORDER BY created_at DESC`,
             [
-                req.session.userId,
+                req.auth.userId,
                 ACTIVE_VEHICLE_STATUS
             ]
         );
@@ -323,7 +323,7 @@ async function getVehicleArchive(
              ORDER BY sold_at DESC NULLS LAST,
                       updated_at DESC`,
             [
-                req.session.userId,
+                req.auth.userId,
                 SOLD_VEHICLE_STATUS
             ]
         );
@@ -376,7 +376,7 @@ async function getVehicleById(req, res, next) {
                AND user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -422,7 +422,7 @@ async function exportBuyerHandoffPackage(
                AND user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -471,7 +471,7 @@ async function getVehicleShareLink(
                AND user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -563,7 +563,7 @@ async function getMileageHistory(
                AND user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -592,7 +592,7 @@ async function getMileageHistory(
              ORDER BY mh.id DESC`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -722,7 +722,7 @@ async function createVehicle(req, res, next) {
                 created_at,
                 updated_at`,
             [
-                req.session.userId,
+                req.auth.userId,
                 normalizedBrand,
                 normalizedModel,
                 parsedYear,
@@ -792,7 +792,7 @@ async function updateMileage(req, res, next) {
                  FOR UPDATE`,
                 [
                     vehicleId,
-                    req.session.userId
+                    req.auth.userId
                 ]
             );
 
@@ -930,7 +930,7 @@ async function updateVehicle(req, res, next) {
                AND user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1155,7 +1155,7 @@ async function verifyVehicleOwnership(
                AND v.user_id = $2`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1392,7 +1392,7 @@ async function markVehicleAsSold(
             [
                 SOLD_VEHICLE_STATUS,
                 vehicleId,
-                req.session.userId,
+                req.auth.userId,
                 ACTIVE_VEHICLE_STATUS
             ]
         );
@@ -1406,7 +1406,7 @@ async function markVehicleAsSold(
                        AND user_id = $2`,
                     [
                         vehicleId,
-                        req.session.userId
+                        req.auth.userId
                     ]
                 );
 
@@ -1460,7 +1460,7 @@ async function deleteVehicle(req, res, next) {
                AND vehicle_status = $3`,
             [
                 vehicleId,
-                req.session.userId,
+                req.auth.userId,
                 ACTIVE_VEHICLE_STATUS
             ]
         );
@@ -1496,7 +1496,7 @@ async function deleteVehicle(req, res, next) {
                AND ownership_stored_file_name IS NOT NULL`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1507,7 +1507,7 @@ async function deleteVehicle(req, res, next) {
              RETURNING id`,
             [
                 vehicleId,
-                req.session.userId
+                req.auth.userId
             ]
         );
 
@@ -1550,3 +1550,4 @@ module.exports = {
     markVehicleAsSold,
     deleteVehicle
 };
+
