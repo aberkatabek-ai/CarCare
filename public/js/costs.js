@@ -194,6 +194,14 @@ function formatMonthKey(value) {
     });
 }
 
+function formatCostCategoryLabel(label) {
+    if (typeof label !== "string" || !label) {
+        return "Other";
+    }
+
+    return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function setDefaultDates() {
     const today = new Date().toISOString().slice(0, 10);
 
@@ -431,7 +439,7 @@ function renderCategoryBreakdownChart() {
     const categoryTotals = new Map();
 
     categoryTotals.set(
-        "fuel",
+        "Fuel",
         fuelEntries.reduce(
             (total, entry) =>
                 total +
@@ -440,7 +448,7 @@ function renderCategoryBreakdownChart() {
         )
     );
     categoryTotals.set(
-        "service",
+        "Service",
         serviceRecords.reduce(
             (total, record) =>
                 total +
@@ -487,7 +495,7 @@ function renderCategoryBreakdownChart() {
     rows.forEach(([label, total]) => {
         list.append(
             createBarChartRow({
-                label,
+                label: formatCostCategoryLabel(label),
                 valueText: formatCurrency(total),
                 percentage:
                     (total / grandTotal) * 100,
@@ -502,7 +510,7 @@ function renderCategoryBreakdownChart() {
         createElement(
             "p",
             "chart-summary-note",
-            `${rows[0][0]} currently leads the spending mix at ${formatCurrency(rows[0][1])}.`
+            `${formatCostCategoryLabel(rows[0][0])} currently leads the spending mix at ${formatCurrency(rows[0][1])}.`
         )
     );
 }
