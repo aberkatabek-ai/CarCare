@@ -42,7 +42,7 @@
 .health-eyebrow {
     margin: 0 0 12px;
 
-    color: var(--muted);
+    color: #0f6a5b !important;
 
     font-size: 13px;
     font-weight: 850;
@@ -57,12 +57,13 @@
     font-size: clamp(32px, 5vw, 48px);
     line-height: 1.08;
     letter-spacing: -0.04em;
+    color: #1b2430 !important;
 }
 
 .health-hero > div:first-child > p:last-child {
     margin: 18px 0 0;
 
-    color: var(--muted);
+    color: #6b6255 !important;
 
     font-size: 17px;
     line-height: 1.65;
@@ -88,17 +89,17 @@
 .health-owner span {
     margin-bottom: 6px;
 
-    color: var(--muted);
+    color: #8a7252 !important;
     font-size: 11px;
     text-transform: uppercase;
 }
 
 .health-owner strong {
-    color: var(--primary);
+    color: #1b2430 !important;
     font-size: 23px;
     line-height: 1.15;
     letter-spacing: -0.03em;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 .health-statistics {
