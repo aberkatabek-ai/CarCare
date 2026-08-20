@@ -20,13 +20,13 @@
     background:
         radial-gradient(
             circle at top right,
-            rgba(91, 142, 255, 0.18),
+            rgba(148, 163, 184, 0.18),
             transparent 32%
         ),
         linear-gradient(
             145deg,
             rgba(251, 252, 254, 0.99),
-            rgba(224, 234, 252, 0.95)
+            rgba(232, 238, 246, 0.95)
         );
 
     border-radius: 28px;
@@ -42,7 +42,7 @@
 .health-eyebrow {
     margin: 0 0 12px;
 
-    color: #3f67c0;
+    color: var(--muted);
 
     font-size: 13px;
     font-weight: 850;
@@ -74,7 +74,7 @@
     min-width: 210px;
     padding: 19px;
 
-    background: rgba(235, 242, 255, 0.96);
+    background: rgba(245, 248, 252, 0.96);
     border: 1px solid var(--border);
     border-radius: 16px;
     box-shadow: 0 12px 24px rgba(33, 28, 18, 0.08);
@@ -88,7 +88,7 @@
 .health-owner span {
     margin-bottom: 6px;
 
-    color: #3f67c0;
+    color: var(--muted);
     font-size: 11px;
     text-transform: uppercase;
 }
@@ -124,7 +124,7 @@
 }
 
 .orange-stat {
-    border-top-color: #5d82d8;
+    border-top-color: #9aa3b2;
 }
 
 .green-stat {
@@ -186,10 +186,10 @@
     margin-bottom: 22px;
     padding: 14px;
 
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 
-    border: 1px solid #c9d7f4;
+    border: 1px solid #d7c39c;
     border-radius: 10px;
 }
 
@@ -306,9 +306,9 @@
 }
 
 .risk-preview.orange {
-    color: #3052a0;
-    background: #edf3ff;
-    border-color: #c9d7f4;
+    color: #6e5732;
+    background: #f3ead8;
+    border-color: #d7c39c;
 }
 
 .risk-preview.red {
@@ -401,7 +401,7 @@
 }
 
 .issue-card.risk-orange {
-    border-left-color: #5d82d8;
+    border-left-color: #b19360;
 }
 
 .issue-card.risk-red {
@@ -454,8 +454,8 @@
 }
 
 .issue-risk-badge.orange {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .issue-risk-badge.red {
@@ -528,8 +528,8 @@
 }
 
 .issue-guidance.orange {
-    color: #3052a0;
-    background: #edf3ff;
+    color: #6e5732;
+    background: #f3ead8;
 }
 
 .issue-guidance.red {

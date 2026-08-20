@@ -3,9 +3,12 @@
     --surface: #fbfcfe;
     --surface-soft: #edf3fb;
 
-    --primary: #2355d8;
-    --primary-dark: #183ba1;
-    --primary-soft: #dbe6ff;
+    --primary: #24303d;
+    --primary-dark: #161f28;
+    --primary-soft: #e5e9ee;
+    --action: #2563eb;
+    --action-dark: #1d4ed8;
+    --action-soft: #dbe7ff;
 
     --text: #142033;
     --muted: #627089;
@@ -57,12 +60,12 @@ body {
     background:
         radial-gradient(
             circle at top left,
-            rgba(91, 142, 255, 0.18),
+            rgba(148, 163, 184, 0.16),
             transparent 30%
         ),
         radial-gradient(
             circle at right top,
-            rgba(35, 85, 216, 0.16),
+            rgba(71, 85, 105, 0.12),
             transparent 28%
         ),
         linear-gradient(180deg, #f7faff 0%, var(--background) 46%);
@@ -106,12 +109,12 @@ a {
     background:
         radial-gradient(
             circle at top left,
-            rgba(91, 142, 255, 0.22),
+            rgba(148, 163, 184, 0.18),
             transparent 35%
         ),
         radial-gradient(
             circle at bottom right,
-            rgba(35, 85, 216, 0.18),
+            rgba(71, 85, 105, 0.14),
             transparent 32%
         ),
         linear-gradient(135deg, #f7faff, #dee7f4);
@@ -160,7 +163,7 @@ a {
         linear-gradient(
             135deg,
             var(--primary),
-            #4ca7ff
+            #445264
         );
 
     border-radius: 14px;
@@ -212,7 +215,7 @@ a {
 }
 
 .auth-inline-link {
-    color: #2355d8;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
@@ -315,9 +318,9 @@ a {
     min-height: 34px;
     padding: 0 10px;
 
-    color: var(--primary);
-    background: rgba(35, 85, 216, 0.10);
-    border: 1px solid rgba(35, 85, 216, 0.20);
+    color: var(--action);
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.20);
     border-radius: 999px;
 
     font-size: 12px;
@@ -326,12 +329,12 @@ a {
 }
 
 .password-toggle:hover {
-    background: rgba(35, 85, 216, 0.16);
+    background: rgba(37, 99, 235, 0.16);
     transform: translateY(-50%);
 }
 
 .password-toggle:focus-visible {
-    outline: 2px solid rgba(35, 85, 216, 0.30);
+    outline: 2px solid rgba(37, 99, 235, 0.30);
     outline-offset: 2px;
 }
 
@@ -370,13 +373,13 @@ a {
     min-height: 50px;
 
     color: white;
-    background: var(--primary);
+    background: var(--action);
 
     border-radius: var(--radius-small);
 }
 
 .primary-button:hover {
-    background: var(--primary-dark);
+    background: var(--action-dark);
     transform: translateY(-1px);
 }
 
@@ -390,7 +393,7 @@ a {
 }
 
 .secondary-button:hover {
-    background: #dbe5f7;
+    background: var(--primary-soft);
 }
 
 a.secondary-button {
@@ -463,11 +466,11 @@ a.secondary-button {
     top: 0;
     z-index: 20;
 
-    background: rgba(250, 246, 238, 0.92);
+    background: rgba(251, 252, 254, 0.92);
     border-bottom: 1px solid var(--border);
 
     backdrop-filter: blur(12px);
-    box-shadow: 0 8px 24px rgba(35, 85, 216, 0.08);
+    box-shadow: 0 8px 24px rgba(20, 32, 51, 0.06);
 }
 
 .dashboard-header-content,
@@ -494,8 +497,8 @@ a.secondary-button {
     padding: 0 14px;
 
     color: var(--primary);
-    background: rgba(31, 74, 58, 0.08);
-    border: 1px solid rgba(31, 74, 58, 0.15);
+    background: rgba(36, 48, 61, 0.08);
+    border: 1px solid rgba(36, 48, 61, 0.15);
     border-radius: 12px;
 
     font-size: 18px;
@@ -504,11 +507,11 @@ a.secondary-button {
 }
 
 .nav-toggle:hover {
-    background: rgba(31, 74, 58, 0.14);
+    background: rgba(36, 48, 61, 0.14);
 }
 
 .nav-toggle:focus-visible {
-    outline: 2px solid rgba(31, 74, 58, 0.28);
+    outline: 2px solid rgba(36, 48, 61, 0.28);
     outline-offset: 2px;
 }
 
@@ -532,12 +535,12 @@ a.secondary-button {
     background:
         linear-gradient(
             145deg,
-            rgba(251, 247, 239, 0.98),
-            rgba(248, 221, 221, 0.94)
+            rgba(251, 252, 254, 0.98),
+            rgba(232, 238, 246, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
-    box-shadow: 0 22px 44px rgba(31, 27, 18, 0.09);
+    box-shadow: 0 22px 44px rgba(20, 32, 51, 0.08);
 }
 
 .welcome-actions {
@@ -616,8 +619,8 @@ a.secondary-button {
 }
 
 .status-badge.warning {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .status-badge.risk {
@@ -626,7 +629,7 @@ a.secondary-button {
 }
 
 .status-badge.stable {
-    color: var(--primary);
+    color: var(--muted);
     background: var(--primary-soft);
 }
 
@@ -639,8 +642,8 @@ a.secondary-button {
     background:
         linear-gradient(
             180deg,
-            rgba(247, 243, 234, 0.98),
-            rgba(239, 232, 220, 0.94)
+            rgba(251, 252, 254, 0.98),
+            rgba(236, 241, 248, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
@@ -658,8 +661,8 @@ a.secondary-button {
     background:
         linear-gradient(
             145deg,
-            rgba(247, 243, 234, 0.98),
-            rgba(239, 232, 220, 0.94)
+            rgba(251, 252, 254, 0.98),
+            rgba(236, 241, 248, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
@@ -947,8 +950,8 @@ a.secondary-button {
 }
 
 .ownership-badge.pending {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .ownership-badge.failed {

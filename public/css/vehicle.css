@@ -52,8 +52,8 @@
     align-items: center;
     justify-content: center;
     padding: 10px 14px;
-    color: var(--primary);
-    background: var(--primary-soft);
+    color: white;
+    background: var(--action);
     border-radius: 10px;
     font-size: 13px;
     font-weight: 750;
@@ -62,7 +62,7 @@
 
 .page-action-link:hover,
 .section-action-link:hover {
-    background: #dbe5f7;
+    background: var(--action-dark);
 }
 
 .passport-toolbar {
@@ -125,13 +125,13 @@
     background:
         radial-gradient(
             circle at top right,
-            rgba(91, 142, 255, 0.18),
+            rgba(148, 163, 184, 0.18),
             transparent 30%
         ),
         linear-gradient(
             145deg,
             rgba(251, 252, 254, 0.99),
-            rgba(224, 234, 252, 0.95)
+            rgba(232, 238, 246, 0.95)
         );
     border-radius: 28px;
     box-shadow: 0 24px 50px rgba(31, 27, 18, 0.1);
@@ -144,7 +144,7 @@
 .back-link {
     display: inline-block;
     margin-bottom: 28px;
-    color: #4065b3;
+    color: var(--primary);
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -156,7 +156,7 @@
 
 .vehicle-hero-eyebrow {
     margin: 0 0 9px;
-    color: #3f67c0;
+    color: var(--muted);
     font-size: 13px;
     font-weight: 850;
     letter-spacing: 0.1em;
@@ -315,11 +315,11 @@
 
 .attention-summary.has-attention {
     border-color: #c2b089;
-    box-shadow: inset 0 3px 0 #5d82d8;
+    box-shadow: inset 0 3px 0 #b19360;
 }
 
 .attention-summary.has-attention strong {
-    color: #3052a0;
+    color: #6e5732;
 }
 
 .cost-summary strong {
@@ -390,8 +390,8 @@
 }
 
 .signal-tone.watch {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .signal-tone.risk {
@@ -524,8 +524,8 @@
 }
 
 .priority-badge.warning {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .priority-badge.info {
@@ -713,7 +713,7 @@
 
 .critical-vehicle-plan {
     border-color: #cda364;
-    box-shadow: inset 4px 0 0 #5d82d8;
+    box-shadow: inset 4px 0 0 #b19360;
 }
 
 .vehicle-plan-heading,
@@ -762,8 +762,8 @@
 }
 
 .detail-status-due-soon {
-    color: #3052a0;
-    background: #e4ecff;
+    color: #6e5732;
+    background: #eee1c7;
 }
 
 .detail-status-ok {
