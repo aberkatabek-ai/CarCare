@@ -947,19 +947,21 @@ a.secondary-button {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 18px;
 }
 
 .vehicle-card-header > div:first-child {
     flex: 1;
-    min-width: 0;
+    min-width: min(180px, 100%);
 }
 
 .vehicle-title {
     margin: 0;
     font-size: 20px;
     line-height: 1.2;
-    overflow-wrap: anywhere;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .vehicle-subtitle {
@@ -968,7 +970,8 @@ a.secondary-button {
     color: var(--muted);
     font-size: 14px;
     line-height: 1.4;
-    overflow-wrap: anywhere;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .ownership-badge {
