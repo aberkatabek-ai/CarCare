@@ -91,6 +91,14 @@
     text-transform: uppercase;
 }
 
+.health-owner strong {
+    color: white;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+}
+
 .health-statistics {
     display: grid;
     grid-template-columns:
@@ -663,6 +671,11 @@
 
     .health-owner {
         width: 100%;
+        padding: 16px 17px;
+    }
+
+    .health-owner strong {
+        font-size: 20px;
     }
 
     .health-statistics,
@@ -717,6 +730,18 @@
 
     .health-hero h1 {
         font-size: clamp(28px, 9vw, 38px);
+    }
+
+    .health-owner {
+        padding: 14px 15px;
+    }
+
+    .health-owner span {
+        font-size: 10px;
+    }
+
+    .health-owner strong {
+        font-size: 18px;
     }
 
     .health-section {
