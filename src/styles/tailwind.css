@@ -14,7 +14,7 @@
     }
 
     .cc-auth-body {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(176,151,108,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(31,74,58,0.20),transparent_32%),linear-gradient(135deg,#efe9de,#ddd8cd)] px-5 py-8 sm:px-6;
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(182,156,109,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(35,70,63,0.16),transparent_32%),linear-gradient(135deg,#f4eee3,#ddd3c2)] px-5 py-8 sm:px-6;
     }
 
     .cc-auth-container {
@@ -22,7 +22,7 @@
     }
 
     .cc-auth-card {
-        @apply w-full rounded-[28px] border border-white/50 bg-[rgba(252,250,245,0.96)] p-7 shadow-panel backdrop-blur sm:p-10;
+        @apply w-full rounded-[28px] border border-white/50 bg-[rgba(252,248,240,0.97)] p-7 shadow-panel backdrop-blur sm:p-10;
     }
 
     .cc-brand-lockup {
@@ -34,7 +34,7 @@
     }
 
     .cc-auth-title {
-        @apply text-3xl font-semibold tracking-[-0.03em] text-ink;
+        @apply font-display text-3xl font-semibold tracking-[-0.03em] text-ink;
     }
 
     .cc-auth-copy {
@@ -66,11 +66,11 @@
     }
 
     .cc-nav-row {
-        @apply flex items-center gap-2 rounded-full border border-border bg-[#fff8ec]/90 p-2 shadow-panel backdrop-blur;
+        @apply flex items-center gap-2 rounded-full border border-border bg-[rgba(252,247,238,0.92)] p-2 shadow-panel backdrop-blur;
     }
 
     .cc-nav-link {
-        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#5f594d] transition hover:bg-[#efe4cf] hover:text-accent;
+        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#655d50] transition hover:bg-[#ece2d0] hover:text-accent;
     }
 
     .cc-nav-link-active {
@@ -78,15 +78,15 @@
     }
 
     .cc-hero-card {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,249,241,0.98),rgba(234,226,214,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(236,227,214,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-kicker {
-        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#6d664f];
+        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#75684a];
     }
 
     .cc-stat-card {
-        @apply relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(247,243,237,0.98),rgba(233,226,216,0.92))] p-5 shadow-[0_10px_30px_rgba(32,38,42,0.05)] transition hover:-translate-y-0.5 hover:shadow-panel;
+        @apply relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(249,245,238,0.98),rgba(236,228,216,0.92))] p-5 shadow-[0_12px_28px_rgba(32,38,42,0.05)] transition hover:-translate-y-0.5 hover:shadow-panel;
     }
 
     .cc-stat-value {
@@ -94,23 +94,23 @@
     }
 
     .cc-page-hero {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,249,241,0.98),rgba(234,226,214,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(236,227,214,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-page-hero-title {
-        @apply text-[clamp(1.8rem,4vw,2.6rem)] font-semibold tracking-[-0.04em] text-ink;
+        @apply font-display text-[clamp(1.8rem,4vw,2.6rem)] font-semibold tracking-[-0.04em] text-ink;
     }
 
     .cc-badge {
-        @apply inline-flex items-center rounded-full border border-border bg-[#fff8ec] px-4 py-2 text-sm font-semibold text-accent shadow-[0_8px_20px_rgba(33,28,18,0.08)];
+        @apply inline-flex items-center rounded-full border border-border bg-[rgba(249,242,231,0.96)] px-4 py-2 text-sm font-semibold text-accent shadow-[0_8px_20px_rgba(33,28,18,0.08)];
     }
 
     .cc-panel {
-        @apply rounded-[26px] border border-border bg-[rgba(252,250,245,0.96)] p-6 shadow-panel sm:p-7;
+        @apply rounded-[26px] border border-border bg-[rgba(252,248,240,0.97)] p-6 shadow-panel sm:p-7;
     }
 
     .cc-panel-heading h2 {
-        @apply text-[1.8rem] font-semibold tracking-[-0.03em] text-ink;
+        @apply font-display text-[1.8rem] font-semibold tracking-[-0.03em] text-ink;
     }
 
     .cc-panel-copy {

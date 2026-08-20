@@ -8,26 +8,34 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                canvas: "#f8f4eb",
-                surface: "#fff8ec",
-                ink: "#1f2a2a",
+                canvas: "#f3ede2",
+                surface: "#fbf7ef",
+                ink: "#1d2528",
                 accent: {
-                    DEFAULT: "#254f46",
-                    soft: "#d9eadf",
-                    strong: "#16352f"
+                    DEFAULT: "#23463f",
+                    soft: "#dde6dd",
+                    strong: "#162f2a"
                 },
-                border: "#cbbfa8",
-                sand: "#efe4cf"
+                border: "#cdbfa8",
+                sand: "#ece2d0"
             },
             fontFamily: {
                 sans: [
+                    "\"Aptos\"",
                     "\"Segoe UI\"",
                     "system-ui",
                     "sans-serif"
+                ],
+                display: [
+                    "\"Iowan Old Style\"",
+                    "\"Palatino Linotype\"",
+                    "\"Book Antiqua\"",
+                    "Georgia",
+                    "serif"
                 ]
             },
             boxShadow: {
-                panel: "0 18px 36px rgba(33, 28, 18, 0.10)"
+                panel: "0 22px 46px rgba(31, 27, 18, 0.11)"
             },
             borderRadius: {
                 panel: "24px"
