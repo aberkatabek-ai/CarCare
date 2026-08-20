@@ -1032,15 +1032,16 @@ a.secondary-button {
 }
 
 .vehicle-detail {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: start;
     min-height: 110px;
     padding: 12px;
 
     background: white;
     border: 1px solid var(--border);
     border-radius: var(--radius-small);
+    text-align: center;
 }
 
 .vehicle-detail strong,
@@ -1057,6 +1058,7 @@ a.secondary-button {
 }
 
 .vehicle-detail strong {
+    align-self: end;
     font-size: 14px;
     line-height: 1.25;
 }
