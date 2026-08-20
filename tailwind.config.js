@@ -12,9 +12,9 @@ module.exports = {
                 surface: "#fbf7ef",
                 ink: "#1d2528",
                 accent: {
-                    DEFAULT: "#23463f",
-                    soft: "#dde6dd",
-                    strong: "#162f2a"
+                    DEFAULT: "#8d2f2f",
+                    soft: "#f0dcda",
+                    strong: "#641f1f"
                 },
                 border: "#cdbfa8",
                 sand: "#ece2d0"
