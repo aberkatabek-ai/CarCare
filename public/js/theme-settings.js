@@ -61,7 +61,11 @@
 
                 renderActiveTheme(appliedTheme);
                 showThemeMessage(
-                    "Accent color saved for this device."
+                    window.translateAppText
+                        ? window.translateAppText(
+                              "Accent color saved for this device."
+                          )
+                        : "Accent color saved for this device."
                 );
             }
         );

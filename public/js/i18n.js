@@ -1929,6 +1929,35 @@
     }
 
     function translateAttributes(element) {
+        const dataI18nValue =
+            element.getAttribute("data-i18n");
+
+        if (dataI18nValue) {
+            const translatedText =
+                translateText(dataI18nValue);
+
+            if (translatedText) {
+                element.textContent = translatedText;
+            }
+        }
+
+        const dataI18nAriaLabel =
+            element.getAttribute("data-i18n-aria-label");
+
+        if (dataI18nAriaLabel) {
+            const translatedAriaLabel =
+                translateText(
+                    dataI18nAriaLabel
+                );
+
+            if (translatedAriaLabel) {
+                element.setAttribute(
+                    "aria-label",
+                    translatedAriaLabel
+                );
+            }
+        }
+
         ["placeholder", "aria-label", "title"].forEach((attributeName) => {
             const attributeValue = element.getAttribute(attributeName);
 
