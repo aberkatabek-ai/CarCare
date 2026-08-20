@@ -737,11 +737,12 @@
     }
 
     .health-owner span {
-        font-size: 10px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
     }
 
     .health-owner strong {
-        font-size: 18px;
+        font-size: 19px;
     }
 
     .health-section {
