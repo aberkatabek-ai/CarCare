@@ -14,7 +14,7 @@
     }
 
     .cc-auth-body {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(255,106,61,0.20),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(214,40,40,0.18),transparent_32%),linear-gradient(135deg,#f4eee3,#ddd3c2)] px-5 py-8 sm:px-6;
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(91,142,255,0.22),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(35,85,216,0.18),transparent_32%),linear-gradient(135deg,#f7faff,#dee7f4)] px-5 py-8 sm:px-6;
     }
 
     .cc-auth-container {
@@ -54,7 +54,7 @@
     }
 
     .cc-helper-link {
-        @apply text-sm font-semibold text-[#bf2f2f] transition hover:text-accent-strong hover:underline;
+        @apply text-sm font-semibold text-[#2355d8] transition hover:text-accent-strong hover:underline;
     }
 
     .cc-divider {
@@ -70,7 +70,7 @@
     }
 
     .cc-nav-link {
-        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#655d50] transition hover:bg-[#fde3e3] hover:text-accent;
+        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#5b6880] transition hover:bg-[#dbe6ff] hover:text-accent;
     }
 
     .cc-nav-link-active {
@@ -78,11 +78,11 @@
     }
 
     .cc-hero-card {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(248,221,221,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(251,252,254,0.99),rgba(224,234,252,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-kicker {
-        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#b43a3a];
+        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#3f67c0];
     }
 
     .cc-stat-card {
@@ -94,7 +94,7 @@
     }
 
     .cc-page-hero {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(248,221,221,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(251,252,254,0.99),rgba(224,234,252,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-page-hero-title {
@@ -997,7 +997,7 @@
 
     .priority-badge.warning,
     .issue-risk-badge.orange {
-        @apply bg-[#efe2c4] text-[#7d6a44];
+        @apply bg-[#e4ecff] text-[#3052a0];
     }
 
     .priority-badge.info,
@@ -1018,7 +1018,7 @@
     }
 
     .issue-card.risk-orange {
-        @apply border-l-[#8f7a52];
+        @apply border-l-[#5d82d8];
     }
 
     .issue-card.risk-red {
@@ -1071,7 +1071,7 @@
 
     .risk-preview.orange,
     .issue-guidance.orange {
-        @apply border-[#cfbe94] bg-[#f0e6d0] text-[#7d6a44];
+        @apply border-[#c9d7f4] bg-[#edf3ff] text-[#3052a0];
     }
 
     .risk-preview.red,
@@ -1154,7 +1154,7 @@
 
     .mileage-timeline::before {
         content: "";
-        @apply absolute bottom-5 left-[18px] top-5 w-0.5 bg-[#d3c3ae];
+        @apply absolute bottom-5 left-[18px] top-5 w-0.5 bg-[#cad7ef];
     }
 
     .mileage-record {
@@ -1259,7 +1259,7 @@
     }
 
     .detail-status-due-soon {
-        @apply bg-[#efe2c4] text-[#7d6a44];
+        @apply bg-[#e4ecff] text-[#3052a0];
     }
 
     .detail-status-ok {
@@ -1331,7 +1331,7 @@
     }
 
     .passport-footer {
-        @apply cc-panel mt-5 flex flex-wrap items-center justify-between gap-6 bg-[#e6ddd1] text-[#55606c];
+        @apply cc-panel mt-5 flex flex-wrap items-center justify-between gap-6 bg-[#e7eef9] text-[#55606c];
     }
 
     .passport-footer-brand {

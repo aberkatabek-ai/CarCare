@@ -8,16 +8,16 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                canvas: "#f3ede2",
-                surface: "#fbf7ef",
-                ink: "#1d2528",
+                canvas: "#e9eef5",
+                surface: "#fbfcfe",
+                ink: "#142033",
                 accent: {
-                    DEFAULT: "#d62828",
-                    soft: "#fde3e3",
-                    strong: "#a61b1b"
+                    DEFAULT: "#2355d8",
+                    soft: "#dbe6ff",
+                    strong: "#183ba1"
                 },
-                border: "#cdbfa8",
-                sand: "#ece2d0"
+                border: "#ced8e8",
+                sand: "#edf3fb"
             },
             fontFamily: {
                 sans: [
@@ -35,7 +35,7 @@ module.exports = {
                 ]
             },
             boxShadow: {
-                panel: "0 22px 46px rgba(31, 27, 18, 0.11)"
+                panel: "0 22px 46px rgba(20, 32, 51, 0.10)"
             },
             borderRadius: {
                 panel: "24px"

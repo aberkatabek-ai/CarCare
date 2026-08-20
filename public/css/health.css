@@ -20,13 +20,13 @@
     background:
         radial-gradient(
             circle at top right,
-            rgba(188, 160, 109, 0.18),
+            rgba(91, 142, 255, 0.18),
             transparent 32%
         ),
         linear-gradient(
             145deg,
-            rgba(252, 247, 239, 0.99),
-            rgba(235, 226, 212, 0.95)
+            rgba(251, 252, 254, 0.99),
+            rgba(224, 234, 252, 0.95)
         );
 
     border-radius: 28px;
@@ -42,7 +42,7 @@
 .health-eyebrow {
     margin: 0 0 12px;
 
-    color: #75684a;
+    color: #3f67c0;
 
     font-size: 13px;
     font-weight: 850;
@@ -74,7 +74,7 @@
     min-width: 210px;
     padding: 19px;
 
-    background: rgba(249, 242, 231, 0.96);
+    background: rgba(235, 242, 255, 0.96);
     border: 1px solid var(--border);
     border-radius: 16px;
     box-shadow: 0 12px 24px rgba(33, 28, 18, 0.08);
@@ -88,7 +88,7 @@
 .health-owner span {
     margin-bottom: 6px;
 
-    color: #75684a;
+    color: #3f67c0;
     font-size: 11px;
     text-transform: uppercase;
 }
@@ -124,7 +124,7 @@
 }
 
 .orange-stat {
-    border-top-color: #8f7a52;
+    border-top-color: #5d82d8;
 }
 
 .green-stat {
@@ -186,10 +186,10 @@
     margin-bottom: 22px;
     padding: 14px;
 
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #3052a0;
+    background: #e4ecff;
 
-    border: 1px solid #cfbe94;
+    border: 1px solid #c9d7f4;
     border-radius: 10px;
 }
 
@@ -306,9 +306,9 @@
 }
 
 .risk-preview.orange {
-    color: #7d6a44;
-    background: #f0e6d0;
-    border-color: #cfbe94;
+    color: #3052a0;
+    background: #edf3ff;
+    border-color: #c9d7f4;
 }
 
 .risk-preview.red {
@@ -401,7 +401,7 @@
 }
 
 .issue-card.risk-orange {
-    border-left-color: #8f7a52;
+    border-left-color: #5d82d8;
 }
 
 .issue-card.risk-red {
@@ -454,8 +454,8 @@
 }
 
 .issue-risk-badge.orange {
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #3052a0;
+    background: #e4ecff;
 }
 
 .issue-risk-badge.red {
@@ -528,8 +528,8 @@
 }
 
 .issue-guidance.orange {
-    color: #7d6a44;
-    background: #f0e6d0;
+    color: #3052a0;
+    background: #edf3ff;
 }
 
 .issue-guidance.red {
@@ -549,7 +549,7 @@
     padding: 13px;
 
     background: #ece3d6;
-    border: 1px solid #d3c3ae;
+    border: 1px solid #cad7ef;
     border-radius: 9px;
 }
 
@@ -597,7 +597,7 @@
     padding: 65px 24px;
 
     background: var(--surface-soft);
-    border: 1px dashed #b29f88;
+    border: 1px dashed #a9b9d3;
     border-radius: var(--radius-large);
 
     text-align: center;

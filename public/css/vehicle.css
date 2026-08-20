@@ -62,7 +62,7 @@
 
 .page-action-link:hover,
 .section-action-link:hover {
-    background: #cac1af;
+    background: #dbe5f7;
 }
 
 .passport-toolbar {
@@ -125,13 +125,13 @@
     background:
         radial-gradient(
             circle at top right,
-            rgba(188, 160, 109, 0.18),
+            rgba(91, 142, 255, 0.18),
             transparent 30%
         ),
         linear-gradient(
             145deg,
-            rgba(252, 247, 239, 0.99),
-            rgba(235, 226, 212, 0.95)
+            rgba(251, 252, 254, 0.99),
+            rgba(224, 234, 252, 0.95)
         );
     border-radius: 28px;
     box-shadow: 0 24px 50px rgba(31, 27, 18, 0.1);
@@ -144,7 +144,7 @@
 .back-link {
     display: inline-block;
     margin-bottom: 28px;
-    color: #8a7550;
+    color: #4065b3;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -156,7 +156,7 @@
 
 .vehicle-hero-eyebrow {
     margin: 0 0 9px;
-    color: #75684a;
+    color: #3f67c0;
     font-size: 13px;
     font-weight: 850;
     letter-spacing: 0.1em;
@@ -315,11 +315,11 @@
 
 .attention-summary.has-attention {
     border-color: #c2b089;
-    box-shadow: inset 0 3px 0 #8f7a52;
+    box-shadow: inset 0 3px 0 #5d82d8;
 }
 
 .attention-summary.has-attention strong {
-    color: #7d6a44;
+    color: #3052a0;
 }
 
 .cost-summary strong {
@@ -390,8 +390,8 @@
 }
 
 .signal-tone.watch {
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #3052a0;
+    background: #e4ecff;
 }
 
 .signal-tone.risk {
@@ -524,8 +524,8 @@
 }
 
 .priority-badge.warning {
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #3052a0;
+    background: #e4ecff;
 }
 
 .priority-badge.info {
@@ -593,7 +593,7 @@
     min-height: 210px;
     padding: 42px 25px;
     background: var(--surface-soft);
-    border: 1px dashed #b29f88;
+    border: 1px dashed #a9b9d3;
     border-radius: var(--radius-medium);
     text-align: center;
 }
@@ -636,7 +636,7 @@
     bottom: 20px;
     left: 18px;
     width: 2px;
-    background: #d3c3ae;
+    background: #cad7ef;
     content: "";
 }
 
@@ -713,7 +713,7 @@
 
 .critical-vehicle-plan {
     border-color: #cda364;
-    box-shadow: inset 4px 0 0 #8f7a52;
+    box-shadow: inset 4px 0 0 #5d82d8;
 }
 
 .vehicle-plan-heading,
@@ -762,8 +762,8 @@
 }
 
 .detail-status-due-soon {
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #3052a0;
+    background: #e4ecff;
 }
 
 .detail-status-ok {
@@ -913,7 +913,7 @@
     margin-top: 20px;
     padding: 23px 26px;
     color: #55606c;
-    background: #e6ddd1;
+    background: #e7eef9;
     border: 1px solid #cdbfaa;
     border-radius: var(--radius-large);
 }
