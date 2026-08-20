@@ -53,6 +53,27 @@ const {
 );
 
 const app = express();
+const publicDirectory = path.join(
+    __dirname,
+    "..",
+    "public"
+);
+const staticPagePaths = new Set([
+    "/",
+    "/buyer-package",
+    "/costs",
+    "/documents",
+    "/forgot-password",
+    "/health",
+    "/login",
+    "/maintenance",
+    "/register",
+    "/service-history",
+    "/settings",
+    "/share",
+    "/swagger",
+    "/vehicle"
+]);
 const generalApiLimiter = createRateLimiter({
     keyPrefix: "api-general",
     windowMs: 60 * 1000,
@@ -89,18 +110,54 @@ app.use(
 
 app.use("/api", generalApiLimiter);
 
+app.use((req, res, next) => {
+    if (
+        req.method !== "GET" &&
+        req.method !== "HEAD"
+    ) {
+        next();
+        return;
+    }
+
+    if (!req.path.endsWith(".html")) {
+        next();
+        return;
+    }
+
+    const normalizedPath =
+        req.path === "/index.html"
+            ? "/"
+            : req.path.slice(0, -5);
+
+    if (!staticPagePaths.has(normalizedPath)) {
+        next();
+        return;
+    }
+
+    const queryIndex =
+        req.originalUrl.indexOf("?");
+    const query =
+        queryIndex >= 0
+            ? req.originalUrl.slice(queryIndex)
+            : "";
+
+    res.redirect(
+        301,
+        `${normalizedPath}${query}`
+    );
+});
+
 app.use(
     express.static(
-        path.join(
-            __dirname,
-            "..",
-            "public"
-        )
+        publicDirectory,
+        {
+            extensions: ["html"]
+        }
     )
 );
 
 app.get("/api/docs", (req, res) => {
-    res.redirect("/swagger.html");
+    res.redirect("/swagger");
 });
 
 app.get(
