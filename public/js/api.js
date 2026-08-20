@@ -7,7 +7,7 @@ const publicPagePaths = new Set([
     "/swagger"
 ]);
 
-const t = (value) =>
+const apiTranslate = (value) =>
     typeof window.translateAppText === "function"
         ? window.translateAppText(value)
         : value;
@@ -36,7 +36,7 @@ function isRefreshableRequest(url) {
 async function parseApiResponse(response) {
     return response.json().catch(() => ({
         success: false,
-        message: t(
+        message: apiTranslate(
             "The server returned an invalid response."
         )
     }));
@@ -61,7 +61,7 @@ async function refreshAuthSession() {
                     const error =
                         new Error(
                             data.message ||
-                                t(
+                                apiTranslate(
                                     "Session refresh failed."
                                 )
                         );
@@ -124,7 +124,7 @@ async function apiRequest(
             const error = new Error(
                 data.message ||
                     refreshError.message ||
-                    t("Request failed.")
+                    apiTranslate("Request failed.")
             );
 
             error.status = 401;
@@ -137,7 +137,7 @@ async function apiRequest(
     if (!response.ok) {
         const error = new Error(
             data.message ||
-            t("Request failed.")
+            apiTranslate("Request failed.")
         );
 
         error.status = response.status;
@@ -176,37 +176,37 @@ function handlePageLoadError(
 const navigationItems = [
     {
         href: "/",
-        label: t("Dashboard")
+        label: apiTranslate("Dashboard")
     },
 
     {
         href: "/maintenance",
-        label: t("Maintenance")
+        label: apiTranslate("Maintenance")
     },
 
     {
         href: "/health",
-        label: t("Health center")
+        label: apiTranslate("Health center")
     },
 
     {
         href: "/service-history",
-        label: t("Service history")
+        label: apiTranslate("Service history")
     },
 
     {
         href: "/documents",
-        label: t("Documents")
+        label: apiTranslate("Documents")
     },
 
     {
         href: "/settings",
-        label: t("Settings")
+        label: apiTranslate("Settings")
     },
 
     {
         href: "/costs",
-        label: t("Costs")
+        label: apiTranslate("Costs")
     }
 ];
 
@@ -256,7 +256,7 @@ function enhanceBrandNavigation() {
     brand.setAttribute("tabindex", "0");
     brand.setAttribute(
         "aria-label",
-        t("Go to dashboard")
+        apiTranslate("Go to dashboard")
     );
 
     if (brand.dataset.dashboardBound) {
@@ -348,8 +348,8 @@ function ensureMobileNavigationToggle() {
         );
 
         toggleButton.textContent = isOpen
-            ? t("Close")
-            : t("Menu");
+            ? apiTranslate("Close")
+            : apiTranslate("Menu");
 
         toggleButton.setAttribute(
             "aria-expanded",
@@ -359,8 +359,8 @@ function ensureMobileNavigationToggle() {
         toggleButton.setAttribute(
             "aria-label",
             isOpen
-                ? t("Close navigation menu")
-                : t("Open navigation menu")
+                ? apiTranslate("Close navigation menu")
+                : apiTranslate("Open navigation menu")
         );
     }
 
