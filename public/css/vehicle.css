@@ -983,6 +983,22 @@
         border-top: 1px solid var(--border);
         border-left: 0;
     }
+
+    .vehicle-signal-grid,
+    .forecast-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .signal-score-row,
+    .priority-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .signal-tone,
+    .priority-badge {
+        align-self: flex-start;
+    }
 }
 
 @media (max-width: 640px) {
@@ -1023,6 +1039,35 @@
 
     .vehicle-hero {
         padding: 27px 22px;
+    }
+
+    .vehicle-insights-section {
+        margin-top: 16px;
+    }
+
+    .vehicle-signal-card,
+    .vehicle-priority-panel {
+        padding: 18px;
+    }
+
+    .vehicle-section-heading h2 {
+        font-size: 1.85rem;
+        line-height: 1.1;
+    }
+
+    .signal-score {
+        font-size: 42px;
+    }
+
+    .signal-score-row {
+        gap: 10px;
+    }
+
+    .vehicle-signal-card p,
+    .forecast-card p,
+    .priority-item-content p {
+        font-size: 14px;
+        line-height: 1.7;
     }
 
     .vehicle-summary-grid {
@@ -1099,6 +1144,25 @@
     .vehicle-detail-section,
     .passport-footer {
         padding: 18px;
+    }
+
+    .vehicle-section-heading h2 {
+        font-size: 1.55rem;
+    }
+
+    .signal-label,
+    .forecast-card span,
+    .priority-item-content span {
+        letter-spacing: 0.06em;
+    }
+
+    .signal-score {
+        font-size: 36px;
+    }
+
+    .signal-tone,
+    .priority-badge {
+        white-space: normal;
     }
 }
 
