@@ -3237,58 +3237,10 @@ function renderSoldVehicles() {
 
 async function loadDashboard() {
     try {
-        const [
-            userData,
-            vehicleData,
-            soldVehicleData,
-            maintenanceData,
-            historyData,
-            issueData,
-            documentData,
-            fuelData,
-            expenseData,
-            ownershipCostData
-        ] = await Promise.all([
-            window.apiRequest(
+        const userData =
+            await window.apiRequest(
                 "/api/auth/me"
-            ),
-
-            window.apiRequest(
-                "/api/vehicles"
-            ),
-            window.apiRequest(
-                "/api/vehicles/archive"
-            ),
-
-            window.apiRequest(
-                "/api/maintenance-plans"
-            ),
-
-            window.apiRequest(
-                "/api/service-history"
-            ),
-
-            requestOptionalList(
-                "/api/issues",
-                "issues"
-            ),
-
-            requestOptionalList(
-                "/api/documents",
-                "documents"
-            ),
-            requestOptionalList(
-                "/api/costs/fuel",
-                "fuelEntries"
-            ),
-            requestOptionalList(
-                "/api/costs/expenses",
-                "expenses"
-            ),
-            window.apiRequest(
-                "/api/costs/summary"
-            )
-        ]);
+            );
 
         userNameElement.textContent =
             getDisplayName(
@@ -3299,26 +3251,90 @@ async function loadDashboard() {
             userData.user.email;
         renderUserEmail();
 
+        const results =
+            await Promise.allSettled([
+                window.apiRequest(
+                    "/api/vehicles"
+                ),
+                window.apiRequest(
+                    "/api/vehicles/archive"
+                ),
+                window.apiRequest(
+                    "/api/maintenance-plans"
+                ),
+                window.apiRequest(
+                    "/api/service-history"
+                ),
+                requestOptionalList(
+                    "/api/issues",
+                    "issues"
+                ),
+                requestOptionalList(
+                    "/api/documents",
+                    "documents"
+                ),
+                requestOptionalList(
+                    "/api/costs/fuel",
+                    "fuelEntries"
+                ),
+                requestOptionalList(
+                    "/api/costs/expenses",
+                    "expenses"
+                ),
+                window.apiRequest(
+                    "/api/costs/summary"
+                )
+            ]);
+
+        results.forEach((result) => {
+            if (result.status === "rejected") {
+                console.error(result.reason);
+            }
+        });
+
         vehicles =
-            vehicleData.vehicles;
+            results[0].status === "fulfilled"
+                ? results[0].value.vehicles || []
+                : [];
 
         soldVehicles =
-            soldVehicleData.vehicles;
+            results[1].status === "fulfilled"
+                ? results[1].value.vehicles || []
+                : [];
 
         maintenancePlans =
-            maintenanceData
-                .maintenancePlans;
+            results[2].status === "fulfilled"
+                ? results[2].value
+                      .maintenancePlans || []
+                : [];
 
         serviceHistory =
-            historyData.serviceHistory;
+            results[3].status === "fulfilled"
+                ? results[3].value
+                      .serviceHistory || []
+                : [];
 
-        vehicleIssues = issueData;
+        vehicleIssues =
+            results[4].status === "fulfilled"
+                ? results[4].value
+                : [];
 
-        vehicleDocuments = documentData;
-        fuelEntries = fuelData;
-        vehicleExpenses = expenseData;
+        vehicleDocuments =
+            results[5].status === "fulfilled"
+                ? results[5].value
+                : [];
+        fuelEntries =
+            results[6].status === "fulfilled"
+                ? results[6].value
+                : [];
+        vehicleExpenses =
+            results[7].status === "fulfilled"
+                ? results[7].value
+                : [];
         ownershipCostSummary =
-            ownershipCostData.summary || {};
+            results[8].status === "fulfilled"
+                ? results[8].value.summary || {}
+                : {};
 
         renderVehicles();
         renderSoldVehicles();
