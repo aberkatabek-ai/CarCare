@@ -1,24 +1,24 @@
 :root {
-    --background: #dfe6ea;
-    --surface: #f8faf9;
-    --surface-soft: #e8eeef;
+    --background: #dfd5c5;
+    --surface: #fbf7ef;
+    --surface-soft: #eee5d7;
 
-    --primary: #17323b;
-    --primary-dark: #0f232b;
-    --primary-soft: #dce7e5;
+    --primary: #23463f;
+    --primary-dark: #162f2a;
+    --primary-soft: #e0d5c1;
 
-    --text: #142027;
-    --muted: #5f6f76;
-    --border: #c7d1d4;
+    --text: #1d2528;
+    --muted: #6b6458;
+    --border: #cdbfa8;
 
-    --success: #245c54;
-    --success-background: #dcebe7;
+    --success: #476f5f;
+    --success-background: #dfe9df;
 
-    --error: #8c413c;
-    --error-background: #f1ddda;
+    --error: #8f443c;
+    --error-background: #edd9d4;
 
     --shadow:
-        0 24px 56px rgba(20, 32, 39, 0.12);
+        0 24px 56px rgba(31, 27, 18, 0.13);
 
     --font-sans:
         "Aptos",
@@ -29,13 +29,11 @@
         BlinkMacSystemFont,
         sans-serif;
     --font-display:
-        "Aptos",
-        "Segoe UI",
-        "Trebuchet MS",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        sans-serif;
+        "Iowan Old Style",
+        "Palatino Linotype",
+        "Book Antiqua",
+        Georgia,
+        serif;
 
     --radius-large: 24px;
     --radius-medium: 14px;
@@ -59,15 +57,15 @@ body {
     background:
         radial-gradient(
             circle at top left,
-            rgba(91, 123, 136, 0.14),
+            rgba(182, 156, 109, 0.18),
             transparent 30%
         ),
         radial-gradient(
             circle at right top,
-            rgba(23, 50, 59, 0.10),
+            rgba(35, 70, 63, 0.09),
             transparent 28%
         ),
-        linear-gradient(180deg, #f3f6f7 0%, var(--background) 46%);
+        linear-gradient(180deg, #efe8dc 0%, var(--background) 46%);
 
     font-family:
         var(--font-sans);
@@ -108,15 +106,15 @@ a {
     background:
         radial-gradient(
             circle at top left,
-            rgba(91, 123, 136, 0.18),
+            rgba(182, 156, 109, 0.24),
             transparent 35%
         ),
         radial-gradient(
             circle at bottom right,
-            rgba(23, 50, 59, 0.16),
+            rgba(35, 70, 63, 0.16),
             transparent 32%
         ),
-        linear-gradient(135deg, #f7fafb, #dbe4e7);
+        linear-gradient(135deg, #f4eee3, #ddd3c2);
 }
 
 .auth-container {
@@ -127,7 +125,7 @@ a {
 .auth-card {
     padding: 38px;
 
-    background: rgba(248, 250, 249, 0.97);
+    background: rgba(252, 248, 240, 0.97);
     border: 1px solid rgba(255, 255, 255, 0.52);
     border-radius: var(--radius-large);
 
@@ -162,7 +160,7 @@ a {
         linear-gradient(
             135deg,
             var(--primary),
-            #4d6670
+            #7b6a49
         );
 
     border-radius: 14px;
@@ -214,7 +212,7 @@ a {
 }
 
 .auth-inline-link {
-    color: #4e6670;
+    color: #7d6a44;
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
@@ -318,8 +316,8 @@ a {
     padding: 0 10px;
 
     color: var(--primary);
-    background: rgba(23, 50, 59, 0.08);
-    border: 1px solid rgba(23, 50, 59, 0.15);
+    background: rgba(31, 74, 58, 0.08);
+    border: 1px solid rgba(31, 74, 58, 0.15);
     border-radius: 999px;
 
     font-size: 12px;
@@ -328,12 +326,12 @@ a {
 }
 
 .password-toggle:hover {
-    background: rgba(23, 50, 59, 0.14);
+    background: rgba(31, 74, 58, 0.14);
     transform: translateY(-50%);
 }
 
 .password-toggle:focus-visible {
-    outline: 2px solid rgba(23, 50, 59, 0.28);
+    outline: 2px solid rgba(31, 74, 58, 0.28);
     outline-offset: 2px;
 }
 
@@ -392,7 +390,7 @@ a {
 }
 
 .secondary-button:hover {
-    background: #d2dddd;
+    background: #cac1af;
 }
 
 a.secondary-button {
@@ -465,7 +463,7 @@ a.secondary-button {
     top: 0;
     z-index: 20;
 
-    background: rgba(246, 249, 249, 0.92);
+    background: rgba(250, 246, 238, 0.92);
     border-bottom: 1px solid var(--border);
 
     backdrop-filter: blur(12px);
@@ -533,12 +531,12 @@ a.secondary-button {
     background:
         linear-gradient(
             145deg,
-            rgba(249, 251, 250, 0.98),
-            rgba(231, 238, 239, 0.94)
+            rgba(251, 247, 239, 0.98),
+            rgba(235, 226, 212, 0.93)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
-    box-shadow: 0 22px 44px rgba(20, 32, 39, 0.08);
+    box-shadow: 0 22px 44px rgba(31, 27, 18, 0.09);
 }
 
 .welcome-actions {
@@ -586,7 +584,7 @@ a.secondary-button {
     height: 34px;
     padding: 0;
     color: var(--muted);
-    background: rgba(255, 255, 255, 0.68);
+    background: rgba(255, 255, 255, 0.45);
     border: 1px solid var(--border);
     border-radius: 999px;
     cursor: pointer;
@@ -599,7 +597,7 @@ a.secondary-button {
 .email-visibility-button:hover,
 .email-visibility-button:focus-visible {
     background: rgba(255, 255, 255, 0.75);
-    border-color: #95a7ae;
+    border-color: #a39681;
     transform: translateY(-1px);
 }
 
@@ -617,8 +615,8 @@ a.secondary-button {
 }
 
 .status-badge.warning {
-    color: #735634;
-    background: #f1e5cc;
+    color: #7d6a44;
+    background: #efe2c4;
 }
 
 .status-badge.risk {
@@ -640,8 +638,8 @@ a.secondary-button {
     background:
         linear-gradient(
             180deg,
-            rgba(248, 250, 249, 0.98),
-            rgba(233, 239, 240, 0.94)
+            rgba(247, 243, 234, 0.98),
+            rgba(239, 232, 220, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
@@ -659,8 +657,8 @@ a.secondary-button {
     background:
         linear-gradient(
             145deg,
-            rgba(248, 250, 249, 0.98),
-            rgba(233, 239, 240, 0.94)
+            rgba(247, 243, 234, 0.98),
+            rgba(239, 232, 220, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);
@@ -707,7 +705,7 @@ a.secondary-button {
     padding: 10px 14px;
 
     color: var(--muted);
-    background: rgba(247, 250, 249, 0.92);
+    background: rgba(255, 248, 236, 0.92);
     border: 1px solid var(--border);
     border-radius: 999px;
     cursor: pointer;
@@ -724,7 +722,7 @@ a.secondary-button {
 
 .dashboard-widget-toggle:hover {
     transform: translateY(-1px);
-    border-color: #a6b5ba;
+    border-color: #b7ab98;
 }
 
 .dashboard-widget-toggle input {
@@ -735,8 +733,8 @@ a.secondary-button {
 
 .dashboard-widget-toggle.active {
     color: var(--primary);
-    background: rgba(219, 230, 228, 0.95);
-    border-color: rgba(23, 50, 59, 0.18);
+    background: rgba(221, 235, 226, 0.95);
+    border-color: rgba(47, 108, 83, 0.24);
 }
 
 .dashboard-workspace {
@@ -827,7 +825,7 @@ a.secondary-button {
     padding: 70px 24px;
 
     background: var(--surface);
-    border: 1px dashed #9eafb4;
+    border: 1px dashed #ae9c7f;
     border-radius: var(--radius-large);
 
     text-align: center;
@@ -867,8 +865,8 @@ a.secondary-button {
     background:
         linear-gradient(
             180deg,
-            rgba(246, 249, 249, 0.96),
-            rgba(228, 235, 237, 0.92)
+            rgba(243, 237, 227, 0.96),
+            rgba(232, 224, 210, 0.92)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-medium);
@@ -887,13 +885,13 @@ a.secondary-button {
     background:
         linear-gradient(
             180deg,
-            rgba(239, 244, 245, 0.96),
-            rgba(224, 232, 234, 0.92)
+            rgba(238, 232, 223, 0.96),
+            rgba(226, 218, 204, 0.92)
         );
 }
 
 .sold-vehicle-card .danger-button {
-    background: #eddad7;
+    background: #ead7d1;
 }
 
 .sold-vehicles-panel .vehicle-grid {
@@ -948,8 +946,8 @@ a.secondary-button {
 }
 
 .ownership-badge.pending {
-    color: #735634;
-    background: #f1e5cc;
+    color: #7d6a44;
+    background: #efe2c4;
 }
 
 .ownership-badge.failed {
@@ -958,8 +956,8 @@ a.secondary-button {
 }
 
 .ownership-badge.muted {
-    color: #4f6068;
-    background: #dfe6e7;
+    color: #55606c;
+    background: #e6e0d6;
 }
 
 .sold-vehicle-card .ownership-badge {
@@ -1107,9 +1105,9 @@ a.secondary-button {
     padding: 14px;
 
     color: #7f4d1f;
-    background: #f5ead4;
+    background: #efe1bf;
 
-    border: 1px solid #d8c097;
+    border: 1px solid #d2bb84;
     border-radius: var(--radius-small);
 
     font-size: 14px;
@@ -1242,7 +1240,7 @@ a.secondary-button {
         width: 100%;
         padding: 12px;
 
-        background: rgba(248, 250, 249, 0.98);
+        background: rgba(252, 250, 245, 0.98);
         border: 1px solid var(--border);
         border-radius: 18px;
         box-shadow: 0 20px 40px rgba(18, 20, 23, 0.14);

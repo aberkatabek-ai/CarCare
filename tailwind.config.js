@@ -8,16 +8,16 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                canvas: "#e7ecef",
-                surface: "#f8faf9",
-                ink: "#142027",
+                canvas: "#f3ede2",
+                surface: "#fbf7ef",
+                ink: "#1d2528",
                 accent: {
-                    DEFAULT: "#17323b",
-                    soft: "#dbe6e4",
-                    strong: "#0f232b"
+                    DEFAULT: "#23463f",
+                    soft: "#dde6dd",
+                    strong: "#162f2a"
                 },
-                border: "#c7d1d4",
-                sand: "#e3e9e8"
+                border: "#cdbfa8",
+                sand: "#ece2d0"
             },
             fontFamily: {
                 sans: [
@@ -27,14 +27,15 @@ module.exports = {
                     "sans-serif"
                 ],
                 display: [
-                    "\"Aptos\"",
-                    "\"Segoe UI\"",
-                    "system-ui",
-                    "sans-serif"
+                    "\"Iowan Old Style\"",
+                    "\"Palatino Linotype\"",
+                    "\"Book Antiqua\"",
+                    "Georgia",
+                    "serif"
                 ]
             },
             boxShadow: {
-                panel: "0 24px 48px rgba(20, 32, 39, 0.10)"
+                panel: "0 22px 46px rgba(31, 27, 18, 0.11)"
             },
             borderRadius: {
                 panel: "24px"
