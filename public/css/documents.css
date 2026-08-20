@@ -714,6 +714,32 @@
 }
 
 @media (max-width: 520px) {
+    .document-panel,
+    .document-form-section,
+    .document-card,
+    .document-information,
+    .document-notes,
+    .document-file-box,
+    .document-empty-state,
+    .document-loading-state,
+    .passport-preview-card,
+    .document-stat-card {
+        color: #172126;
+    }
+
+    .document-section-heading p:last-child,
+    .document-list-heading p:last-child,
+    .document-form-section-heading p,
+    .document-file-help,
+    .document-vehicle-name,
+    .document-information span,
+    .document-notes span,
+    .document-empty-state p,
+    .document-loading-state,
+    .input-suffix span {
+        color: #5f594d;
+    }
+
     .document-statistics {
         grid-template-columns: 1fr;
     }

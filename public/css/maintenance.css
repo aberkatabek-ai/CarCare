@@ -421,6 +421,28 @@
 }
 
 @media (max-width: 520px) {
+    .plans-toolbar,
+    .maintenance-card,
+    .maintenance-detail,
+    .critical-control {
+        color: var(--text);
+    }
+
+    .plans-toolbar label,
+    .maintenance-vehicle,
+    .maintenance-detail-label,
+    .critical-control small,
+    .warning-box,
+    .warning-box p {
+        color: #5f594d;
+    }
+
+    .maintenance-card-header h3,
+    .plans-toolbar h2,
+    .maintenance-detail strong {
+        color: #172126;
+    }
+
     .maintenance-details {
         grid-template-columns: 1fr;
     }

@@ -691,6 +691,33 @@
 }
 
 @media (max-width: 520px) {
+    .cost-panel,
+    .cost-summary-card,
+    .cost-entry-card,
+    .cost-detail,
+    .consumption-box,
+    .cost-entry-notes,
+    .cost-empty-state,
+    .cost-loading-state,
+    .cost-chart-empty {
+        color: #172126;
+    }
+
+    .cost-section-heading p:last-child,
+    .cost-history-heading p:last-child,
+    .cost-summary-card span,
+    .cost-summary-card p,
+    .chart-series-label,
+    .chart-summary-note,
+    .cost-checkbox small,
+    .fuel-price-preview,
+    .cost-entry-vehicle,
+    .cost-detail-label,
+    .cost-empty-state p,
+    .cost-loading-state {
+        color: #5f594d;
+    }
+
     .cost-summary-grid {
         grid-template-columns: 1fr;
     }
