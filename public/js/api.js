@@ -1,9 +1,22 @@
 let refreshPromise = null;
+const publicPagePaths = new Set([
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/share",
+    "/swagger"
+]);
 
 const t = (value) =>
     typeof window.translateAppText === "function"
         ? window.translateAppText(value)
         : value;
+
+function redirectToLogin() {
+    if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+    }
+}
 
 function shouldAddJsonHeader(options) {
     return options.body !== undefined;
@@ -147,7 +160,7 @@ function handlePageLoadError(
     console.error(error);
 
     if (isUnauthorizedError(error)) {
-        window.location.href = "/login";
+        redirectToLogin();
         return true;
     }
 
@@ -509,6 +522,32 @@ function enhanceNavigation() {
     enhanceBrandNavigation();
     ensureMobileNavigationToggle();
 }
+
+async function verifyProtectedPageSession() {
+    const currentPath = window.location.pathname || "/";
+
+    if (publicPagePaths.has(currentPath)) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/auth/me", {
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+
+        if (response.status === 401) {
+            redirectToLogin();
+        }
+    } catch (error) {
+        console.warn(
+            "Initial session verification failed.",
+            error
+        );
+    }
+}
+
+verifyProtectedPageSession();
 
 window.apiRequest = apiRequest;
 window.isUnauthorizedError =
