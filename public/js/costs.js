@@ -1,3 +1,4 @@
+(function initializeCostsPage() {
 const accountName = window.document.querySelector("#account-name");
 const logoutButton = window.document.querySelector("#logout-button");
 
@@ -956,3 +957,4 @@ async function loadCostCenter() {
 }
 
 loadCostCenter();
+})();

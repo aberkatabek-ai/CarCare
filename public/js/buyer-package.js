@@ -1,3 +1,4 @@
+(function initializeBuyerPackagePage() {
 const loadingState = document.querySelector(
     "#buyer-package-loading"
 );
@@ -993,3 +994,4 @@ if (printButton) {
 }
 
 loadBuyerPackageReport();
+})();

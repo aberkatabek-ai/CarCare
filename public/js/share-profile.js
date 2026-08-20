@@ -1,3 +1,4 @@
+(function initializeShareProfilePage() {
 const loadingState = document.querySelector(
     "#share-loading"
 );
@@ -386,3 +387,4 @@ async function loadSharedProfile() {
 }
 
 loadSharedProfile();
+})();

@@ -1,3 +1,4 @@
+(function initializeMaintenancePage() {
 const completionStyle = document.createElement("link");
 
 completionStyle.rel = "stylesheet";
@@ -1034,3 +1035,4 @@ lastServiceDateInput.max = new Date()
     .slice(0, 10);
 
 loadMaintenancePage();
+})();

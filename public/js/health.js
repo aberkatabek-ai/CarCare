@@ -1,3 +1,4 @@
+(function initializeHealthPage() {
 const workflowStyle = document.createElement("style");
 
 workflowStyle.textContent = `
@@ -1999,3 +2000,4 @@ logoutButton.addEventListener(
 );
 
 loadHealthCenter();
+})();

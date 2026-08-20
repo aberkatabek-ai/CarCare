@@ -1,3 +1,4 @@
+(function initializeVehiclePage() {
 const logoutButton = document.querySelector(
     "#logout-button"
 );
@@ -2515,3 +2516,4 @@ window.addEventListener(
 logoutButton.addEventListener("click", logout);
 
 loadVehiclePage();
+})();

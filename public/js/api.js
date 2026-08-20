@@ -1,3 +1,4 @@
+(function initializeCarCareApi() {
 let refreshPromise = null;
 const publicPagePaths = new Set([
     "/login",
@@ -566,3 +567,4 @@ if (
 } else {
     enhanceNavigation();
 }
+})();

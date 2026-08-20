@@ -1,3 +1,4 @@
+(function initializeDashboardPage() {
 const userNameElement = document.querySelector(
     "#user-name"
 );
@@ -3932,3 +3933,4 @@ aiQuickActionButtons.forEach((button) => {
 initializeDashboardCustomization();
 loadDashboard();
 loadAiHistory();
+})();

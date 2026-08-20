@@ -1,3 +1,4 @@
+(function initializeDocumentsPage() {
 const accountName = window.document.querySelector(
     "#account-name"
 );
@@ -1993,3 +1994,4 @@ logoutButton.addEventListener(
 );
 
 loadDocumentCenter();
+})();

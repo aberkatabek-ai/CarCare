@@ -1,3 +1,4 @@
+(function initializeServiceHistoryPage() {
 const accountName = document.querySelector(
     "#account-name"
 );
@@ -388,3 +389,4 @@ logoutButton.addEventListener(
 );
 
 loadServiceHistoryPage();
+})();

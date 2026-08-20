@@ -1,3 +1,4 @@
+(function initializeSettingsPage() {
 const logoutButton = document.querySelector(
     "#logout-button"
 );
@@ -77,6 +78,7 @@ function getPasswordValidationError(
 
     return null;
 }
+})();
 
 function showMessage(
     element,
