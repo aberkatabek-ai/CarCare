@@ -676,6 +676,125 @@ function clearMessage(element) {
     element.className = "form-message";
 }
 
+function normalizeVehicleFormValue(value) {
+    return typeof value === "string"
+        ? value.trim()
+        : "";
+}
+
+function normalizeVehicleIdentifier(
+    value
+) {
+    return normalizeVehicleFormValue(value)
+        .replace(/\s+/g, " ")
+        .toUpperCase();
+}
+
+function isNetworkRequestError(error) {
+    return (
+        error instanceof TypeError &&
+        /failed to fetch/i.test(
+            error.message
+        )
+    );
+}
+
+function isSameVehicleSubmission(
+    vehicle,
+    vehicleData
+) {
+    return (
+        normalizeVehicleIdentifier(
+            vehicle.brand
+        ) ===
+            normalizeVehicleIdentifier(
+                vehicleData.brand
+            ) &&
+        normalizeVehicleIdentifier(
+            vehicle.model
+        ) ===
+            normalizeVehicleIdentifier(
+                vehicleData.model
+            ) &&
+        String(vehicle.model_year || "") ===
+            String(
+                normalizeVehicleFormValue(
+                    vehicleData.modelYear
+                )
+            ) &&
+        normalizeVehicleIdentifier(
+            vehicle.nickname || ""
+        ) ===
+            normalizeVehicleIdentifier(
+                vehicleData.nickname
+            ) &&
+        normalizeVehicleIdentifier(
+            vehicle.license_plate || ""
+        ) ===
+            normalizeVehicleIdentifier(
+                vehicleData.licensePlate
+            ) &&
+        String(
+            vehicle.current_mileage || 0
+        ) ===
+            String(
+                Number(
+                    vehicleData.currentMileage
+                ) || 0
+            )
+    );
+}
+
+async function recoverVehicleCreation(
+    vehicleData
+) {
+    await new Promise((resolve) => {
+        window.setTimeout(resolve, 900);
+    });
+
+    const response =
+        await window.apiRequest(
+            "/api/vehicles",
+            {
+                retryOnUnauthorized: false
+            }
+        );
+
+    const matchingVehicle =
+        (response.vehicles || []).find(
+            (vehicle) =>
+                isSameVehicleSubmission(
+                    vehicle,
+                    vehicleData
+                )
+        );
+
+    if (!matchingVehicle) {
+        return null;
+    }
+
+    const existingVehicleIndex =
+        vehicles.findIndex(
+            (vehicle) =>
+                vehicle.id ===
+                matchingVehicle.id
+        );
+
+    if (existingVehicleIndex >= 0) {
+        vehicles[
+            existingVehicleIndex
+        ] = matchingVehicle;
+    } else {
+        vehicles.unshift(
+            matchingVehicle
+        );
+    }
+
+    renderVehicles();
+
+    return matchingVehicle;
+}
+
 function getMaskedEmail(email) {
     return String(email || "").replace(
         /./g,
@@ -3425,6 +3544,41 @@ vehicleForm.addEventListener(
 
             renderVehicles();
         } catch (error) {
+            if (
+                isNetworkRequestError(
+                    error
+                )
+            ) {
+                try {
+                    const recoveredVehicle =
+                        await recoverVehicleCreation(
+                            vehicleData
+                        );
+
+                    if (
+                        recoveredVehicle
+                    ) {
+                        vehicleForm.reset();
+
+                        showMessage(
+                            vehicleFormMessage,
+                            t(
+                                "Vehicle added successfully."
+                            ),
+                            "success"
+                        );
+
+                        return;
+                    }
+                } catch (
+                    recoveryError
+                ) {
+                    console.error(
+                        recoveryError
+                    );
+                }
+            }
+
             showMessage(
                 vehicleFormMessage,
                 error.message

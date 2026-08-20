@@ -81,6 +81,69 @@ function getOwnershipStatusForPlate(plateKey) {
         : OWNERSHIP_NOT_STARTED;
 }
 
+function normalizeOptionalVehicleText(value) {
+    return typeof value === "string" &&
+        value.trim()
+        ? value.trim()
+        : null;
+}
+
+async function findRecentlyCreatedMatchingVehicle({
+    userId,
+    brand,
+    model,
+    modelYear,
+    nickname,
+    licensePlate,
+    currentMileage
+}) {
+    const result = await db.query(
+        `SELECT
+            id,
+            brand,
+            model,
+            model_year,
+            nickname,
+            license_plate,
+            vehicle_status,
+            ownership_status,
+            ownership_verified_at,
+            ownership_verification_score,
+            ownership_document_id,
+            ownership_failure_reason,
+            ownership_original_file_name,
+            ownership_file_mime_type,
+            sold_at,
+            current_mileage,
+            created_at,
+            updated_at
+         FROM vehicles
+         WHERE user_id = $1
+           AND vehicle_status = $2
+           AND brand = $3
+           AND model = $4
+           AND model_year IS NOT DISTINCT FROM $5
+           AND nickname IS NOT DISTINCT FROM $6
+           AND license_plate IS NOT DISTINCT FROM $7
+           AND current_mileage = $8
+           AND created_at >= NOW() - INTERVAL '10 minutes'
+         ORDER BY created_at DESC, id DESC
+         LIMIT 1`,
+        [
+            userId,
+            ACTIVE_VEHICLE_STATUS,
+            brand,
+            model,
+            modelYear,
+            nickname,
+            licensePlate,
+            currentMileage
+        ]
+    );
+
+    return result.rows[0] || null;
+}
+
 function buildVerifiedPlateConflictResponse(res) {
     return res.status(409).json({
         success: false,
@@ -667,10 +730,9 @@ async function createVehicle(req, res, next) {
         }
 
         const normalizedNickname =
-            typeof nickname === "string" &&
-            nickname.trim()
-                ? nickname.trim()
-                : null;
+            normalizeOptionalVehicleText(
+                nickname
+            );
 
         const normalizedLicensePlate =
             normalizeLicensePlate(
@@ -681,6 +743,34 @@ async function createVehicle(req, res, next) {
             getOwnershipStatusForPlate(
                 normalizedLicensePlate.key
             );
+
+        const existingVehicle =
+            await findRecentlyCreatedMatchingVehicle(
+                {
+                    userId: req.auth.userId,
+                    brand: normalizedBrand,
+                    model: normalizedModel,
+                    modelYear: parsedYear,
+                    nickname:
+                        normalizedNickname,
+                    licensePlate:
+                        normalizedLicensePlate.displayValue,
+                    currentMileage: mileage
+                }
+            );
+
+        if (existingVehicle) {
+            return res.status(200).json({
+                success: true,
+                message:
+                    "Vehicle was already added. Showing the existing record.",
+                vehicle:
+                    mapVehicleRow(
+                        existingVehicle
+                    ),
+                deduplicated: true
+            });
+        }
 
         const result = await db.query(
             `INSERT INTO vehicles (
