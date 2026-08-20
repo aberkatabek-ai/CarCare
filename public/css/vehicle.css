@@ -1045,6 +1045,38 @@
         margin-top: 16px;
     }
 
+    .passport-meta-bar,
+    .vehicle-insights-section,
+    .vehicle-signal-card,
+    .vehicle-priority-panel,
+    .forecast-card,
+    .priority-item,
+    .vehicle-detail-section,
+    .vehicle-summary-card,
+    .mileage-record-content,
+    .passport-record-card,
+    .passport-transaction,
+    .vehicle-service-record,
+    .vehicle-plan-card,
+    .document-information,
+    .vehicle-information-item {
+        color: var(--text);
+    }
+
+    .vehicle-signal-card p,
+    .forecast-card p,
+    .priority-item-content p,
+    .vehicle-summary-card p,
+    .mileage-record-content p,
+    .passport-transaction span,
+    .vehicle-service-heading p,
+    .document-information span,
+    .vehicle-information-item span,
+    .passport-footer,
+    .passport-footer small {
+        color: var(--muted);
+    }
+
     .vehicle-signal-card,
     .vehicle-priority-panel {
         padding: 18px;

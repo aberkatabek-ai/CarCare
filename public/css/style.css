@@ -1279,6 +1279,37 @@ a.secondary-button {
         font-size: 16px;
     }
 
+    .dashboard-header .header-actions,
+    .dashboard-header .header-actions a,
+    .dashboard-header .header-actions button,
+    .welcome-card,
+    .dashboard-customize-panel,
+    .dashboard-section,
+    .statistic-card,
+    .dashboard-widget-chip,
+    .dashboard-alerts-panel,
+    .dashboard-ai-panel,
+    .vehicle-empty-state,
+    .document-empty-state,
+    .health-empty-state,
+    .cost-empty-state {
+        color: var(--text);
+    }
+
+    .dashboard-header .header-actions .nav-link,
+    .dashboard-header .header-actions .secondary-button,
+    .dashboard-header .header-actions button:not(.primary-button):not(.danger-button),
+    .welcome-card .muted-text,
+    .dashboard-customize-panel p,
+    .dashboard-section p,
+    .statistic-card p,
+    .vehicle-empty-state p,
+    .document-empty-state p,
+    .health-empty-state p,
+    .cost-empty-state p {
+        color: var(--muted);
+    }
+
     .dashboard-section {
         padding: 21px;
     }
