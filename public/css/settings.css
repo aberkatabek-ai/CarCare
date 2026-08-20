@@ -92,13 +92,15 @@
 
 .label-with-optional {
     display: inline-flex !important;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .label-with-optional .optional-text {
     margin-left: 0;
+    line-height: 1;
+    transform: translateY(1px);
 }
 
 .label-with-optional .optional-text::before {
