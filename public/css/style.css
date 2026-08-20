@@ -824,6 +824,8 @@ a.secondary-button {
 }
 
 .optional-text {
+    display: inline-block;
+    margin-left: 6px;
     color: var(--muted);
     font-size: 12px;
     font-weight: 500;
