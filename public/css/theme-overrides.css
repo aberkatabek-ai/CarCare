@@ -1,0 +1,159 @@
+body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(182, 156, 109, 0.18),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at right top,
+            rgba(36, 48, 61, 0.08),
+            transparent 28%
+        ),
+        linear-gradient(180deg, #efe8dc 0%, var(--background) 46%) !important;
+}
+
+.auth-body,
+.cc-auth-body,
+.settings-body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(182, 156, 109, 0.24),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(36, 48, 61, 0.12),
+            transparent 32%
+        ),
+        linear-gradient(135deg, #f4eee3, #ddd3c2) !important;
+}
+
+.auth-card,
+.cc-auth-card,
+.welcome-card,
+.dashboard-section,
+.dashboard-customize-panel,
+.cc-hero-card,
+.cc-page-hero,
+.cc-panel,
+.settings-hero,
+.settings-panel,
+.health-hero,
+.vehicle-hero {
+    border-color: var(--border) !important;
+    box-shadow: 0 18px 40px rgba(31, 27, 18, 0.08) !important;
+}
+
+.welcome-card,
+.cc-hero-card,
+.cc-page-hero,
+.settings-hero,
+.health-hero,
+.vehicle-hero {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(251, 247, 239, 0.98),
+            rgba(237, 229, 216, 0.94)
+        ) !important;
+}
+
+.dashboard-section,
+.dashboard-customize-panel,
+.cc-panel,
+.settings-panel {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(247, 243, 234, 0.98),
+            rgba(239, 232, 220, 0.94)
+        ) !important;
+}
+
+.brand-icon,
+.passport-footer-brand > span,
+.mileage-marker {
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        ) !important;
+}
+
+.primary-button,
+.cc-button-primary,
+.page-action-link,
+.section-action-link,
+.passport-print-button {
+    color: white !important;
+    background: var(--action) !important;
+}
+
+.primary-button:hover,
+.cc-button-primary:hover,
+.page-action-link:hover,
+.section-action-link:hover,
+.passport-print-button:hover {
+    background: var(--action-dark) !important;
+}
+
+.secondary-button,
+.cc-button-secondary,
+.dashboard-header .header-actions .secondary-button,
+.dashboard-header .header-actions button:not(.primary-button):not(.danger-button) {
+    color: var(--primary) !important;
+    background: var(--primary-soft) !important;
+}
+
+.secondary-button:hover,
+.cc-button-secondary:hover {
+    background: var(--primary-soft) !important;
+}
+
+.cc-nav-link-active,
+.nav-link-active {
+    color: white !important;
+    background: var(--primary) !important;
+}
+
+.auth-inline-link,
+.auth-switch a,
+.cc-helper-link,
+.toolbar-back-link,
+.back-link,
+.document-file-link {
+    color: var(--primary) !important;
+}
+
+.cc-kicker,
+.eyebrow,
+.health-eyebrow,
+.vehicle-hero-eyebrow,
+.settings-account-badge,
+.status-badge.stable,
+.count-badge,
+.vehicle-count-pill,
+.section-total,
+.health-owner,
+.share-hero-badge {
+    color: var(--primary) !important;
+}
+
+.settings-account-badge,
+.status-badge.stable,
+.count-badge,
+.vehicle-count-pill,
+.health-owner,
+.share-hero-badge,
+.cc-badge {
+    background: var(--primary-soft) !important;
+    border-color: var(--border) !important;
+}
+
+.dashboard-header,
+.cc-nav-row {
+    background: rgba(252, 248, 240, 0.92) !important;
+}

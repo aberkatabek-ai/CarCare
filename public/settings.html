@@ -10,6 +10,8 @@
 
     <title>Settings | CarCare</title>
 
+    <script src="/js/theme.js?v=20260820-theme1"></script>
+
     <link
         rel="stylesheet"
         href="/css/style.css?v=20260820-neutral1"
@@ -29,6 +31,10 @@
         rel="stylesheet"
         href="/css/tailwind.css?v=20260820-neutral1"
     >
+    <link
+        rel="stylesheet"
+        href="/css/theme-overrides.css?v=20260820-theme1"
+    >
 
     <script
         src="/js/i18n.js?v=20260819-i18n1"
@@ -42,6 +48,10 @@
 
     <script
         src="/js/settings.js"
+        defer
+    ></script>
+    <script
+        src="/js/theme-settings.js?v=20260820-theme1"
         defer
     ></script>
 </head>
@@ -91,6 +101,70 @@
         </section>
 
         <section class="settings-grid">
+            <section class="settings-panel">
+                <div class="settings-panel-heading">
+                    <div>
+                        <p class="eyebrow">Appearance</p>
+                        <h2>Accent color</h2>
+                        <p>
+                            Keep the beige background and choose the accent color you prefer.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="theme-picker"
+                    role="group"
+                    aria-label="Accent color options"
+                >
+                    <button
+                        type="button"
+                        class="theme-option"
+                        data-theme-option="graphite"
+                        aria-pressed="false"
+                    >
+                        <span class="theme-swatch theme-swatch-graphite"></span>
+                        Graphite
+                    </button>
+
+                    <button
+                        type="button"
+                        class="theme-option"
+                        data-theme-option="blue"
+                        aria-pressed="false"
+                    >
+                        <span class="theme-swatch theme-swatch-blue"></span>
+                        Blue
+                    </button>
+
+                    <button
+                        type="button"
+                        class="theme-option"
+                        data-theme-option="green"
+                        aria-pressed="false"
+                    >
+                        <span class="theme-swatch theme-swatch-green"></span>
+                        Green
+                    </button>
+
+                    <button
+                        type="button"
+                        class="theme-option"
+                        data-theme-option="red"
+                        aria-pressed="false"
+                    >
+                        <span class="theme-swatch theme-swatch-red"></span>
+                        Red
+                    </button>
+                </div>
+
+                <p
+                    id="theme-selection-message"
+                    class="form-message"
+                    aria-live="polite"
+                ></p>
+            </section>
+
             <section class="settings-panel">
                 <div class="settings-panel-heading">
                     <div>
