@@ -153,6 +153,42 @@
             </div>
         </section>
 
+        <section class="dashboard-customize-panel">
+            <div class="dashboard-customize-heading">
+                <div>
+                    <p class="eyebrow">Dashboard layout</p>
+                    <h2>Choose what stays visible</h2>
+                    <p>
+                        Keep the dashboard focused by showing only the modules you use most.
+                    </p>
+                </div>
+
+                <div class="dashboard-customize-actions">
+                    <button
+                        id="show-all-widgets"
+                        class="secondary-button cc-button-secondary"
+                        type="button"
+                    >
+                        Show all
+                    </button>
+
+                    <button
+                        id="reset-dashboard-layout"
+                        class="secondary-button cc-button-secondary"
+                        type="button"
+                    >
+                        Reset default
+                    </button>
+                </div>
+            </div>
+
+            <div
+                id="dashboard-widget-picker"
+                class="dashboard-widget-picker"
+                aria-label="Dashboard widget visibility"
+            ></div>
+        </section>
+
         <section class="dashboard-overview">
             <div class="overview-heading">
                 <div>
@@ -267,15 +303,21 @@
                 </article>
             </div>
 
-            <section class="garage-signals-section">
-                <div class="insight-heading">
+            <section class="garage-signals-section dashboard-widget">
+                <div
+                    class="insight-heading"
+                    data-widget="garageSignals"
+                >
                     <div>
                         <p class="eyebrow">Garage signals</p>
                         <h3>Explainable status view</h3>
                     </div>
                 </div>
 
-                <div class="signal-grid">
+                <div
+                    class="signal-grid dashboard-widget"
+                    data-widget="garageSignals"
+                >
                     <article class="signal-card">
                         <span class="signal-label">
                             Mechanical confidence
@@ -355,7 +397,10 @@
                     </article>
                 </div>
 
-                <div class="priority-panel">
+                <div
+                    class="priority-panel dashboard-widget"
+                    data-widget="priorityQueue"
+                >
                     <div class="priority-panel-heading">
                         <div>
                             <p class="eyebrow">Priority queue</p>
@@ -373,7 +418,10 @@
                     </div>
                 </div>
 
-                <div class="forecast-panel">
+                <div
+                    class="forecast-panel dashboard-widget"
+                    data-widget="budgetForecast"
+                >
                     <div class="priority-panel-heading">
                         <div>
                             <p class="eyebrow">Budget forecast</p>
@@ -409,7 +457,10 @@
                     </div>
                 </div>
 
-                <div class="ai-panel">
+                <div
+                    class="ai-panel dashboard-widget"
+                    data-widget="aiCopilot"
+                >
                     <div class="priority-panel-heading">
                         <div>
                             <p class="eyebrow">CarCare AI</p>
@@ -507,7 +558,10 @@
             </section>
 
             <div class="dashboard-insight-grid">
-                <article class="dashboard-insight-card">
+                <article
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="maintenanceWatch"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Maintenance watch</p>
@@ -532,7 +586,10 @@
                     </div>
                 </article>
 
-                <article class="dashboard-insight-card">
+                <article
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="recentActivity"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Recent activity</p>
@@ -559,7 +616,10 @@
             </div>
 
             <div class="dashboard-intelligence-stack">
-                <section class="dashboard-insight-card">
+                <section
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="costIntelligence"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Cost intelligence</p>
@@ -593,7 +653,10 @@
                     </div>
                 </section>
 
-                <section class="dashboard-insight-card">
+                <section
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="upcomingWork"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Upcoming work</p>
@@ -611,7 +674,10 @@
                     </div>
                 </section>
 
-                <section class="dashboard-insight-card">
+                <section
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="saleReadiness"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Sale readiness</p>
@@ -629,7 +695,10 @@
                     </div>
                 </section>
 
-                <section class="dashboard-insight-card">
+                <section
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="vehicleSnapshots"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Vehicle snapshots</p>
@@ -647,7 +716,10 @@
                     </div>
                 </section>
 
-                <section class="dashboard-insight-card">
+                <section
+                    class="dashboard-insight-card dashboard-widget"
+                    data-widget="dataGaps"
+                >
                     <div class="insight-heading">
                         <div>
                             <p class="eyebrow">Data gaps</p>
@@ -737,7 +809,10 @@
         </section>
 
         <section class="dashboard-workspace">
-        <section class="dashboard-section garage-composer">
+        <section
+            class="dashboard-section garage-composer dashboard-widget"
+            data-widget="addVehicle"
+        >
             <div class="section-heading">
                 <div>
                     <p class="eyebrow">Vehicle garage</p>
@@ -858,7 +933,10 @@
             </form>
         </section>
 
-        <section class="dashboard-section garage-panel">
+        <section
+            class="dashboard-section garage-panel dashboard-widget"
+            data-widget="garage"
+        >
             <div class="section-heading vehicle-list-heading">
                 <div>
                     <p class="eyebrow">Your vehicles</p>
@@ -880,7 +958,10 @@
             </div>
         </section>
 
-        <section class="dashboard-section sold-vehicles-panel">
+        <section
+            class="dashboard-section sold-vehicles-panel dashboard-widget"
+            data-widget="soldVehicles"
+        >
             <div class="section-heading vehicle-list-heading">
                 <div>
                     <p class="eyebrow">Archive</p>

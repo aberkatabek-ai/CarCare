@@ -276,6 +276,100 @@ const aiQuickActionButtons =
     document.querySelectorAll(
         ".ai-quick-action"
     );
+const dashboardWidgetPicker =
+    document.querySelector(
+        "#dashboard-widget-picker"
+    );
+const showAllWidgetsButton =
+    document.querySelector(
+        "#show-all-widgets"
+    );
+const resetDashboardLayoutButton =
+    document.querySelector(
+        "#reset-dashboard-layout"
+    );
+
+const DASHBOARD_WIDGET_STORAGE_KEY =
+    "carcare.dashboard.widgets";
+const DASHBOARD_WIDGET_GROUP_SELECTORS =
+    [
+        ".garage-signals-section",
+        ".dashboard-insight-grid",
+        ".dashboard-intelligence-stack",
+        ".dashboard-workspace"
+    ];
+const DASHBOARD_WIDGETS = [
+    {
+        key: "garageSignals",
+        label: "Garage signals",
+        defaultVisible: true
+    },
+    {
+        key: "priorityQueue",
+        label: "Priority queue",
+        defaultVisible: true
+    },
+    {
+        key: "budgetForecast",
+        label: "Budget forecast",
+        defaultVisible: true
+    },
+    {
+        key: "aiCopilot",
+        label: "AI copilot",
+        defaultVisible: false
+    },
+    {
+        key: "maintenanceWatch",
+        label: "Maintenance watch",
+        defaultVisible: true
+    },
+    {
+        key: "recentActivity",
+        label: "Recent activity",
+        defaultVisible: true
+    },
+    {
+        key: "costIntelligence",
+        label: "Cost intelligence",
+        defaultVisible: true
+    },
+    {
+        key: "upcomingWork",
+        label: "Upcoming work",
+        defaultVisible: true
+    },
+    {
+        key: "saleReadiness",
+        label: "Sale readiness",
+        defaultVisible: false
+    },
+    {
+        key: "vehicleSnapshots",
+        label: "Vehicle snapshots",
+        defaultVisible: false
+    },
+    {
+        key: "dataGaps",
+        label: "Data gaps",
+        defaultVisible: false
+    },
+    {
+        key: "addVehicle",
+        label: "Add vehicle",
+        defaultVisible: false
+    },
+    {
+        key: "garage",
+        label: "Garage",
+        defaultVisible: true
+    },
+    {
+        key: "soldVehicles",
+        label: "Sold vehicles",
+        defaultVisible: false
+    }
+];
 
 let vehicles = [];
 let soldVehicles = [];
@@ -294,6 +388,273 @@ let selectedVehicleId = null;
 let editingVehicleId = null;
 let userEmailAddress = "";
 let isUserEmailVisible = true;
+let dashboardWidgetState =
+    createDefaultDashboardWidgetState();
+
+function createDefaultDashboardWidgetState() {
+    return DASHBOARD_WIDGETS.reduce(
+        (state, widget) => {
+            state[widget.key] =
+                widget.defaultVisible;
+            return state;
+        },
+        {}
+    );
+}
+
+function saveDashboardWidgetState() {
+    try {
+        localStorage.setItem(
+            DASHBOARD_WIDGET_STORAGE_KEY,
+            JSON.stringify(
+                dashboardWidgetState
+            )
+        );
+    } catch (error) {
+        console.warn(
+            "Dashboard widget preferences could not be saved.",
+            error
+        );
+    }
+}
+
+function loadDashboardWidgetState() {
+    const defaults =
+        createDefaultDashboardWidgetState();
+
+    try {
+        const storedValue =
+            localStorage.getItem(
+                DASHBOARD_WIDGET_STORAGE_KEY
+            );
+
+        if (!storedValue) {
+            return defaults;
+        }
+
+        const parsedValue =
+            JSON.parse(storedValue);
+
+        return DASHBOARD_WIDGETS.reduce(
+            (state, widget) => {
+                state[widget.key] =
+                    typeof parsedValue?.[
+                        widget.key
+                    ] === "boolean"
+                        ? parsedValue[
+                            widget.key
+                        ]
+                        : defaults[widget.key];
+                return state;
+            },
+            {}
+        );
+    } catch (error) {
+        console.warn(
+            "Dashboard widget preferences could not be loaded.",
+            error
+        );
+        return defaults;
+    }
+}
+
+function setDashboardWidgetVisibility(
+    widgetKey,
+    isVisible
+) {
+    document
+        .querySelectorAll(
+            `[data-widget="${widgetKey}"]`
+        )
+        .forEach((element) => {
+            element.classList.toggle(
+                "dashboard-widget-hidden",
+                !isVisible
+            );
+        });
+}
+
+function updateDashboardWidgetGroups() {
+    DASHBOARD_WIDGET_GROUP_SELECTORS.forEach(
+        (selector) => {
+            const group =
+                document.querySelector(
+                    selector
+                );
+
+            if (!group) {
+                return;
+            }
+
+            const hasVisibleWidgets =
+                group.querySelector(
+                    "[data-widget]:not(.dashboard-widget-hidden)"
+                );
+
+            group.classList.toggle(
+                "dashboard-widget-hidden",
+                !hasVisibleWidgets
+            );
+        }
+    );
+}
+
+function syncDashboardWidgetPicker() {
+    if (!dashboardWidgetPicker) {
+        return;
+    }
+
+    dashboardWidgetPicker
+        .querySelectorAll(
+            "[data-widget-toggle]"
+        )
+        .forEach((toggle) => {
+            const widgetKey =
+                toggle.getAttribute(
+                    "data-widget-toggle"
+                );
+            const isVisible =
+                dashboardWidgetState[
+                    widgetKey
+                ] !== false;
+            const checkbox =
+                toggle.querySelector(
+                    'input[type="checkbox"]'
+                );
+
+            toggle.classList.toggle(
+                "active",
+                isVisible
+            );
+
+            if (checkbox) {
+                checkbox.checked = isVisible;
+            }
+        });
+}
+
+function applyDashboardWidgetState() {
+    DASHBOARD_WIDGETS.forEach((widget) => {
+        setDashboardWidgetVisibility(
+            widget.key,
+            dashboardWidgetState[
+                widget.key
+            ] !== false
+        );
+    });
+
+    updateDashboardWidgetGroups();
+    syncDashboardWidgetPicker();
+}
+
+function updateDashboardWidgetState(
+    nextState,
+    persist = true
+) {
+    dashboardWidgetState = {
+        ...createDefaultDashboardWidgetState(),
+        ...nextState
+    };
+
+    applyDashboardWidgetState();
+
+    if (persist) {
+        saveDashboardWidgetState();
+    }
+}
+
+function renderDashboardWidgetPicker() {
+    if (!dashboardWidgetPicker) {
+        return;
+    }
+
+    dashboardWidgetPicker.innerHTML = "";
+
+    DASHBOARD_WIDGETS.forEach((widget) => {
+        const toggle =
+            document.createElement(
+                "label"
+            );
+        const checkbox =
+            document.createElement(
+                "input"
+            );
+        const text =
+            document.createElement(
+                "span"
+            );
+
+        toggle.className =
+            "dashboard-widget-toggle";
+        toggle.setAttribute(
+            "data-widget-toggle",
+            widget.key
+        );
+
+        checkbox.type = "checkbox";
+        checkbox.checked =
+            dashboardWidgetState[
+                widget.key
+            ] !== false;
+        checkbox.addEventListener(
+            "change",
+            () => {
+                updateDashboardWidgetState(
+                    {
+                        ...dashboardWidgetState,
+                        [widget.key]:
+                            checkbox.checked
+                    }
+                );
+            }
+        );
+
+        text.textContent = widget.label;
+
+        toggle.append(checkbox, text);
+        dashboardWidgetPicker.append(
+            toggle
+        );
+    });
+
+    syncDashboardWidgetPicker();
+}
+
+function initializeDashboardCustomization() {
+    dashboardWidgetState =
+        loadDashboardWidgetState();
+
+    renderDashboardWidgetPicker();
+    applyDashboardWidgetState();
+
+    showAllWidgetsButton?.addEventListener(
+        "click",
+        () => {
+            const nextState =
+                DASHBOARD_WIDGETS.reduce(
+                    (state, widget) => {
+                        state[widget.key] =
+                            true;
+                        return state;
+                    },
+                    {}
+                );
+
+            updateDashboardWidgetState(
+                nextState
+            );
+        }
+    );
+
+    resetDashboardLayoutButton?.addEventListener(
+        "click",
+        () => {
+            updateDashboardWidgetState(
+                createDefaultDashboardWidgetState()
+            );
+        }
+    );
+}
 
 function showMessage(
     element,
@@ -3548,5 +3909,6 @@ aiQuickActionButtons.forEach((button) => {
     );
 });
 
+initializeDashboardCustomization();
 loadDashboard();
 loadAiHistory();
