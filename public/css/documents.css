@@ -50,7 +50,7 @@
 .document-hero > div > p:last-child {
     max-width: 680px;
     margin: 0;
-    color: rgba(240, 233, 221, 0.9);
+    color: #666158;
     font-size: 18px;
     line-height: 1.6;
 }
@@ -70,9 +70,9 @@
 .document-account-badge {
     flex-shrink: 0;
     padding: 13px 20px;
-    color: white;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--primary);
+    background: #fff8ec;
+    border: 1px solid var(--border);
     border-radius: 999px;
     font-weight: 700;
     white-space: nowrap;
