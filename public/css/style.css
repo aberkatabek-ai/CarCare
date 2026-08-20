@@ -3,9 +3,9 @@
     --surface: #fbf7ef;
     --surface-soft: #eee5d7;
 
-    --primary: #8d2f2f;
-    --primary-dark: #641f1f;
-    --primary-soft: #f0dcda;
+    --primary: #d62828;
+    --primary-dark: #a61b1b;
+    --primary-soft: #fde3e3;
 
     --text: #1d2528;
     --muted: #6b6458;
@@ -62,7 +62,7 @@ body {
         ),
         radial-gradient(
             circle at right top,
-            rgba(141, 47, 47, 0.14),
+            rgba(214, 40, 40, 0.18),
             transparent 28%
         ),
         linear-gradient(180deg, #efe8dc 0%, var(--background) 46%);
@@ -106,12 +106,12 @@ a {
     background:
         radial-gradient(
             circle at top left,
-            rgba(181, 86, 74, 0.18),
+            rgba(255, 106, 61, 0.20),
             transparent 35%
         ),
         radial-gradient(
             circle at bottom right,
-            rgba(141, 47, 47, 0.15),
+            rgba(214, 40, 40, 0.18),
             transparent 32%
         ),
         linear-gradient(135deg, #f4eee3, #ddd3c2);
@@ -160,7 +160,7 @@ a {
         linear-gradient(
             135deg,
             var(--primary),
-            #d17854
+            #ff6a3d
         );
 
     border-radius: 14px;
@@ -212,7 +212,7 @@ a {
 }
 
 .auth-inline-link {
-    color: #9a433a;
+    color: #bf2f2f;
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
@@ -316,8 +316,8 @@ a {
     padding: 0 10px;
 
     color: var(--primary);
-    background: rgba(141, 47, 47, 0.08);
-    border: 1px solid rgba(141, 47, 47, 0.16);
+    background: rgba(214, 40, 40, 0.10);
+    border: 1px solid rgba(214, 40, 40, 0.20);
     border-radius: 999px;
 
     font-size: 12px;
@@ -326,12 +326,12 @@ a {
 }
 
 .password-toggle:hover {
-    background: rgba(141, 47, 47, 0.14);
+    background: rgba(214, 40, 40, 0.16);
     transform: translateY(-50%);
 }
 
 .password-toggle:focus-visible {
-    outline: 2px solid rgba(141, 47, 47, 0.28);
+    outline: 2px solid rgba(214, 40, 40, 0.30);
     outline-offset: 2px;
 }
 
@@ -467,7 +467,7 @@ a.secondary-button {
     border-bottom: 1px solid var(--border);
 
     backdrop-filter: blur(12px);
-    box-shadow: 0 8px 24px rgba(141, 47, 47, 0.06);
+    box-shadow: 0 8px 24px rgba(214, 40, 40, 0.08);
 }
 
 .dashboard-header-content,
@@ -533,7 +533,7 @@ a.secondary-button {
         linear-gradient(
             145deg,
             rgba(251, 247, 239, 0.98),
-            rgba(241, 224, 220, 0.93)
+            rgba(248, 221, 221, 0.94)
         );
     border: 1px solid var(--border);
     border-radius: var(--radius-large);

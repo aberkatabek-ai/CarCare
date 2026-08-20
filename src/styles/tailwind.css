@@ -14,7 +14,7 @@
     }
 
     .cc-auth-body {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(181,86,74,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(141,47,47,0.15),transparent_32%),linear-gradient(135deg,#f4eee3,#ddd3c2)] px-5 py-8 sm:px-6;
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(255,106,61,0.20),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(214,40,40,0.18),transparent_32%),linear-gradient(135deg,#f4eee3,#ddd3c2)] px-5 py-8 sm:px-6;
     }
 
     .cc-auth-container {
@@ -54,7 +54,7 @@
     }
 
     .cc-helper-link {
-        @apply text-sm font-semibold text-[#9a433a] transition hover:text-accent-strong hover:underline;
+        @apply text-sm font-semibold text-[#bf2f2f] transition hover:text-accent-strong hover:underline;
     }
 
     .cc-divider {
@@ -70,7 +70,7 @@
     }
 
     .cc-nav-link {
-        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#655d50] transition hover:bg-[#f0dcda] hover:text-accent;
+        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#655d50] transition hover:bg-[#fde3e3] hover:text-accent;
     }
 
     .cc-nav-link-active {
@@ -78,11 +78,11 @@
     }
 
     .cc-hero-card {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(241,224,220,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(248,221,221,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-kicker {
-        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#8f4c44];
+        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#b43a3a];
     }
 
     .cc-stat-card {
@@ -94,7 +94,7 @@
     }
 
     .cc-page-hero {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(241,224,220,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(248,221,221,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-page-hero-title {
@@ -134,7 +134,7 @@
     }
 
     .cc-warning {
-        @apply rounded-2xl border border-[#deada3] bg-[#fbeceb] p-4 text-sm leading-6 text-[#8b3834];
+        @apply rounded-2xl border border-[#f0b1b1] bg-[#fff0f0] p-4 text-sm leading-6 text-[#a61b1b];
     }
 
     .cc-card {
