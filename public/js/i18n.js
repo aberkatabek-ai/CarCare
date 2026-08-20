@@ -77,6 +77,7 @@
                 "Forgot password?": "Şifreni mi unuttun?",
                 "Log in": "Giriş yap",
                 "Do not have an account?": "Hesabın yok mu?",
+                "Create account": "Hesap oluştur",
                 "Create an account": "Hesap oluştur",
                 "Create your account": "Hesabını oluştur",
                 "Start tracking your vehicles and maintenance history.": "Araçlarını ve bakım geçmişini takip etmeye başla.",
@@ -94,6 +95,7 @@
                 "Enter code and new password": "Kodu ve yeni şifreyi gir",
                 "Use the code from your email to finish the reset.": "Sıfırlamayı tamamlamak için e-postandaki kodu kullan.",
                 "Verification code": "Doğrulama kodu",
+                "Verification code must contain 6 digits.": "Doğrulama kodu 6 rakam içermelidir.",
                 "New password": "Yeni şifre",
                 "Reset password": "Şifreyi sıfırla",
                 "Back to login": "Girişe dön",
@@ -713,6 +715,7 @@
                 "Forgot password?": "Забыли пароль?",
                 "Log in": "Войти",
                 "Do not have an account?": "Нет аккаунта?",
+                "Create account": "Создать аккаунт",
                 "Create an account": "Создать аккаунт",
                 "Create your account": "Создайте аккаунт",
                 "Start tracking your vehicles and maintenance history.": "Начните отслеживать свои автомобили и историю обслуживания.",
@@ -729,6 +732,7 @@
                 "Enter code and new password": "Введите код и новый пароль",
                 "Use the code from your email to finish the reset.": "Используйте код из письма, чтобы завершить сброс.",
                 "Verification code": "Код подтверждения",
+                "Verification code must contain 6 digits.": "Код подтверждения должен состоять из 6 цифр.",
                 "New password": "Новый пароль",
                 "Reset password": "Сбросить пароль",
                 "Back to login": "Вернуться ко входу",
@@ -1062,6 +1066,7 @@
                 "Forgot password?": "¿Olvidaste la contraseña?",
                 "Log in": "Iniciar sesión",
                 "Do not have an account?": "¿No tienes una cuenta?",
+                "Create account": "Crear cuenta",
                 "Create an account": "Crear una cuenta",
                 "Create your account": "Crea tu cuenta",
                 "Start tracking your vehicles and maintenance history.": "Empieza a seguir tus vehículos y su historial de mantenimiento.",
@@ -1078,6 +1083,7 @@
                 "Enter code and new password": "Introduce el código y la nueva contraseña",
                 "Use the code from your email to finish the reset.": "Usa el código de tu correo para completar el restablecimiento.",
                 "Verification code": "Código de verificación",
+                "Verification code must contain 6 digits.": "El código de verificación debe contener 6 dígitos.",
                 "New password": "Nueva contraseña",
                 "Reset password": "Restablecer contraseña",
                 "Back to login": "Volver al inicio de sesión",
@@ -1690,19 +1696,19 @@
             [/^(\d+) entry$/u, "$1 kayıt"]
         ],
         ru: [
-            [/^(.+) tracked in total$/u, "Ğ’ÑĞµĞ³Ğ¾ Ğ¾Ñ‚ÑĞ»ĞµĞ¶ĞµĞ½Ğ¾: $1"],
-            [/^1 active maintenance plan$/u, "1 Ğ°ĞºÑ‚Ğ¸Ğ²Ğ½Ñ‹Ğ¹ Ğ¿Ğ»Ğ°Ğ½ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ"],
-            [/^(\d+) active maintenance plans$/u, "$1 Ğ°ĞºÑ‚Ğ¸Ğ²Ğ½Ñ‹Ñ… Ğ¿Ğ»Ğ°Ğ½Ğ° Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ"],
-            [/^(\d+) overdue [â€¢Â·] (\d+) issues [â€¢Â·] (\d+) documents$/u, "$1 Ğ¿Ñ€Ğ¾ÑÑ€Ğ¾Ñ‡ĞµĞ½Ğ¾ â€¢ $2 Ğ¿Ñ€Ğ¾Ğ±Ğ»ĞµĞ¼ â€¢ $3 Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ²"],
-            [/^Across 1 completed service$/u, "ĞŸĞ¾ 1 Ğ·Ğ°Ğ²ĞµÑ€ÑˆÑ‘Ğ½Ğ½Ğ¾Ğ¼Ñƒ ÑĞµÑ€Ğ²Ğ¸ÑÑƒ"],
-            [/^Across (\d+) completed services$/u, "ĞŸĞ¾ $1 Ğ·Ğ°Ğ²ĞµÑ€ÑˆÑ‘Ğ½Ğ½Ñ‹Ğ¼ ÑĞµÑ€Ğ²Ğ¸ÑĞ°Ğ¼"],
-            [/^(\d+) vehicles$/u, "$1 Ğ°Ğ²Ñ‚Ğ¾Ğ¼Ğ¾Ğ±Ğ¸Ğ»ĞµĞ¹"],
-            [/^(\d+) maintenance plan(?:s)? overdue\.$/u, "ĞŸÑ€Ğ¾ÑÑ€Ğ¾Ñ‡ĞµĞ½Ğ¾ Ğ¿Ğ»Ğ°Ğ½Ğ¾Ğ² Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ: $1."],
-            [/^(\d+) maintenance item(?:s)? coming up soon\.$/u, "Ğ¡ĞºĞ¾Ñ€Ğ¾ Ğ¿Ğ¾Ğ´Ğ¾Ğ¹Ğ´ÑƒÑ‚ $1 Ğ·Ğ°Ğ´Ğ°Ñ‡ Ğ¾Ğ±ÑĞ»ÑƒĞ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ñ."],
-            [/^(\d+) document(?:s)? already expired\.$/u, "Ğ”Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ² Ñ Ğ¸ÑÑ‚Ñ‘ĞºÑˆĞ¸Ğ¼ ÑÑ€Ğ¾ĞºĞ¾Ğ¼: $1."],
+            [/^(.+) tracked in total$/u, "Всего отслежено: $1"],
+            [/^1 active maintenance plan$/u, "1 активный план обслуживания"],
+            [/^(\d+) active maintenance plans$/u, "$1 активных плана обслуживания"],
+            [/^(\d+) overdue [â€¢Â·] (\d+) issues [â€¢Â·] (\d+) documents$/u, "$1 просрочено • $2 проблем • $3 документов"],
+            [/^Across 1 completed service$/u, "По 1 завершённому сервису"],
+            [/^Across (\d+) completed services$/u, "По $1 завершённым сервисам"],
+            [/^(\d+) vehicles$/u, "$1 автомобилей"],
+            [/^(\d+) maintenance plan(?:s)? overdue\.$/u, "Просрочено планов обслуживания: $1."],
+            [/^(\d+) maintenance item(?:s)? coming up soon\.$/u, "Скоро подойдут $1 задач обслуживания."],
+            [/^(\d+) document(?:s)? already expired\.$/u, "Документов с истёкшим сроком: $1."],
             [/^(\d+) document(?:s)? due soon\.$/u, "Ğ¡ĞºĞ¾Ñ€Ğ¾ Ğ¸ÑÑ‚ĞµĞºĞ°ÑŽÑ‚ $1 Ğ´Ğ¾ĞºÑƒĞ¼ĞµĞ½Ñ‚Ğ¾Ğ²."],
-            [/^Renewal is approaching in about (\d+) day(?:s)?\.$/u, "ĞŸÑ€Ğ¾Ğ´Ğ»ĞµĞ½Ğ¸Ğµ Ğ¿Ğ¾Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€Ğ½Ğ¾ Ñ‡ĞµÑ€ĞµĞ· $1 Ğ´Ğ½."],
-            [/^(.+) needs the most attention here\.$/u, "Ğ—Ğ´ĞµÑÑŒ Ğ±Ğ¾Ğ»ÑŒÑˆĞµ Ğ²ÑĞµĞ³Ğ¾ Ğ²Ğ½Ğ¸Ğ¼Ğ°Ğ½Ğ¸Ñ Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚: $1."],
+            [/^Renewal is approaching in about (\d+) day(?:s)?\.$/u, "Продление потребуется примерно через $1 дн."],
+            [/^(.+) needs the most attention here\.$/u, "Здесь больше всего внимания требует: $1."],
             [/^(\d+) completed services$/u, "$1 завершённых сервисов"],
             [/^(\d+) additional expenses$/u, "$1 дополнительных расходов"],
             [/^(\d+) fill-ups [•·] (.+) litres$/u, "$1 заправок • $2 литров"],
@@ -1713,16 +1719,16 @@
             [/^(.+) tracked in total$/u, "$1 registrados en total"],
             [/^1 active maintenance plan$/u, "1 plan de mantenimiento activo"],
             [/^(\d+) active maintenance plans$/u, "$1 planes de mantenimiento activos"],
-            [/^(\d+) overdue [â€¢Â·] (\d+) issues [â€¢Â·] (\d+) documents$/u, "$1 vencidos â€¢ $2 incidencias â€¢ $3 documentos"],
-            [/^Across 1 completed service$/u, "A travÃ©s de 1 servicio completado"],
-            [/^Across (\d+) completed services$/u, "A travÃ©s de $1 servicios completados"],
-            [/^(\d+) vehicles$/u, "$1 vehÃ­culos"],
+            [/^(\d+) overdue [â€¢Â·] (\d+) issues [â€¢Â·] (\d+) documents$/u, "$1 vencidos • $2 incidencias • $3 documentos"],
+            [/^Across 1 completed service$/u, "A través de 1 servicio completado"],
+            [/^Across (\d+) completed services$/u, "A través de $1 servicios completados"],
+            [/^(\d+) vehicles$/u, "$1 vehículos"],
             [/^(\d+) maintenance plan(?:s)? overdue\.$/u, "$1 planes de mantenimiento vencidos."],
             [/^(\d+) maintenance item(?:s)? coming up soon\.$/u, "$1 tareas de mantenimiento se acercan."],
             [/^(\d+) document(?:s)? already expired\.$/u, "$1 documentos ya vencieron."],
             [/^(\d+) document(?:s)? due soon\.$/u, "$1 documentos vencen pronto."],
-            [/^Renewal is approaching in about (\d+) day(?:s)?\.$/u, "La renovaciÃ³n se acerca en unos $1 dÃ­as."],
-            [/^(.+) needs the most attention here\.$/u, "AquÃ­ lo que mÃ¡s atenciÃ³n necesita es: $1."],
+            [/^Renewal is approaching in about (\d+) day(?:s)?\.$/u, "La renovación se acerca en unos $1 días."],
+            [/^(.+) needs the most attention here\.$/u, "Aquí lo que más atención necesita es: $1."],
             [/^(\d+) completed services$/u, "$1 servicios completados"],
             [/^(\d+) additional expenses$/u, "$1 gastos adicionales"],
             [/^(\d+) fill-ups [•·] (.+) litres$/u, "$1 repostajes • $2 litros"],
@@ -1730,6 +1736,69 @@
             [/^(\d+) entry$/u, "$1 registro"]
         ],
         en: []
+    };
+    const supplementalExactTranslations = {
+        tr: {
+            "Garage signals": "Garaj sinyalleri",
+            "Priority queue": "Oncelik sirasi",
+            "AI copilot": "Yapay zeka yardimci pilotu",
+            "Upcoming work": "Yaklasan isler",
+            "Vehicle snapshots": "Arac ozetleri",
+            "Data gaps": "Veri bosluklari",
+            "Garage": "Garaj",
+            "Sold vehicles": "Satilmis araclar",
+            "Close": "Kapat",
+            "Menu": "Menu",
+            "Dashboard layout": "Gosterge paneli duzeni",
+            "Choose what stays visible": "Gorunur kalacaklari sec",
+            "Show all": "Hepsini goster",
+            "Reset default": "Varsayilana don",
+            "Smart alerts": "Akilli uyarilar",
+            "Refresh": "Yenile",
+            "Odometer update": "Kilometre guncellemesi",
+            "Edit vehicle details": "Arac detaylarini duzenle"
+        },
+        ru: {
+            "Garage signals": "Сигналы гаража",
+            "Priority queue": "Очередь приоритетов",
+            "AI copilot": "ИИ-напарник",
+            "Upcoming work": "Предстоящие работы",
+            "Vehicle snapshots": "Сводки по автомобилям",
+            "Data gaps": "Пробелы в данных",
+            "Garage": "Гараж",
+            "Sold vehicles": "Проданные автомобили",
+            "Close": "Закрыть",
+            "Menu": "Меню",
+            "Dashboard layout": "Макет панели",
+            "Choose what stays visible": "Выберите, что оставить видимым",
+            "Show all": "Показать все",
+            "Reset default": "Сбросить по умолчанию",
+            "Smart alerts": "Умные оповещения",
+            "Refresh": "Обновить",
+            "Odometer update": "Обновление одометра",
+            "Edit vehicle details": "Редактировать данные автомобиля"
+        },
+        es: {
+            "Garage signals": "Senales del garaje",
+            "Priority queue": "Cola de prioridades",
+            "AI copilot": "Copiloto de IA",
+            "Upcoming work": "Proximos trabajos",
+            "Vehicle snapshots": "Resumen de vehiculos",
+            "Data gaps": "Vacios de datos",
+            "Garage": "Garaje",
+            "Sold vehicles": "Vehiculos vendidos",
+            "Close": "Cerrar",
+            "Menu": "Menu",
+            "Dashboard layout": "Diseno del panel",
+            "Choose what stays visible": "Elige que permanece visible",
+            "Show all": "Mostrar todo",
+            "Reset default": "Restablecer por defecto",
+            "Smart alerts": "Alertas inteligentes",
+            "Refresh": "Actualizar",
+            "Odometer update": "Actualizacion del odometro",
+            "Edit vehicle details": "Editar detalles del vehiculo"
+        },
+        en: {}
     };
 
     function getStoredLocale() {
@@ -1779,6 +1848,13 @@
 
         if (exactTranslation) {
             return exactTranslation;
+        }
+
+        const supplementalTranslation =
+            supplementalExactTranslations[locale]?.[normalizedText];
+
+        if (supplementalTranslation) {
+            return supplementalTranslation;
         }
 
         let fragmentTranslatedText = text;

@@ -147,7 +147,7 @@ function handlePageLoadError(
     console.error(error);
 
     if (isUnauthorizedError(error)) {
-        window.location.href = "/login.html";
+        window.location.href = "/login";
         return true;
     }
 
@@ -162,37 +162,37 @@ function handlePageLoadError(
 
 const navigationItems = [
     {
-        href: "/index.html",
+        href: "/",
         label: t("Dashboard")
     },
 
     {
-        href: "/maintenance.html",
+        href: "/maintenance",
         label: t("Maintenance")
     },
 
     {
-        href: "/health.html",
+        href: "/health",
         label: t("Health center")
     },
 
     {
-        href: "/service-history.html",
+        href: "/service-history",
         label: t("Service history")
     },
 
     {
-        href: "/documents.html",
+        href: "/documents",
         label: t("Documents")
     },
 
     {
-        href: "/settings.html",
+        href: "/settings",
         label: t("Settings")
     },
 
     {
-        href: "/costs.html",
+        href: "/costs",
         label: t("Costs")
     }
 ];
@@ -205,7 +205,7 @@ function getCurrentPath() {
         pathname === "/" ||
         pathname === ""
     ) {
-        return "/index.html";
+        return "/";
     }
 
     return pathname;
@@ -221,7 +221,7 @@ function enhanceBrandNavigation() {
         return;
     }
 
-    const dashboardPath = "/index.html";
+    const dashboardPath = "/";
     const currentPath =
         getCurrentPath();
     const shouldNavigate =
@@ -243,7 +243,7 @@ function enhanceBrandNavigation() {
     brand.setAttribute("tabindex", "0");
     brand.setAttribute(
         "aria-label",
-        "Go to dashboard"
+        t("Go to dashboard")
     );
 
     if (brand.dataset.dashboardBound) {
@@ -335,8 +335,8 @@ function ensureMobileNavigationToggle() {
         );
 
         toggleButton.textContent = isOpen
-            ? "Close"
-            : "Menu";
+            ? t("Close")
+            : t("Menu");
 
         toggleButton.setAttribute(
             "aria-expanded",
@@ -346,8 +346,8 @@ function ensureMobileNavigationToggle() {
         toggleButton.setAttribute(
             "aria-label",
             isOpen
-                ? "Close navigation menu"
-                : "Open navigation menu"
+                ? t("Close navigation menu")
+                : t("Open navigation menu")
         );
     }
 

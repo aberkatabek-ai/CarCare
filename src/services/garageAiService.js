@@ -1644,7 +1644,7 @@ function buildRecommendedActions({
             label: isTurkish
                 ? "Belgeleri duzenle"
                 : "Manage documents",
-            href: "/documents.html",
+            href: "/documents",
             kind: "link"
         });
     }
@@ -1662,7 +1662,7 @@ function buildRecommendedActions({
             label: isTurkish
                 ? "Bakim planlarini ac"
                 : "Open maintenance",
-            href: "/maintenance.html",
+            href: "/maintenance",
             kind: "link"
         });
     }
@@ -1672,7 +1672,7 @@ function buildRecommendedActions({
             label: isTurkish
                 ? "Araclari incele"
                 : "Review vehicles",
-            href: "/index.html",
+            href: "/",
             kind: "link"
         });
     }

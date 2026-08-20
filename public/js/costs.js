@@ -928,7 +928,7 @@ async function logout() {
         await window.apiRequest("/api/auth/logout", {
             method: "POST"
         });
-        window.location.href = "/login.html";
+        window.location.href = "/login";
     } catch (error) {
         logoutButton.disabled = false;
         logoutButton.textContent = "Log out";

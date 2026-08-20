@@ -930,7 +930,7 @@ function renderReport(reportPackage, vehicleId) {
 
     if (backLink) {
         backLink.href =
-            `/vehicle.html?id=${vehicleId}`;
+            `/vehicle?id=${vehicleId}`;
     }
 
     loadingState.hidden = true;

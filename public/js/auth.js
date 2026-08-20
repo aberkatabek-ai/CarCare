@@ -1,6 +1,10 @@
 const loginForm = document.querySelector("#login-form");
 const registerForm = document.querySelector("#register-form");
 const messageElement = document.querySelector("#form-message");
+const t = (value) =>
+    typeof window.translateAppText === "function"
+        ? window.translateAppText(value)
+        : value;
 const passwordRequirementsMessage =
     "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
 
@@ -58,14 +62,14 @@ function attachPasswordToggles(root = document) {
                 : "password";
 
             button.textContent = shouldShow
-                ? "Hide"
-                : "Show";
+                ? t("Hide")
+                : t("Show");
 
             button.setAttribute(
                 "aria-label",
                 shouldShow
-                    ? "Hide password"
-                    : "Show password"
+                    ? t("Hide password")
+                    : t("Show password")
             );
 
             button.setAttribute(
@@ -90,7 +94,7 @@ function setSubmitting(form, submitting) {
 
     button.disabled = submitting;
     button.textContent = submitting
-        ? "Please wait..."
+        ? t("Please wait...")
         : button.dataset.defaultText;
 }
 
@@ -98,7 +102,7 @@ attachPasswordToggles();
 
 if (loginForm) {
     const button = loginForm.querySelector('button[type="submit"]');
-    button.dataset.defaultText = button.textContent;
+    button.dataset.defaultText = t("Log in");
 
     loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -118,9 +122,9 @@ if (loginForm) {
                 })
             });
 
-            showMessage("Login successful.", "success");
+            showMessage(t("Login successful."), "success");
 
-            window.location.href = "/index.html";
+            window.location.href = "/";
         } catch (error) {
             showMessage(error.message);
         } finally {
@@ -131,7 +135,7 @@ if (loginForm) {
 
 if (registerForm) {
     const button = registerForm.querySelector('button[type="submit"]');
-    button.dataset.defaultText = button.textContent;
+    button.dataset.defaultText = t("Create account");
 
     registerForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -145,7 +149,7 @@ if (registerForm) {
         showMessage("");
 
         if (password !== passwordConfirmation) {
-            showMessage("Passwords do not match.");
+            showMessage(t("Passwords do not match."));
             return;
         }
 
@@ -154,7 +158,7 @@ if (registerForm) {
 
         if (passwordError) {
             showMessage(
-                `${passwordError} ${passwordRequirementsMessage}`
+                `${t(passwordError)} ${t(passwordRequirementsMessage)}`
             );
             return;
         }
@@ -172,11 +176,11 @@ if (registerForm) {
             });
 
             showMessage(
-                "Your account was created successfully.",
+                t("Your account was created successfully."),
                 "success"
             );
 
-            window.location.href = "/index.html";
+            window.location.href = "/";
         } catch (error) {
             showMessage(error.message);
         } finally {

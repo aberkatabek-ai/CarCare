@@ -716,7 +716,7 @@ function renderPassports() {
             "click",
             () => {
                 window.location.href =
-                    `/vehicle.html?id=${vehicle.id}`;
+                    `/vehicle?id=${vehicle.id}`;
             }
         );
 
@@ -738,7 +738,7 @@ function renderPassports() {
             "click",
             () => {
                 window.location.href =
-                    `/vehicle.html?id=${vehicle.id}`;
+                    `/vehicle?id=${vehicle.id}`;
             }
         );
 
@@ -1108,7 +1108,7 @@ function renderDocuments() {
                     "click",
                     () => {
                         window.location.href =
-                            `/vehicle.html?id=` +
+                            `/vehicle?id=` +
                             `${documentRecord
                                 .vehicle_id}`;
                     }
@@ -1973,7 +1973,7 @@ async function logout() {
         );
 
         window.location.href =
-            "/login.html";
+            "/login";
     } catch (error) {
         logoutButton.disabled =
             false;

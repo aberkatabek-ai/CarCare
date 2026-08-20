@@ -352,7 +352,7 @@ logoutButton.addEventListener(
             );
 
             window.location.href =
-                "/login.html";
+                "/login";
         } catch (error) {
             logoutButton.disabled = false;
             logoutButton.textContent =

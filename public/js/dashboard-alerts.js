@@ -223,7 +223,7 @@
                     message: isOverdue
                         ? `Maintenance is overdue. ${getMaintenanceDeadline(plan)}`
                         : `Maintenance is approaching. ${getMaintenanceDeadline(plan)}`,
-                    href: "/maintenance.html",
+                    href: "/maintenance",
                     actionLabel: "View plan"
                 };
             });
@@ -279,7 +279,7 @@
                     title: issue.issue_title,
                     vehicle: getVehicleName(issue),
                     message,
-                    href: "/health.html",
+                    href: "/health",
                     actionLabel: "View issue"
                 };
             });
@@ -326,7 +326,7 @@
                         getDocumentDeadline(
                             documentRecord
                         ),
-                    href: "/documents.html",
+                    href: "/documents",
                     actionLabel: "View document"
                 };
             });

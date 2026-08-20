@@ -1332,7 +1332,7 @@ function renderIssues() {
             "click",
             () => {
                 window.location.href =
-                    `/vehicle.html?id=` +
+                    `/vehicle?id=` +
                     `${issue.vehicle_id}`;
             }
         );
@@ -1982,7 +1982,7 @@ async function logout() {
         );
 
         window.location.href =
-            "/login.html";
+            "/login";
     } catch (error) {
         logoutButton.disabled = false;
 

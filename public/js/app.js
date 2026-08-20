@@ -288,6 +288,10 @@ const resetDashboardLayoutButton =
     document.querySelector(
         "#reset-dashboard-layout"
     );
+const t = (value) =>
+    typeof window.translateAppText === "function"
+        ? window.translateAppText(value)
+        : value;
 
 const DASHBOARD_WIDGET_STORAGE_KEY =
     "carcare.dashboard.widgets";
@@ -609,7 +613,7 @@ function renderDashboardWidgetPicker() {
             }
         );
 
-        text.textContent = widget.label;
+        text.textContent = t(widget.label);
 
         toggle.append(checkbox, text);
         dashboardWidgetPicker.append(
@@ -2988,7 +2992,7 @@ function renderVehicles() {
             "click",
             () => {
                 window.location.href =
-                    `/vehicle.html?id=` +
+                    `/vehicle?id=` +
                     `${vehicle.id}`;
             }
         );
@@ -3195,7 +3199,7 @@ function renderSoldVehicles() {
             "click",
             () => {
                 window.location.href =
-                    `/vehicle.html?id=${vehicle.id}`;
+                    `/vehicle?id=${vehicle.id}`;
             }
         );
 
@@ -3343,7 +3347,7 @@ vehicleForm.addEventListener(
         submitButton.disabled = true;
 
         submitButton.textContent =
-            "Adding vehicle...";
+            t("Adding vehicle...");
 
         const formData =
             new FormData(vehicleForm);
@@ -3412,7 +3416,7 @@ vehicleForm.addEventListener(
             submitButton.disabled = false;
 
             submitButton.textContent =
-                "Add vehicle";
+                t("Add vehicle");
         }
     }
 );
@@ -3590,7 +3594,7 @@ mileageForm.addEventListener(
         submitButton.disabled = true;
 
         submitButton.textContent =
-            "Updating...";
+            t("Updating...");
 
         try {
             const data =
@@ -3641,7 +3645,7 @@ mileageForm.addEventListener(
             submitButton.disabled = false;
 
             submitButton.textContent =
-                "Confirm mileage";
+                t("Confirm mileage");
         }
     }
 );
@@ -3672,7 +3676,7 @@ vehicleEditForm.addEventListener(
 
         submitButton.disabled = true;
         submitButton.textContent =
-            "Saving...";
+            t("Saving...");
 
         const formData =
             new FormData(
@@ -3727,7 +3731,7 @@ vehicleEditForm.addEventListener(
         } finally {
             submitButton.disabled = false;
             submitButton.textContent =
-                "Save changes";
+                t("Save changes");
         }
     }
 );
@@ -3839,7 +3843,7 @@ async function logout() {
     logoutButton.disabled = true;
 
     logoutButton.textContent =
-        "Logging out...";
+        t("Logging out...");
 
     try {
         await window.apiRequest(
@@ -3850,12 +3854,12 @@ async function logout() {
         );
 
         window.location.href =
-            "/login.html";
+            "/login";
     } catch (error) {
         logoutButton.disabled = false;
 
         logoutButton.textContent =
-            "Log out";
+            t("Log out");
 
         alert(error.message);
     }

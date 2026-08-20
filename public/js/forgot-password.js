@@ -13,6 +13,10 @@ const forgotMessage = document.querySelector(
 const resetMessage = document.querySelector(
     "#reset-message"
 );
+const t = (value) =>
+    typeof window.translateAppText === "function"
+        ? window.translateAppText(value)
+        : value;
 const passwordRequirementsMessage =
     "Use at least 8 characters, including uppercase, lowercase, a number, and a special character, with no spaces.";
 
@@ -70,14 +74,14 @@ function attachPasswordToggles(root = document) {
                 : "password";
 
             button.textContent = shouldShow
-                ? "Hide"
-                : "Show";
+                ? t("Hide")
+                : t("Show");
 
             button.setAttribute(
                 "aria-label",
                 shouldShow
-                    ? "Hide password"
-                    : "Show password"
+                    ? t("Hide password")
+                    : t("Show password")
             );
 
             button.setAttribute(
@@ -108,7 +112,7 @@ function setSubmitting(form, submitting) {
 
     button.disabled = submitting;
     button.textContent = submitting
-        ? "Please wait..."
+        ? t("Please wait...")
         : button.dataset.defaultText;
 }
 
@@ -137,8 +141,9 @@ if (forgotPasswordForm) {
             'button[type="submit"]'
         );
 
-    button.dataset.defaultText =
-        button.textContent;
+    button.dataset.defaultText = t(
+        "Send verification code"
+    );
 
     forgotPasswordForm.addEventListener(
         "submit",
@@ -173,7 +178,7 @@ if (forgotPasswordForm) {
                 showFormMessage(
                     forgotMessage,
                     response.debugCode
-                        ? `${response.message} Verification code: ${response.debugCode}`
+                        ? `${response.message} ${t("Verification code")}: ${response.debugCode}`
                         : response.message,
                     "success"
                 );
@@ -198,8 +203,9 @@ if (resetPasswordForm) {
             'button[type="submit"]'
         );
 
-    button.dataset.defaultText =
-        button.textContent;
+    button.dataset.defaultText = t(
+        "Reset password"
+    );
 
     resetPasswordForm.addEventListener(
         "submit",
@@ -220,7 +226,7 @@ if (resetPasswordForm) {
             if (newPassword !== confirmPassword) {
                 showFormMessage(
                     resetMessage,
-                    "Passwords do not match."
+                    t("Passwords do not match.")
                 );
                 return;
             }
@@ -228,7 +234,9 @@ if (resetPasswordForm) {
             if (code.length !== 6) {
                 showFormMessage(
                     resetMessage,
-                    "Verification code must contain 6 digits."
+                    t(
+                        "Verification code must contain 6 digits."
+                    )
                 );
                 return;
             }
@@ -236,13 +244,13 @@ if (resetPasswordForm) {
             const passwordError =
                 getPasswordValidationError(
                     newPassword,
-                    "New password"
+                    t("New password")
                 );
 
             if (passwordError) {
                 showFormMessage(
                     resetMessage,
-                    `${passwordError} ${passwordRequirementsMessage}`
+                    `${t(passwordError)} ${t(passwordRequirementsMessage)}`
                 );
                 return;
             }
@@ -276,7 +284,7 @@ if (resetPasswordForm) {
 
                 window.setTimeout(() => {
                     window.location.href =
-                        "/login.html";
+                        "/login";
                 }, 1200);
             } catch (error) {
                 showFormMessage(

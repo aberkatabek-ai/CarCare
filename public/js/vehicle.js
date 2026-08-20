@@ -215,7 +215,7 @@ const vehicleMaintenanceList = document.querySelector(
 );
 
 const maintenanceActionLink = document.querySelector(
-    'a[href="/maintenance.html"]'
+    'a[href="/maintenance"]'
 );
 
 const vehicleServiceList = document.querySelector(
@@ -2254,7 +2254,7 @@ function printVehiclePassport() {
 
 async function logout() {
     logoutButton.disabled = true;
-    logoutButton.textContent = "Logging out...";
+    logoutButton.textContent = t("Logging out...");
 
     try {
         await window.apiRequest(
@@ -2264,10 +2264,10 @@ async function logout() {
             }
         );
 
-        window.location.href = "/login.html";
+        window.location.href = "/login";
     } catch (error) {
         logoutButton.disabled = false;
-        logoutButton.textContent = "Log out";
+        logoutButton.textContent = t("Log out");
 
         alert(error.message);
     }
@@ -2279,7 +2279,7 @@ async function exportBuyerPackage() {
     }
 
     window.location.href =
-        `/buyer-package.html?id=${vehicle.id}`;
+        `/buyer-package?id=${vehicle.id}`;
 }
 
 async function copyVehicleShareLink() {
@@ -2478,7 +2478,7 @@ if (ownershipVerificationForm) {
 }
 
 const dashboardLink = document.querySelector(
-    'a[href="/index.html"]'
+    'a[href="/"]'
 );
 
 if (dashboardLink) {
