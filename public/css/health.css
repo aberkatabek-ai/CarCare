@@ -20,19 +20,19 @@
     background:
         radial-gradient(
             circle at top right,
-            rgba(188, 160, 109, 0.18),
+            rgba(91, 123, 136, 0.16),
             transparent 32%
         ),
         linear-gradient(
             145deg,
-            rgba(252, 247, 239, 0.99),
-            rgba(235, 226, 212, 0.95)
+            rgba(249, 251, 250, 0.99),
+            rgba(231, 238, 239, 0.95)
         );
 
     border-radius: 28px;
 
     box-shadow:
-        0 24px 48px rgba(31, 27, 18, 0.1);
+        0 24px 48px rgba(20, 32, 39, 0.1);
 }
 
 .health-hero > div:first-child {
@@ -42,7 +42,7 @@
 .health-eyebrow {
     margin: 0 0 12px;
 
-    color: #75684a;
+    color: #50656d;
 
     font-size: 13px;
     font-weight: 850;
@@ -74,10 +74,10 @@
     min-width: 210px;
     padding: 19px;
 
-    background: rgba(249, 242, 231, 0.96);
+    background: rgba(244, 248, 248, 0.96);
     border: 1px solid var(--border);
     border-radius: 16px;
-    box-shadow: 0 12px 24px rgba(33, 28, 18, 0.08);
+    box-shadow: 0 12px 24px rgba(20, 32, 39, 0.08);
 }
 
 .health-owner span,
@@ -88,7 +88,7 @@
 .health-owner span {
     margin-bottom: 6px;
 
-    color: #75684a;
+    color: #50656d;
     font-size: 11px;
     text-transform: uppercase;
 }
@@ -186,10 +186,10 @@
     margin-bottom: 22px;
     padding: 14px;
 
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #735634;
+    background: #f1e5cc;
 
-    border: 1px solid #cfbe94;
+    border: 1px solid #d8c097;
     border-radius: 10px;
 }
 
@@ -301,20 +301,20 @@
 
 .risk-preview.green {
     color: var(--success);
-    background: #edf6f0;
-    border-color: #b7d8c7;
+    background: #edf6f3;
+    border-color: #bfdad3;
 }
 
 .risk-preview.orange {
-    color: #7d6a44;
-    background: #f0e6d0;
-    border-color: #cfbe94;
+    color: #735634;
+    background: #f5ead4;
+    border-color: #d8c097;
 }
 
 .risk-preview.red {
     color: #8f2d28;
-    background: #f5e7e3;
-    border-color: #e0b8b1;
+    background: #f1ddda;
+    border-color: #e2bdb6;
 }
 
 .risk-preview-heading {
@@ -454,8 +454,8 @@
 }
 
 .issue-risk-badge.orange {
-    color: #7d6a44;
-    background: #efe2c4;
+    color: #735634;
+    background: #f1e5cc;
 }
 
 .issue-risk-badge.red {
@@ -466,7 +466,7 @@
 .issue-description {
     margin: 18px 0;
 
-    color: #334155;
+    color: #546670;
     line-height: 1.65;
 }
 
@@ -528,13 +528,13 @@
 }
 
 .issue-guidance.orange {
-    color: #7d6a44;
-    background: #f0e6d0;
+    color: #735634;
+    background: #f5ead4;
 }
 
 .issue-guidance.red {
     color: #8f2d28;
-    background: #f5e7e3;
+    background: #f1ddda;
 }
 
 .issue-guidance p {
@@ -548,14 +548,14 @@
     margin-top: 13px;
     padding: 13px;
 
-    background: #ece3d6;
-    border: 1px solid #d3c3ae;
+    background: #e7eff0;
+    border: 1px solid #c6d2d5;
     border-radius: 9px;
 }
 
 .issue-note-box.resolution {
-    background: #edf6f0;
-    border-color: #b7d8c7;
+    background: #edf6f3;
+    border-color: #bfdad3;
 }
 
 .issue-note-box span {
@@ -597,7 +597,7 @@
     padding: 65px 24px;
 
     background: var(--surface-soft);
-    border: 1px dashed #b29f88;
+    border: 1px dashed #9eafb4;
     border-radius: var(--radius-large);
 
     text-align: center;

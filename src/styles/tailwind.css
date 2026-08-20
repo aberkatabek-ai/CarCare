@@ -14,7 +14,7 @@
     }
 
     .cc-auth-body {
-        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(182,156,109,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(35,70,63,0.16),transparent_32%),linear-gradient(135deg,#f4eee3,#ddd3c2)] px-5 py-8 sm:px-6;
+        @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(91,123,136,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(23,50,59,0.16),transparent_32%),linear-gradient(135deg,#f7fafb,#dbe4e7)] px-5 py-8 sm:px-6;
     }
 
     .cc-auth-container {
@@ -22,7 +22,7 @@
     }
 
     .cc-auth-card {
-        @apply w-full rounded-[28px] border border-white/50 bg-[rgba(252,248,240,0.97)] p-7 shadow-panel backdrop-blur sm:p-10;
+        @apply w-full rounded-[28px] border border-white/60 bg-[rgba(248,250,249,0.97)] p-7 shadow-panel backdrop-blur sm:p-10;
     }
 
     .cc-brand-lockup {
@@ -34,11 +34,11 @@
     }
 
     .cc-auth-title {
-        @apply font-display text-3xl font-semibold tracking-[-0.03em] text-ink;
+        @apply text-3xl font-semibold tracking-[-0.03em] text-ink;
     }
 
     .cc-auth-copy {
-        @apply mt-2 text-sm leading-6 text-[#666158];
+        @apply mt-2 text-sm leading-6 text-[#5f6f76];
     }
 
     .cc-field {
@@ -50,11 +50,11 @@
     }
 
     .cc-input {
-        @apply min-h-12 w-full rounded-xl border border-border bg-[#ebe4d8] px-4 text-ink outline-none transition placeholder:text-[#938b7d] focus:border-accent focus:bg-white;
+        @apply min-h-12 w-full rounded-xl border border-border bg-[#e8eeef] px-4 text-ink outline-none transition placeholder:text-[#87969c] focus:border-accent focus:bg-white;
     }
 
     .cc-helper-link {
-        @apply text-sm font-semibold text-[#7d6a44] transition hover:text-accent-strong hover:underline;
+        @apply text-sm font-semibold text-[#49616b] transition hover:text-accent-strong hover:underline;
     }
 
     .cc-divider {
@@ -66,11 +66,11 @@
     }
 
     .cc-nav-row {
-        @apply flex items-center gap-2 rounded-full border border-border bg-[rgba(252,247,238,0.92)] p-2 shadow-panel backdrop-blur;
+        @apply flex items-center gap-2 rounded-full border border-border bg-[rgba(248,250,249,0.92)] p-2 shadow-panel backdrop-blur;
     }
 
     .cc-nav-link {
-        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#655d50] transition hover:bg-[#ece2d0] hover:text-accent;
+        @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-[#58686f] transition hover:bg-[#e3e9e8] hover:text-accent;
     }
 
     .cc-nav-link-active {
@@ -78,15 +78,15 @@
     }
 
     .cc-hero-card {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(236,227,214,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(249,251,250,0.99),rgba(231,238,239,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-kicker {
-        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#75684a];
+        @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#50656d];
     }
 
     .cc-stat-card {
-        @apply relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(249,245,238,0.98),rgba(236,228,216,0.92))] p-5 shadow-[0_12px_28px_rgba(32,38,42,0.05)] transition hover:-translate-y-0.5 hover:shadow-panel;
+        @apply relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,rgba(248,251,250,0.98),rgba(232,239,240,0.92))] p-5 shadow-[0_12px_28px_rgba(20,32,39,0.06)] transition hover:-translate-y-0.5 hover:shadow-panel;
     }
 
     .cc-stat-value {
@@ -94,27 +94,27 @@
     }
 
     .cc-page-hero {
-        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(252,247,239,0.99),rgba(236,227,214,0.95))] p-6 shadow-panel sm:p-8;
+        @apply rounded-[28px] border border-border bg-[linear-gradient(145deg,rgba(249,251,250,0.99),rgba(231,238,239,0.95))] p-6 shadow-panel sm:p-8;
     }
 
     .cc-page-hero-title {
-        @apply font-display text-[clamp(1.8rem,4vw,2.6rem)] font-semibold tracking-[-0.04em] text-ink;
+        @apply text-[clamp(1.8rem,4vw,2.6rem)] font-semibold tracking-[-0.04em] text-ink;
     }
 
     .cc-badge {
-        @apply inline-flex items-center rounded-full border border-border bg-[rgba(249,242,231,0.96)] px-4 py-2 text-sm font-semibold text-accent shadow-[0_8px_20px_rgba(33,28,18,0.08)];
+        @apply inline-flex items-center rounded-full border border-border bg-[rgba(244,248,248,0.96)] px-4 py-2 text-sm font-semibold text-accent shadow-[0_8px_20px_rgba(20,32,39,0.08)];
     }
 
     .cc-panel {
-        @apply rounded-[26px] border border-border bg-[rgba(252,248,240,0.97)] p-6 shadow-panel sm:p-7;
+        @apply rounded-[26px] border border-border bg-[rgba(248,250,249,0.97)] p-6 shadow-panel sm:p-7;
     }
 
     .cc-panel-heading h2 {
-        @apply font-display text-[1.8rem] font-semibold tracking-[-0.03em] text-ink;
+        @apply text-[1.8rem] font-semibold tracking-[-0.03em] text-ink;
     }
 
     .cc-panel-copy {
-        @apply mt-2 text-sm leading-6 text-[#666158];
+        @apply mt-2 text-sm leading-6 text-[#5f6f76];
     }
 
     .cc-section-grid {
@@ -134,7 +134,7 @@
     }
 
     .cc-warning {
-        @apply rounded-2xl border border-[#d9b37f] bg-[#fff5e8] p-4 text-sm leading-6 text-[#7d5b35];
+        @apply rounded-2xl border border-[#d5b88d] bg-[#f8efdf] p-4 text-sm leading-6 text-[#7b5b35];
     }
 
     .cc-card {
@@ -308,7 +308,7 @@
     .settings-danger-card,
     .settings-danger-confirmation,
     .issue-checkbox {
-        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4;
+        @apply rounded-2xl border border-border bg-[#eef3f3] p-4;
     }
 
     .critical-control label,
@@ -340,7 +340,7 @@
     .settings-danger-card p,
     .settings-danger-confirmation span,
     .issue-checkbox small {
-        @apply mt-1 block text-sm leading-6 text-[#666158];
+        @apply mt-1 block text-sm leading-6 text-[#5f6f76];
     }
 
     .document-stat-card,
@@ -358,7 +358,7 @@
     .cost-list-heading span,
     .document-file-help,
     .optional-text {
-        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .document-file-help {
@@ -402,14 +402,14 @@
     }
 
     .input-suffix span {
-        @apply pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#6f6a5f];
+        @apply pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#607178];
     }
 
     .fuel-price-preview,
     .loading-state,
     .document-loading-state,
     .cost-loading-state {
-        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4 text-sm leading-6 text-[#666158];
+        @apply rounded-2xl border border-border bg-[#eef3f3] p-4 text-sm leading-6 text-[#5f6f76];
     }
 
     .cost-history-grid {
@@ -436,7 +436,7 @@
     }
 
     .settings-switch-slider {
-        @apply relative h-7 w-14 rounded-full border border-border bg-[#e7dcc8] transition;
+        @apply relative h-7 w-14 rounded-full border border-border bg-[#dbe5e6] transition;
     }
 
     .settings-switch-slider::after {
@@ -462,7 +462,7 @@
     }
 
     .settings-form-grid .input-hint {
-        @apply mt-2 text-xs leading-5 text-[#666158];
+        @apply mt-2 text-xs leading-5 text-[#5f6f76];
     }
 
     .health-hero,
@@ -647,7 +647,7 @@
 
     .health-owner span,
     .share-hero-badge span {
-        @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8c79d];
+        @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6e848d];
     }
 
     .health-owner strong,
@@ -665,7 +665,7 @@
                 rgba(176, 151, 108, 0.28),
                 transparent 34%
             ),
-            linear-gradient(135deg, #143126, #1f4a3a);
+            linear-gradient(135deg, #10242c, #1b3a45);
     }
 
     .history-heading .eyebrow,
@@ -687,7 +687,7 @@
     .share-hero .share-eyebrow,
     .buyer-package-hero .buyer-package-eyebrow,
     .history-heading .eyebrow {
-        @apply text-[#d8c79d];
+        @apply text-[#6e848d];
     }
 
     .health-hero > div:first-child > p:last-child,
@@ -719,7 +719,7 @@
     .buyer-package-empty-state,
     .share-readiness-summary,
     .share-readiness-score {
-        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+        @apply rounded-xl border border-border bg-[#eef3f3] p-4;
     }
 
     .history-details,
@@ -747,7 +747,7 @@
     .buyer-package-meta span,
     .history-detail-label,
     .summary-label {
-        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .share-detail-card strong,
@@ -783,7 +783,7 @@
     }
 
     .state-icon {
-        @apply mx-auto grid h-[54px] w-[54px] place-items-center rounded-full bg-[#f7e6e1] text-2xl font-bold text-[#9f443d];
+        @apply mx-auto grid h-[54px] w-[54px] place-items-center rounded-full bg-[#f1ddda] text-2xl font-bold text-[#9f443d];
     }
 
     .passport-toolbar {
@@ -796,7 +796,7 @@
 
     .passport-ready-badge,
     .vehicle-count-pill {
-        @apply inline-flex items-center justify-center rounded-full border border-[#b8d3c6] bg-[#ddebe2] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#2f6c53];
+        @apply inline-flex items-center justify-center rounded-full border border-[#bfd3d6] bg-[#dcebe7] px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-[#245c54];
     }
 
     .passport-export-button {
@@ -815,11 +815,11 @@
                 rgba(176, 151, 108, 0.4),
                 transparent 34%
             ),
-            linear-gradient(135deg, #143126, #1f4a3a);
+            linear-gradient(135deg, #10242c, #1b3a45);
     }
 
     .vehicle-hero-eyebrow {
-        @apply cc-kicker text-[#d8c79d];
+        @apply cc-kicker text-[#6e848d];
     }
 
     .vehicle-hero h1 {
@@ -843,7 +843,7 @@
     }
 
     .hero-mileage span {
-        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#d8c79d];
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6e848d];
     }
 
     .hero-mileage strong {
@@ -867,7 +867,7 @@
     }
 
     .passport-meta-bar span {
-        @apply mb-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply mb-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .passport-meta-bar strong {
@@ -903,7 +903,7 @@
     .signal-label,
     .vehicle-summary-card .summary-label,
     .forecast-card span {
-        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply text-xs font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .signal-score-row {
@@ -922,7 +922,7 @@
     .forecast-card p,
     .vehicle-summary-card p,
     .muted-text {
-        @apply mt-3 text-sm leading-6 text-[#666158];
+        @apply mt-3 text-sm leading-6 text-[#5f6f76];
     }
 
     .priority-list,
@@ -953,7 +953,7 @@
     .service-record-card,
     .document-record-card,
     .health-record-card {
-        @apply rounded-2xl border border-border bg-[#f7f1e7] p-4 shadow-[0_8px_20px_rgba(33,28,18,0.05)];
+        @apply rounded-2xl border border-border bg-[#eef3f3] p-4 shadow-[0_8px_20px_rgba(20,32,39,0.05)];
     }
 
     .priority-item {
@@ -982,7 +982,7 @@
     .priority-item-content p,
     .issue-description,
     .buyer-package-record-note {
-        @apply mt-2 text-sm leading-6 text-[#475569];
+        @apply mt-2 text-sm leading-6 text-[#546670];
     }
 
     .priority-badge,
@@ -992,17 +992,17 @@
 
     .priority-badge.critical,
     .issue-risk-badge.red {
-        @apply bg-[#f5e7e3] text-[#8f2d28];
+        @apply bg-[#f1ddda] text-[#8f2d28];
     }
 
     .priority-badge.warning,
     .issue-risk-badge.orange {
-        @apply bg-[#efe2c4] text-[#7d6a44];
+        @apply bg-[#f1e5cc] text-[#735634];
     }
 
     .priority-badge.info,
     .issue-risk-badge.green {
-        @apply bg-[#ddebe2] text-[#2f6c53];
+        @apply bg-[#dcebe7] text-[#245c54];
     }
 
     .issue-grid {
@@ -1014,7 +1014,7 @@
     }
 
     .issue-card.risk-green {
-        @apply border-l-[#2f6c53];
+        @apply border-l-[#245c54];
     }
 
     .issue-card.risk-orange {
@@ -1033,7 +1033,7 @@
     .risk-preview small,
     .occurs-when,
     .issue-information span {
-        @apply text-xs leading-5 text-[#666158];
+        @apply text-xs leading-5 text-[#5f6f76];
     }
 
     .issue-information-grid,
@@ -1066,17 +1066,17 @@
 
     .risk-preview.green,
     .issue-guidance.green {
-        @apply border-[#b7d8c7] bg-[#edf6f0] text-[#2f6c53];
+        @apply border-[#bfdad3] bg-[#edf6f3] text-[#245c54];
     }
 
     .risk-preview.orange,
     .issue-guidance.orange {
-        @apply border-[#cfbe94] bg-[#f0e6d0] text-[#7d6a44];
+        @apply border-[#d8c097] bg-[#f5ead4] text-[#735634];
     }
 
     .risk-preview.red,
     .issue-guidance.red {
-        @apply border-[#e0b8b1] bg-[#f5e7e3] text-[#8f2d28];
+        @apply border-[#e2bdb6] bg-[#f1ddda] text-[#8f2d28];
     }
 
     .issue-form-actions {
@@ -1105,7 +1105,7 @@
     }
 
     .buyer-package-record-heading span {
-        @apply text-xs text-[#666158];
+        @apply text-xs text-[#5f6f76];
     }
 
     .buyer-package-footer-note {
@@ -1117,15 +1117,15 @@
     }
 
     .buyer-package-signature-card {
-        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+        @apply rounded-xl border border-border bg-[#eef3f3] p-4;
     }
 
     .buyer-package-signature-card span {
-        @apply mb-5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply mb-5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .buyer-package-signature-line {
-        @apply h-[42px] border-b-2 border-[#c4b49c];
+        @apply h-[42px] border-b-2 border-[#b8c7cb];
     }
 
     .share-readiness-score {
@@ -1133,7 +1133,7 @@
     }
 
     .share-readiness-score span {
-        @apply text-xs font-bold uppercase tracking-[0.08em] text-[#666158];
+        @apply text-xs font-bold uppercase tracking-[0.08em] text-[#5f6f76];
     }
 
     .share-readiness-score strong {
@@ -1154,7 +1154,7 @@
 
     .mileage-timeline::before {
         content: "";
-        @apply absolute bottom-5 left-[18px] top-5 w-0.5 bg-[#d3c3ae];
+        @apply absolute bottom-5 left-[18px] top-5 w-0.5 bg-[#c6d2d5];
     }
 
     .mileage-record {
@@ -1179,7 +1179,7 @@
     .document-empty-state,
     .cost-empty-state,
     .vehicle-empty-state {
-        @apply rounded-xl border border-border bg-[#f7f1e7] p-4;
+        @apply rounded-xl border border-border bg-[#eef3f3] p-4;
     }
 
     .mileage-record-heading,
@@ -1203,7 +1203,7 @@
     .vehicle-service-cost,
     .transaction-cost,
     .section-total {
-        @apply text-xs font-bold text-[#2f6c53];
+        @apply text-xs font-bold text-[#245c54];
     }
 
     .vehicle-plan-category,
@@ -1215,7 +1215,7 @@
     .cost-detail span,
     .issue-note-box span,
     .issue-date {
-        @apply text-xs leading-5 text-[#666158];
+        @apply text-xs leading-5 text-[#5f6f76];
     }
 
     .vehicle-plan-category {
@@ -1243,7 +1243,7 @@
     .vehicle-information-item span,
     .document-information span,
     .cost-detail span {
-        @apply mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6a5f];
+        @apply mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#607178];
     }
 
     .vehicle-information-item strong,
@@ -1255,19 +1255,19 @@
     }
 
     .detail-status-overdue {
-        @apply bg-[#f5e7e3] text-[#8f2d28];
+        @apply bg-[#f1ddda] text-[#8f2d28];
     }
 
     .detail-status-due-soon {
-        @apply bg-[#efe2c4] text-[#7d6a44];
+        @apply bg-[#f1e5cc] text-[#735634];
     }
 
     .detail-status-ok {
-        @apply bg-[#ddebe2] text-[#2f6c53];
+        @apply bg-[#dcebe7] text-[#245c54];
     }
 
     .detail-status-unscheduled {
-        @apply bg-[#e6e0d6] text-[#55606c];
+        @apply bg-[#dfe6e7] text-[#4f6068];
     }
 
     .vehicle-detail-status {
@@ -1297,7 +1297,7 @@
     }
 
     .consumption-box.calculated {
-        @apply border-[#b7d8c7] bg-[#edf6f0] text-[#2f6c53];
+        @apply border-[#bfdad3] bg-[#edf6f3] text-[#245c54];
     }
 
     .consumption-box strong {
@@ -1315,7 +1315,7 @@
     .document-empty-icon,
     .cost-empty-icon,
     .vehicle-empty-icon {
-        @apply mx-auto mb-4 grid h-12 w-12 place-items-center rounded-[14px] bg-[#d8d0bf] font-bold text-accent;
+        @apply mx-auto mb-4 grid h-12 w-12 place-items-center rounded-[14px] bg-[#d9e3e4] font-bold text-accent;
     }
 
     .health-empty-state h3,
@@ -1327,11 +1327,11 @@
     .document-empty-state p,
     .cost-empty-state p,
     .vehicle-empty-state p {
-        @apply mx-auto max-w-[32rem] text-sm leading-6 text-[#666158];
+        @apply mx-auto max-w-[32rem] text-sm leading-6 text-[#5f6f76];
     }
 
     .passport-footer {
-        @apply cc-panel mt-5 flex flex-wrap items-center justify-between gap-6 bg-[#e6ddd1] text-[#55606c];
+        @apply cc-panel mt-5 flex flex-wrap items-center justify-between gap-6 bg-[#dde5e7] text-[#4f6068];
     }
 
     .passport-footer-brand {
@@ -1352,6 +1352,6 @@
     }
 
     .passport-footer-brand small {
-        @apply mt-1 text-[10px] text-[#666158];
+        @apply mt-1 text-[10px] text-[#5f6f76];
     }
 }
